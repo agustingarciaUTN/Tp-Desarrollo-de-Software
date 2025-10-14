@@ -1,35 +1,46 @@
 package Usuario;
 
+import Dominio.Usuario;
+
 public class DtoUsuario {
-    private int ID_Usuario;
-    private String Nombre;
-    private String Contrasenia;
-    // private String HashContrasenia;
+    private int idUsuario;
+    private String nombre;
+    private String contrasenia;
+    private String hashContrasenia;
 
     public DtoUsuario() {
     }
-    public DtoUsuario(int ID_Usuario, String Nombre, String Contrasenia) {
-        this.Nombre = Nombre;
-        this.Contrasenia = Contrasenia;
-        this.ID_Usuario = ID_Usuario;
+
+    public DtoUsuario(int idUsuario, String nombre, String contrasenia) {
+        this.nombre = nombre;
+        this.contrasenia = contrasenia;
+        this.idUsuario = idUsuario;
+        this.hashContrasenia = new Usuario().generarHashMD5(contrasenia);
     }
 
-    public String getNombre() {
-        return Nombre;
-    }
-    public void setNombre(String Nombre) {
-        this.Nombre = Nombre;
-    }
-    public String getContrasenia() {
-        return Contrasenia;
-    }
-    public void setContrasenia(String Contrasenia) {
-        this.Contrasenia = Contrasenia;
-    }
-    public int getID_Usuario(){
-        return ID_Usuario;
-    }
-    public void setID_Usuario(int ID_Usuario){
-        this.ID_Usuario = ID_Usuario;
-    }
+
+public String getContrasenia() {
+    return contrasenia;
+}
+public void setContrasenia(String Contrasenia) {
+    this.contrasenia = Contrasenia;
+}
+public int getIdUsuario() {
+    return idUsuario;
+}
+public void setIdUsuario(int idUsuario) {
+    this.idUsuario = idUsuario;
+}
+public String getNombre() {
+    return nombre;
+}
+public void setNombre(String nombre) {
+    this.nombre = nombre;
+}
+public String getHashContrasenia() {
+    return hashContrasenia;
+}
+public void setHashContrasenia(String hashContrasenia) {
+    this.hashContrasenia = hashContrasenia;
+}
 }
