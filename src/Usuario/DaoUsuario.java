@@ -4,8 +4,9 @@ import Dominio.Usuario;
 
 public class DaoUsuario implements DaoUsuarioInterfaz {
     @Override
-    public Usuario ObtenerUsuario(int ID_Usuario){
+    public DtoUsuario ObtenerUsuario(int ID_Usuario){
         //implementacion segun base de datos u archivos a usar
+
     }
 
     @Override
@@ -23,3 +24,5 @@ public class DaoUsuario implements DaoUsuarioInterfaz {
         //implementacion segun base de datos u archivos a usar
     }
 }
+//queremos tener diferentes metodos para devolver por ej una lista de dto?
+//tenemos que controlar excepciones

@@ -8,3 +8,5 @@ public interface DaoHuespedInterfaz {
     boolean EliminarHuesped(int idUsuario);
     Huesped ObtenerHuesped(int idUsuario);
 }
+//queremos tener diferentes metodos para devolver por ej una lista de dto?
+//tenemos que controlar excepciones

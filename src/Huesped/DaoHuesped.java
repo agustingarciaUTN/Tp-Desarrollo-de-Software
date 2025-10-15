@@ -1,12 +1,13 @@
 package Huesped;
 
 import Dominio.Huesped;
+import Usuario.DtoUsuario;
 
 public class DaoHuesped implements DaoHuespedInterfaz {
-    boolean CrearHuesped(DtoHuesped dto){}
-    boolean ModificarHuesped(int idUsuario){}
-    boolean EliminarHuesped(int idUsuario){}
-    Huesped ObtenerHuesped(int idUsuario){}
+    public boolean CrearHuesped(DtoHuesped dto){}
+    public boolean ModificarHuesped(int idUsuario){}
+    public boolean EliminarHuesped(int idUsuario){}
+    public DtoHuesped ObtenerHuesped(int idUsuario){}
     /* Crear un nuevo huésped
     method CrearHuesped(DtoHuesped dto) -> boolean:
     iniciar conexión a la base de datos
@@ -51,3 +52,5 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     retornar null'''*/
 }
 
+//queremos tener diferentes metodos para devolver por ej una lista de dto?
+//tenemos que controlar excepciones

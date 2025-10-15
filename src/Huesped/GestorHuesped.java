@@ -31,4 +31,77 @@ public class GestorHuesped {
         //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
         //si apreto bien ir al cu10. y terminar.
     }
+
+    public boolean darAltaHuesped(){
+        //precondicion haberse ejecutado el cu2, buscar huesped
+        //una vez ejecutado el buscarHuesped(), se puede ahora ejecutar este
+
+        //pantalla presenta datos, inputs (algunos obligariorios y otros no)
+        // y botones Siguiente y Cancelar
+
+            //no ingresa todos los obligatorios y toca siguiente
+            //Mostramos un mensaje de error detallando cada una de las omisiones. (podemos concatenar un string si es que falla)
+            //vuelve a pedir ingreso de datos
+
+            //ya existe el dni, mostrar mensaje CUIDADO ...
+            //Botones aceptar igualmente o corregir
+                //Aceptar igualmente lleva a seguir por el flujo normal
+                //Corregir vuelve a pedir el ingreso del dni solamente
+
+            //Cancelar
+            //mensaje ¿Desea cancelar el alta del huésped? Y los botones Si y No.
+                //Si, termina el metodo
+                //no, regresa al principio del metodo
+
+        //Registramos el huesped, persistimos en bdd
+        //“El huésped nombres y apellido ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro?
+        //Botones Si No
+        //No y termina
+        //Si y volves al principio de todo
+
+    }
+
+    public boolean modificarHuesped(){
+        //ponemos todos los datos del huesped en pantalla
+        //Botones SIGUIENTE, CANCELAR Y BORRAR
+
+            //el actor blaquea 1 o + datos y toca SIGUIENTE
+            //mostramos mensaje detallando omisiones hechas
+            //volvemos al paso anterior
+
+            //ya existe el document
+            //misma logica que el dar el alta
+
+            //Cancelar
+            //misma logica que dar de alta
+
+            //BORRAR
+            //ejecutar cu11 "dar de baja huesped"
+
+        //Modifica los datos, toca siguiente
+        //actualizamos los datos, persistir con dao en la bdd
+        //mensaje de exito
+        //termina
+    }
+
+    public boolean darDeBajaHuesped(){
+        //primero verificar que existe
+        //ejecutar el buscarHuesped()
+
+            //si no existe, no se ejecuta y mostramos mensaje de que no existe.
+
+        //Verificar si el huesped se alojo alguna vez en el hotel (hizo el check in)
+            //si lo hizo, no se pde eliminar
+            //mostramos mensaje correspondiente
+            //presione cualq tecla y termina el cu
+
+        //Mostramos los datos, nombre, apellido, tipoDoc, nroDoc
+        //Botones ELIMINAR CANCELAR0
+            //toca Cancelar
+            //termina el cu
+
+        //toca Eliminar, borramos el huesped. Se ocupa el DAO
+        //mostramos mensaje de eliminacion y presione cualq tecla,
+        //termina el cu
+    }
 }
