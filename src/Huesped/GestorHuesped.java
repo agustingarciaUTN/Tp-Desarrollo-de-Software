@@ -1,6 +1,6 @@
 package Huesped;
 
-
+//puto el que lee
 import Dominio.Huesped;
 
 public class GestorHuesped {
