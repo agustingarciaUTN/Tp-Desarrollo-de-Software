@@ -2,6 +2,7 @@ package Huesped;
 
 //puto el que lee
 import Dominio.Huesped;
+import java.util.List;
 
 public class GestorHuesped {
     //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
@@ -27,6 +28,7 @@ public class GestorHuesped {
         // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
        
         List<DtoHuesped> listaHuespedes;
+
         
         if (datos.estanVacios()) {
             listaHuespedes = DaoHuesped.obtenerTodosLosHuespedes(); 
