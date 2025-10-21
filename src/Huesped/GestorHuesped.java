@@ -11,7 +11,7 @@ public class GestorHuesped {
         this.dao = dao;
     }
 
-    public boolean buscarHuesped(){
+    public boolean buscarHuesped(DtoHuesped datos){
         // presentar en pantalla los inputs necesarios de
         //apellido.
         //▪ Nombres.
@@ -23,9 +23,18 @@ public class GestorHuesped {
         //Según el diagrama de secuencia el ingreso y presionar buscar se hace en la pantalla
         // y luego se le pasan los datos ingresados al gestor, y se maneja lo de que no 
         // ingrese ningún dato o algunos.
-
         //dao busca con los criterios pasados los huespedes, devuelve dtos? -> Esto va en la
         // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
+       
+        List<DtoHuesped> listaHuespedes;
+        
+        if (datos.estanVacios()) {
+            listaHuespedes = DaoHuesped.obtenerTodosLosHuespedes(); 
+        }
+        else {
+            listaHuespedes = DaoHuesped.obtenerHuespedesPorCriterios(datos);
+        }
+        
         //ver si existe concordancia, si no pasar al cu11 y finalizar este cu.
         //si encuentra seguir
         // presentar los datos de los dto encontrados en pantalla de la manera correcta
@@ -35,6 +44,15 @@ public class GestorHuesped {
         //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
         //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
         // esto tampoco lo hace el gestor
+        
+        if (listaHuespedes.isEmpty()) {
+            pantalla.mostrarListaVacia();
+            this.darAltaHuesped ();
+        }
+        else {
+            pantalla.mostrarListaHuespedes(listaHuespedes);
+        }
+        
     }
 
     public boolean darAltaHuesped(){
