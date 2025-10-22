@@ -1,11 +1,12 @@
 package Dominio;
 
 public class Direccion {
+    private int ID;
     private String calle;
     private int numero;
     private String departamento;
     private int piso;
-    private int cod_postal;
+    private int codPostal;
     private String localidad;
     private String provincia;
     private String pais;
@@ -15,12 +16,12 @@ public class Direccion {
     }
 
     // Constructor con todos los datos
-    public Direccion(String calle, int numero, String departamento, int piso, int cod_postal, String localidad, String provincia, String pais) {
+    public Direccion(String calle, int numero, String departamento, int piso, int codPostal, String localidad, String provincia, String pais) {
         this.calle = calle;
         this.numero = numero;
         this.departamento = departamento;
         this.piso = piso;
-        this.cod_postal = cod_postal;
+        this.codPostal = codPostal;
         this.localidad = localidad;
         this.provincia = provincia;
         this.pais = pais;
@@ -36,6 +37,7 @@ public class Direccion {
     }
 
     // Getters y Setters
+    public void setId(int ID){this.ID = ID;}
     public String getCalle() {
         return calle;
     }
@@ -60,11 +62,11 @@ public class Direccion {
     public void setPiso(int piso) {
         this.piso = piso;
     }
-    public int getCod_postal() {
-        return cod_postal;
+    public int getCodPostal() {
+        return codPostal;
     }
-    public void setCod_postal(int cod_postal) {
-        this.cod_postal = cod_postal;
+    public void setCodPostal(int codPostal) {
+        this.codPostal = codPostal;
     }
     public String getLocalidad() {
         return localidad;
