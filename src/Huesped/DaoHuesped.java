@@ -6,6 +6,11 @@ import Dominio.Huesped;
 import Usuario.DtoUsuario;
 import BaseDeDatos.Coneccion;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class DaoHuesped implements DaoHuespedInterfaz {
     public boolean crearHuesped(DtoHuesped dto){
      
@@ -15,45 +20,125 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     public boolean eliminarHuesped(int idUsuario){}
     
     public List<DtoHuesped> obtenerTodosLosHuespedes (){
-        // 1. Preparamos la lista que vamos a devolver
+       
         List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
-        
-        // 2. Definimos la consulta SQL (asegúrate que los nombres de las columnas coincidan)
+
         String sql = "SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped";
-
-        // 3. Usamos try-with-resources para manejar la conexión y la sentencia
-        try (Connection conn = ConnectionManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            // 4. Iteramos sobre los resultados de la consulta
+        //Usamos try-with-resources para manejar la conexión y la sentencia
+        try (Connection conn = Coneccion.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);) {
+        //Crear los recursos para la conexion y las interacciones con la base de datos
+        // aca hace que Java invoque .close() automaticamente para cerrarlos en caso de error
+        // o que termine el metodo y te ahorra un bloque finally
+      
             while (rs.next()) {
                 // Para cada fila, creamos un nuevo DTO
                 DtoHuesped huespedDTO = new DtoHuesped();
                 
-                // 5. Mapeamos cada columna al atributo correspondiente del DTO
+                //Mapeamos cada columna al atributo correspondiente del DTO
                 huespedDTO.setApellido(rs.getString("apellido"));
                 huespedDTO.setNombres(rs.getString("nombres"));
-                huespedDTO.setTipoDocumento(rs.getString("tipo_documento"));
-                huespedDTO.setNumeroDocumento(rs.getString("numero_documento"));
-                // ... setear los otros atributos si los hubiera ...
+                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                
+                //Para el enum cambia
+                //Primero leemos el tipo de documento como string y despues lo convertimos a enum
+                String tipoDocumentoStr = rs.getString("tipo_documento");
+                try {
+                 if (tipoDocumentoStr != null) {
+                 huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
+                }
+                } catch (IllegalArgumentException e) {
+                  System.err.println("Valor de tipo_documento no válido en la BD: " + tipoDocumentoStr);
+                }
 
-                // 6. Añadimos el DTO a nuestra lista
+                //Añadimos el DTO a nuestra lista
                 huespedesEncontrados.add(huespedDTO);
             }
 
         } catch (SQLException e) {
-            // Un buen manejo de errores es crucial en una aplicación real
             System.err.println("Error al obtener los huéspedes de la base de datos: " + e.getMessage());
-            // Aquí podrías lanzar una excepción personalizada
         }
 
-        // 7. Devolvemos la lista (puede estar vacía, pero nunca será nula)
+        //Devolvemos la lista (puede estar vacía, pero nunca será nula)
         return huespedesEncontrados;
     }
     
-    public DtoHuesped obtenerHuesped(int idUsuario){
+    public List<DtoHuesped> obtenerHuespedesPorCriterio(DtoHuesped criterios){
     
+        List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
+        
+        StringBuffer sql = new StringBuffer("SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped WHERE 1=1");
+        
+        //Creamos una lista para guardar los parámetros que realmente usaremos
+        List<Object> params = new ArrayList<>();
+
+        //Añadimos las condiciones a la consulta dinámicamente
+        if (criterios.getApellido() != null && !criterios.getApellido().trim().isEmpty()) {
+            sql.append(" AND apellido LIKE ?");
+            // Usamos LIKE para buscar apellidos que "empiecen con" el criterio
+            params.add(criterios.getApellido() + "%"); 
+        }
+        if (criterios.getNombres() != null && !criterios.getNombres().trim().isEmpty()) {
+            sql.append(" AND nombres LIKE ?");
+            params.add(criterios.getNombres() + "%");
+        }
+        if (criterios.getTipoDocumento() != null) {
+            sql.append(" AND tipo_documento = ?");
+            params.add(criterios.getTipoDocumento().name()); //.name() es para devolver el valor del enum como string
+        }
+        if (criterios.getDocumento() > 0) {
+            sql.append(" AND numero_documento = ?");
+            params.add(criterios.getDocumento());
+        }
+
+        //Ejecutamos la consulta con los parámetros recolectados
+        try (Connection conn = Coneccion.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString());) {
+
+            // Asignamos los parámetros con sus tipos correctos
+           for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    pstmt.setString(i + 1, (String) param);
+                } else if (param instanceof Long) {
+                    pstmt.setLong(i + 1, (Long) param);
+                }
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                //Mapeamos los resultados a DTOs
+                 while (rs.next()) {
+                // Para cada fila, creamos un nuevo DTO
+                DtoHuesped huespedDTO = new DtoHuesped();
+                
+                //Mapeamos cada columna al atributo correspondiente del DTO
+                huespedDTO.setApellido(rs.getString("apellido"));
+                huespedDTO.setNombres(rs.getString("nombres"));
+                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                
+                //Para el enum cambia
+                //Primero leemos el tipo de documento como string y despues lo convertimos a enum
+                String tipoDocumentoStr = rs.getString("tipo_documento");
+                try {
+                 if (tipoDocumentoStr != null) {
+                 huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
+                }
+                } catch (IllegalArgumentException e) {
+                  System.err.println("Valor de tipo_documento no válido en la BD: " + tipoDocumentoStr);
+                }
+
+                //Añadimos el DTO a nuestra lista
+                huespedesEncontrados.add(huespedDTO);
+            }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al buscar huéspedes por criterio: " + e.getMessage());
+        }
+
+        return huespedesEncontrados;
+        
     }
     /* Crear un nuevo huésped
     method CrearHuesped(DtoHuesped dto) -> boolean:
