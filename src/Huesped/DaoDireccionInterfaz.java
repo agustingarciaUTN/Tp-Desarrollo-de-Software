@@ -1,7 +1,9 @@
 package Huesped;
 
+import Excepciones.PersistenciaException;
+
 public interface DaoDireccionInterfaz {
-    boolean CrearDireccion(DtoDireccion dto);
+    DtoDireccion CrearDireccion(DtoDireccion dto) throws PersistenciaException;
     boolean ModificarDireccion(int idDireccion);
     boolean EliminarDireccion(int idDireccion);
     DtoDireccion ObtenerDireccion(int idDireccion);
