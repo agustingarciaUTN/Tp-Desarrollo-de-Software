@@ -5,9 +5,14 @@ import Dominio.Huesped;
 public class GestorHuesped {
     //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
     // solo si se autentico antes el conserje
-    private final DaoHuespedInterfaz dao;
-    public GestorHuesped(DaoHuespedInterfaz dao) {
-        this.dao = dao;
+
+    //los daos que utilizara el gestor (son de tipo interfaz por SOLID)
+    private final DaoHuespedInterfaz daoHuesped;
+    private final DaoDireccionInterfaz daoDireccion;
+
+    public GestorHuesped(DaoHuespedInterfaz daoHuesped, DaoDireccionInterfaz daoDireccion) {
+        this.daoHuesped = daoHuesped;
+        this.daoDireccion = daoDireccion;
     }
 
     public boolean buscarHuesped(){
