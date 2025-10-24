@@ -31,6 +31,10 @@ public class DtoHuesped {
         this.ocupacion = ocupacion;
         this.nacionalidad = nacionalidad;
     }
+    
+    public DtoHuesped (){
+        
+    }
 
     // Getters y Setters
     public String getNombres() {
