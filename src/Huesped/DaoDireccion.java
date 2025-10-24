@@ -54,7 +54,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
             }
             catch (SQLException e) {
                 // El TP te pide excepciones propias, tendriamos que crear una aca para dar un mensaje personalizado
-                e.printStackTrace(); // Dejamos esto para ver el error en consola
+                e.printStackTrace(); // Dejamos esto para ver el error en consola.
                 //lanzamos la excepcion personalizada que debe ser manejada en el GestorHuesped
                 throw new PersistenciaException("Error al intentar crear la dirección en la BD", e);
             }
