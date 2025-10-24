@@ -56,6 +56,23 @@ public class GestorHuesped {
             pantalla.mostrarListaHuespedes(listaHuespedes);
         }
         
+        // presentar los datos de los dto encontrados en pantalla de la manera correcta
+        // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
+        //Seleccionar una persona de alguna manera -> no lo hace el gestor
+        //Presiona siguiente. -> no lo hace el gestor
+        //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
+        //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
+        // esto tampoco lo hace el gestor
+        
+    }
+    
+    public void seleccionaHuesped (DtoHuesped huespedSeleccionado) {
+        if (huespedSeleccionado == null) {
+            this.darAltaHuesped();
+        }
+        else {
+            this.modificarHuesped();
+        }
     }
 
     public boolean darAltaHuesped(){
