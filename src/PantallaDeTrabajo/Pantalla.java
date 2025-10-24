@@ -41,6 +41,7 @@ public class Pantalla {
             if (opcionBoton == 1) {//presiono SIGUIENTE
                 System.out.println("Procesando datos...");
 
+
                 //aca hay que llamar al gestor para que valide los datos
                 //List<String> errores = gestorHuesped.validarDatos(datosIngresados);
                 List<String> errores = new ArrayList<>();
