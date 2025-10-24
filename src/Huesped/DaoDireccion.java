@@ -6,14 +6,14 @@ import java.sql.*;
 public class DaoDireccion implements DaoDireccionInterfaz {
 
         //estos son los atributos que necesita la clase para conectarse a la DB
-        private static final String DB_URL =;
-        private static final String USER =;
-        private static final String PASS =;
+        //private static final String URL = "jdbc:postgresql://ep-red-truth-aczpiy6y-pooler.sa-east-1.aws.neon.tech:5432/neondb?sslmode=require";
+        //private static final String USUARIO = "neondb_owner";
+        //private static final String CONTRASENIA = "npg_QufXyUrW7aL9";
 
         //metodo para realizarla coneccion a la DB
-        private Connection getConnection() throws SQLException{
-            return DriverManager.getConnection(DB_URL, USER, PASS);
-        }
+        //private Connection getConnection() throws SQLException{
+        //    return DriverManager.getConnection(URL, USUARIO, CONTRASENIA);
+        //}
 
         //debe ser tipo DtoDireccion porque necesitamos el ID de la Direccion creada para asignarla al Huesped
         @Override
@@ -24,7 +24,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
             //Cualquier objeto que pongamos dentro de los paréntesis del try (try (...)) será cerrado automáticamente por Java al final del bloque. No importa si el código termina bien o si falla con una excepción.
 
             //el primer try maneja la coneccion y la sentencia
-            try (Connection conn = this.getConnection();
+            try (Connection conn = this.getConnection();//ACA HAY QUE VER COMO PASARLE EL OBJETO PARA CONECTARSE
                  PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
                 pstmt.setString(1, dto.getCalle());
