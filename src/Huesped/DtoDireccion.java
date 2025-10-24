@@ -1,6 +1,7 @@
 package Huesped;
 
 public class DtoDireccion {
+    private int ID;
     private String calle;
     private int numero;
     private String departamento;
@@ -23,6 +24,7 @@ public class DtoDireccion {
     }
 
     // Getters y Setters
+    public void setId(int ID){this.ID = ID;}
     public String getCalle() {
         return calle;
     }
