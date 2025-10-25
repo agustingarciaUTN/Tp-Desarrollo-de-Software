@@ -1,15 +1,20 @@
 package PantallaDeTrabajo;
 
 import Huesped.*;
+import enums.PosIva;
+import enums.TipoDocumento;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class Pantalla {
 
     private GestorHuesped gestorHuesped;
-    private Scanner scanner;//para la entrada por teclado
+    private final Scanner scanner;//para la entrada por teclado
 
     //constructor (hay que ver como lo vamos a llamar)
     public Pantalla(){
@@ -73,7 +78,7 @@ public class Pantalla {
                 }
 
             } else if (opcionBoton == 2) {//presiono CANCELAR
-                System.out.println("¿Desea cancelar el alta del huesped? (SI/NO): ");
+                System.out.println("¿Desea cancelar el alta del huésped? (SI/NO): ");
 
                 //validacion de ingreso correcto (capaz esto puede ser una funcion aparte, habria que ver como manejar los mensajes distintos)
                 String ingresoCancelarAlta = scanner.nextLine();
@@ -99,8 +104,116 @@ public class Pantalla {
     //metodo privado para pedir los datos del huesped a ingresar
     private DtoHuesped mostrarYPedirDatosFormulario(){
 
+        System.out.println("Apellido: ");
+        String apellido = scanner.nextLine();
 
-        return new DtoHuesped();
+        System.out.println("Nombres: ");
+        String nombres = scanner.nextLine();
+
+        System.out.println("Tipo de Documento (DNI, LE, LC, PASAPORTE, OTRO): ");//poner todos en mayuscula facilita la validacion
+        String tipoDocStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
+        TipoDocumento tipoDocumento = null;
+        try {
+            tipoDocumento = TipoDocumento.valueOf(tipoDocStr); // Convierte String a Enum
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: Tipo de documento inválido.");
+            // Manejar el error, volver a pedir
+            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
+            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
+
+            /*Poner la lectura dentro de un bucle while.
+
+            Dentro del while, usar un try-catch.
+
+            Si el try funciona (el dato se parsea bien), salís del while.
+
+            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
+        }
+
+        System.out.println("Numero de Documento: ");
+        long numeroDocumento = scanner.nextLong();
+        scanner.nextLine(); //consumir salto de línea
+
+        System.out.println("CUIT: ");//no obligatorio
+        String cuit = scanner.nextLine();
+
+        System.out.println("Posición Frente al IVA (Consumidor Final, Monotributista, Responsable Inscripto, Excento): ");//por defecto consumidor final
+        String posIvaStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
+        PosIva posIva = null;
+        try {
+            posIva = PosIva.valueOf(posIvaStr); // Convierte String a Enum
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: Posición Frente al IVA inválida.");
+            // Manejar el error, volver a pedir
+            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
+            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
+            //aca se aniade la complejidad de validar consumidor final, teniendo en cuenta que el valor del enum es ConsumidorFinal, sin espacios
+        }
+
+        System.out.println("Fecha de Nacimiento (dd/mm/aaaa): ");
+        String fechaNacimientoString = scanner.nextLine();
+        Date fechaNacimiento = null;
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            fechaNacimiento = formatoFecha.parse(fechaNacimientoString);
+        } catch (ParseException e) {
+            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy.");
+            // manejar reintento o dejar fechaNacimiento en null según la lógica de la aplicación
+            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
+            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A DATE
+        }
+
+        System.out.println("Calle: ");
+        String calleDireccion = scanner.nextLine();
+
+        System.out.println("Numero: ");
+        int numeroDireccion = scanner.nextInt();
+        scanner.nextLine(); //consumir salto de línea
+
+        System.out.println("Departamento: ");//supongo que es opcional
+        String departamentoDireccion = scanner.nextLine();
+
+        System.out.println("Piso: ");//supongo que es opcional
+        int pisoDireccion = scanner.nextInt();
+        scanner.nextLine(); //consumir salto de línea
+
+        System.out.println("Codigo Postal: ");
+        int codPostalDireccion = scanner.nextInt();
+        scanner.nextLine(); //consumir salto de línea
+
+        System.out.println("Localidad: ");
+        String localidadDireccion = scanner.nextLine();
+
+        System.out.println("Provincia: ");
+        String provinciaDireccion = scanner.nextLine();
+
+        System.out.println("Pais: ");
+        String paisDireccion = scanner.nextLine();
+
+        System.out.println("Telefono: ");
+        int telefono = scanner.nextInt();
+        scanner.nextLine(); //consumir salto de línea
+
+        System.out.println("Email: ");//no obligatorio
+        String email = scanner.nextLine();
+
+        System.out.println("Ocupacion: ");
+        String ocupacion = scanner.nextLine();
+
+        System.out.println("Nacionalidad: ");
+        String nacionalidad = scanner.nextLine();
+
+        // Crear los DTOs (aún no tenemos el ID de dirección)
+        DtoDireccion direccionDto = new DtoDireccion(calleDireccion, numeroDireccion, departamentoDireccion, pisoDireccion, codPostalDireccion, localidadDireccion, provinciaDireccion, paisDireccion);
+        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumento, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
+
+        //asociamos el la direccion con el huesped
+        huespedDto.setDireccion(direccionDto);
+
+
+        System.out.println("--- Fin Formulario ---");
+        return huespedDto; // Devolver el DTO con los datos cargados
+
     }
 
 
