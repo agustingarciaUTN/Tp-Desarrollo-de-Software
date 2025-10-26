@@ -1,17 +1,14 @@
 package Huesped;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import Dominio.Huesped;
 import Usuario.DtoUsuario;
 import BaseDeDatos.Coneccion;
+import enums.TipoDocumento;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DaoHuesped implements DaoHuespedInterfaz {
@@ -39,15 +36,15 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     public boolean modificarHuesped(int idUsuario){}
     public boolean eliminarHuesped(int idUsuario){}
     
-    public List<DtoHuesped> obtenerTodosLosHuespedes (){
+    public ArrayList<DtoHuesped> obtenerTodosLosHuespedes (){
        
         List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
 
         String sql = "SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped";
         //Usamos try-with-resources para manejar la conexión y la sentencia
         try (Connection conn = Coneccion.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql);) {
         //Crear los recursos para la conexion y las interacciones con la base de datos
         // aca hace que Java invoque .close() automaticamente para cerrarlos en caso de error
         // o que termine el metodo y te ahorra un bloque finally
@@ -84,7 +81,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         return huespedesEncontrados;
     }
     
-    public List<DtoHuesped> obtenerHuespedesPorCriterio(DtoHuesped criterios){
+    public ArrayList<DtoHuesped> obtenerHuespedesPorCriterio(DtoHuesped criterios){
     
         List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
         
