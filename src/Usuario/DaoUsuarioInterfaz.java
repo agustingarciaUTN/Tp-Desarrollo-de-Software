@@ -6,7 +6,6 @@ public interface DaoUsuarioInterfaz {
     boolean ModificarUsuario(int idUsuario);
     boolean EliminarUsuario(int idUsuario);
     DtoUsuario ObtenerUsuario(int idUsuario);
+    DtoUsuario ObtenerUsuarioPorNombre(String nombre);
 }
 
-//queremos tener diferentes metodos para devolver por ej una lista de dto?
-//tenemos que controlar excepciones
