@@ -127,7 +127,7 @@ public class Pantalla {
 
             Si el try funciona (el dato se parsea bien), salís del while.
 
-            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
+            .Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
         }
 
         System.out.println("Numero de Documento: ");
