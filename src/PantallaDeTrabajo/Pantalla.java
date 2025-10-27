@@ -58,7 +58,7 @@ public class Pantalla {
                         System.out.println("- " + error);
                     }
                     System.out.println("Por favor, ingrese los datos nuevamente");
-                    continue; //fuerza al inicio del while
+                    continue; //fuerzaa al inicio del while
                 }
 
                 System.out.println("El huésped '" + datosIngresados.getNombres() + " " + datosIngresados.getApellido() +"' ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro? (SI/NO)");
