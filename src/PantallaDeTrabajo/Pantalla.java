@@ -39,7 +39,7 @@ public class Pantalla {
             DtoHuesped datosIngresados = mostrarYPedirDatosFormulario();
 
             System.out.println("Acciones: 1 = SIGUIENTE, 2 = CANCELAR");
-            System.out.println("Ingrese una opcion: ");
+            System.out.println("Ingrese una opción: ");
             int opcionBoton = scanner.nextInt();
             scanner.nextLine();//para consumir el salto de linea
 
@@ -48,8 +48,9 @@ public class Pantalla {
 
 
                 //aca hay que llamar al gestor para que valide los datos
-                //List<String> errores = gestorHuesped.validarDatos(datosIngresados);
                 List<String> errores = new ArrayList<>();
+                errores = gestorHuesped.validarDatos(datosIngresados);
+
 
                 if(!errores.isEmpty()){
                     System.out.println("ERROR: Se encontraron los siguientes errores: ");
@@ -60,15 +61,15 @@ public class Pantalla {
                     continue; //fuerza al inicio del while
                 }
 
-                System.out.println("El huesped '" + datosIngresados.getNombres() + " " + datosIngresados.getApellido() +"' ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro? (SI/NO)");
+                System.out.println("El huésped '" + datosIngresados.getNombres() + " " + datosIngresados.getApellido() +"' ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro? (SI/NO)");
 
-                System.out.println("¿Desea cargar otro huesped? (SI/NO): ");
+                System.out.println("¿Desea cargar otro huésped? (SI/NO): ");
 
                 //validacion de ingreso correcto
                 String ingresoOtroHuesped = scanner.nextLine();
                 while (!ingresoOtroHuesped.equalsIgnoreCase("NO") && !ingresoOtroHuesped.equalsIgnoreCase("SI")) {
                     //no se si aca hay que consumir salto de linea o no
-                    System.out.println("Ingreso invalido. ¿Desea cargar otro huesped? (SI/NO): ")
+                    System.out.println("Ingreso invalido. ¿Desea cargar otro huésped? (SI/NO): ");
                     ingresoOtroHuesped = scanner.nextLine();
                 }
 
@@ -110,76 +111,31 @@ public class Pantalla {
         System.out.println("Nombres: ");
         String nombres = scanner.nextLine();
 
-        System.out.println("Tipo de Documento (DNI, LE, LC, PASAPORTE, OTRO): ");//poner todos en mayuscula facilita la validacion
-        String tipoDocStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
-        TipoDocumento tipoDocumento = null;
-        try {
-            tipoDocumento = TipoDocumento.valueOf(tipoDocStr); // Convierte String a Enum
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: Tipo de documento inválido.");
-            // Manejar el error, volver a pedir
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
+        TipoDocumento tipoDocumento = pedirTipoDocumento();
 
-            /*Poner la lectura dentro de un bucle while.
+        long numeroDocumento = pedirLong("Número de Documento: ");
 
-            Dentro del while, usar un try-catch.
-
-            Si el try funciona (el dato se parsea bien), salís del while.
-
-            .Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
-        }
-
-        System.out.println("Numero de Documento: ");
-        long numeroDocumento = scanner.nextLong();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("CUIT: ");//no obligatorio
+        System.out.println("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
         String cuit = scanner.nextLine();
-
-        System.out.println("Posición Frente al IVA (Consumidor Final, Monotributista, Responsable Inscripto, Excento): ");//por defecto consumidor final
-        String posIvaStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
-        PosIva posIva = null;
-        try {
-            posIva = PosIva.valueOf(posIvaStr); // Convierte String a Enum
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: Posición Frente al IVA inválida.");
-            // Manejar el error, volver a pedir
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
-            //aca se aniade la complejidad de validar consumidor final, teniendo en cuenta que el valor del enum es ConsumidorFinal, sin espacios
+        if (cuit.trim().isEmpty()) { // trim() quita espacios en blanco al inicio y final
+            cuit = null;
         }
 
-        System.out.println("Fecha de Nacimiento (dd/mm/aaaa): ");
-        String fechaNacimientoString = scanner.nextLine();
-        Date fechaNacimiento = null;
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            fechaNacimiento = formatoFecha.parse(fechaNacimientoString);
-        } catch (ParseException e) {
-            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy.");
-            // manejar reintento o dejar fechaNacimiento en null según la lógica de la aplicación
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A DATE
-        }
+        PosIva posIva = pedirPosIva();
+
+        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
 
         System.out.println("Calle: ");
         String calleDireccion = scanner.nextLine();
 
-        System.out.println("Numero: ");
-        int numeroDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
+        int numeroDireccion = pedirEntero("Número de calle: ");
 
         System.out.println("Departamento: ");//supongo que es opcional
         String departamentoDireccion = scanner.nextLine();
 
-        System.out.println("Piso: ");//supongo que es opcional
-        int pisoDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
+        int pisoDireccion = pedirEntero("Piso (ingrese 0 si no aplica): ");
 
-        System.out.println("Codigo Postal: ");
-        int codPostalDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
+        int codPostalDireccion = pedirEntero("Código Postal: ");
 
         System.out.println("Localidad: ");
         String localidadDireccion = scanner.nextLine();
@@ -190,12 +146,13 @@ public class Pantalla {
         System.out.println("Pais: ");
         String paisDireccion = scanner.nextLine();
 
-        System.out.println("Telefono: ");
-        int telefono = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
+        int telefono = pedirEntero("Teléfono: ");
 
-        System.out.println("Email: ");//no obligatorio
+        System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
         String email = scanner.nextLine();
+        if (email.trim().isEmpty()) {
+            email = null;
+        }
 
         System.out.println("Ocupacion: ");
         String ocupacion = scanner.nextLine();
@@ -220,13 +177,59 @@ public class Pantalla {
 
 
 
+    private int pedirEntero(String mensaje) {
+        int valor = 0;
+        boolean valido = false;
+        while (!valido) {
+            System.out.print(mensaje);
+            try {
+                valor = scanner.nextInt();
+                scanner.nextLine();
+                valido = true;      //si llega aca, el número es válido
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("Error: Ingrese un número entero válido.");
+                scanner.nextLine(); // Limpiar la entrada incorrecta del scanner antes de repetir
+            }
+        }
+        return valor;
+    }
 
+    private long pedirLong(String mensaje) {
+        long valor = 0;
+        boolean valido = false;
+        while (!valido) {
+            System.out.print(mensaje);
+            try {
+                valor = scanner.nextLong();
+                scanner.nextLine(); // Consumir salto de línea
+                valido = true;
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("Error: Ingrese un número válido.");
+                scanner.nextLine(); // Limpiar entrada incorrecta
+            }
+        }
+        return valor;
+    }
 
+    private Date pedirFecha(String mensaje) {
+        Date fecha = null;
+        boolean valida = false;
+        //definimos el formato que queremos
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+        formatoFecha.setLenient(false); // No permite fechas inválidas (ej: 31/02)
 
-
-
-
-
+        while (!valida) {
+            System.out.print(mensaje);
+            String fechaStr = scanner.nextLine();
+            try {
+                fecha = formatoFecha.parse(fechaStr);
+                valida = true; // Si el parseo funciona, la fecha es válida en formato
+            } catch (ParseException e) {
+                System.out.println("Error: Formato de fecha inválido. Use dd/MM/yyyy.");
+                // El bucle se repite para volver a pedir
+            }
+        }
+        return fecha;
 
 
 
@@ -263,3 +266,68 @@ public class Pantalla {
 
 
 }
+
+    private TipoDocumento pedirTipoDocumento() {
+        TipoDocumento tipoDoc = null;
+        boolean valido = false;
+
+        // Mostrar opciones válidas construyendo un String
+        StringBuilder opciones = new StringBuilder("Tipo de Documento (");
+        TipoDocumento[] valores = TipoDocumento.values();
+        for (int i = 0; i < valores.length; i++) {
+            opciones.append(valores[i].name()); // .name() devuelve el nombre del enum (DNI, LE, etc.)
+            if (i < valores.length - 1) {
+                opciones.append("/");
+            }
+        }
+        opciones.append("): ");
+
+        while (!valido) {
+            System.out.print(opciones.toString());
+            String tipoDocStr = scanner.nextLine().toUpperCase().trim(); // A mayúsculas y sin espacios
+            try {
+                tipoDoc = TipoDocumento.valueOf(tipoDocStr); // Intenta convertir String a Enum
+                valido = true; // Si funciona, es válido
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: Tipo de documento inválido. Ingrese una de las opciones.");
+                // El bucle se repite
+            }
+        }
+        return tipoDoc;
+    }
+
+    private PosIva pedirPosIva() {
+        PosIva posIva = null;
+        boolean valido = false;
+
+        // Mostrar opciones
+        StringBuilder opciones = new StringBuilder("Posición IVA (");
+        PosIva[] valores = PosIva.values();
+        for(int i=0; i<valores.length; i++){
+            opciones.append(valores[i].name());
+            if(i < valores.length - 1){
+                opciones.append("/");
+            }
+        }
+        opciones.append(", por defecto Consumidor_Final): "); // Aclarar el default
+
+        while(!valido){
+            System.out.print(opciones.toString());
+            String posIvaStr = scanner.nextLine().toUpperCase().trim();
+
+            // Permitir Enter para el valor por defecto
+            if (posIvaStr.isEmpty()) {
+                posIva = PosIva.Consumidor_Final; // Asignar el default
+                valido = true;
+            } else {
+                try {
+                    posIva = PosIva.valueOf(posIvaStr);
+                    valido = true;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para Consumidor_Final.");
+                }
+            }
+        }
+        return posIva;
+    }
+
