@@ -49,7 +49,7 @@ public class Pantalla {
 
                 //aca hay que llamar al gestor para que valide los datos
                 List<String> errores = new ArrayList<>();
-                errores = gestorHuesped.validarDatos(datosIngresados);
+                errores = gestorHuesped.validarDatosHuesped(datosIngresados);
 
 
                 if(!errores.isEmpty()){
@@ -128,14 +128,14 @@ public class Pantalla {
         System.out.println("Calle: ");
         String calleDireccion = scanner.nextLine();
 
-        int numeroDireccion = pedirEntero("Número de calle: ");
+        Integer numeroDireccion = pedirEntero("Número de calle: ");
 
         System.out.println("Departamento: ");//supongo que es opcional
         String departamentoDireccion = scanner.nextLine();
 
-        int pisoDireccion = pedirEntero("Piso (ingrese 0 si no aplica): ");
+        Integer pisoDireccion = pedirEntero("Piso (ingrese 0 si no aplica): ");
 
-        int codPostalDireccion = pedirEntero("Código Postal: ");
+        Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
         System.out.println("Localidad: ");
         String localidadDireccion = scanner.nextLine();
@@ -146,7 +146,7 @@ public class Pantalla {
         System.out.println("Pais: ");
         String paisDireccion = scanner.nextLine();
 
-        int telefono = pedirEntero("Teléfono: ");
+        Integer telefono = pedirEntero("Teléfono: ");
 
         System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
         String email = scanner.nextLine();
@@ -177,18 +177,22 @@ public class Pantalla {
 
 
 
-    private int pedirEntero(String mensaje) {
-        int valor = 0;
+    private Integer pedirEntero(String mensaje) {
+        Integer valor = null; // Usamos la clase wrapper para permitir null
         boolean valido = false;
         while (!valido) {
-            System.out.print(mensaje);
-            try {
-                valor = scanner.nextInt();
-                scanner.nextLine();
-                valido = true;      //si llega aca, el número es válido
-            } catch (java.util.InputMismatchException e) {
-                System.out.println("Error: Ingrese un número entero válido.");
-                scanner.nextLine(); // Limpiar la entrada incorrecta del scanner antes de repetir
+            String entrada = scanner.nextLine(); // leemos siempre como String
+
+            if (entrada.trim().isEmpty()) {
+                valido = true; // omitir es una entrada válida (valida el gestor, regla de negocio)
+                valor = null;
+            } else {
+                try {
+                    valor = Integer.parseInt(entrada); // intentamos convertir el String a int
+                    valido = true;      // Si funciona, es válido
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Ingrese un número entero válido o presione Enter para omitir.");
+                }
             }
         }
         return valor;

@@ -4,6 +4,8 @@ package Huesped;
 
 import Dominio.Huesped;
 
+import java.util.List;
+
 public class GestorHuesped {
     //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
     // solo si se autentico antes el conserje
@@ -15,6 +17,10 @@ public class GestorHuesped {
     public GestorHuesped(DaoHuespedInterfaz daoHuesped, DaoDireccionInterfaz daoDireccion) {
         this.daoHuesped = daoHuesped;
         this.daoDireccion = daoDireccion;
+    }
+
+    public List<String> validarDatosHuesped(DtoHuesped dtoHuesped){
+
     }
 
     public boolean buscarHuesped(DtoHuesped datos){
