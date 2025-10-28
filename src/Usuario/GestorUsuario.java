@@ -4,30 +4,53 @@ import Dominio.Usuario;
 public class GestorUsuario {
     private final DaoUsuarioInterfaz daoUsuario;
 
-    public GestorUsuario(DaoUsuarioInterfaz dao){
+    public GestorUsuario(DaoUsuarioInterfaz dao) {
         this.daoUsuario = dao;
     }
 
-    public boolean autenticarUsuario(String nombre, String contrasenia){
-        // #logica de bdd: aquí se llamaría a daoUsuario.ObtenerUsuario(...) para obtener el usuario real
-        // Usuario usuarioObtenido = daoUsuario.ObtenerUsuario(...);
-        // DtoUsuario dtoAlmacenado = new DtoUsuario(usuarioObtenido.getId_Usuario(), usuarioObtenido.getNombre(), usuarioObtenido.getContrasenia());
+    public boolean autenticarUsuario(String nombre, String contrasenia) {
+        try {
+            //Validaciones básicas antes de consultar la BDD
+            if (nombre == null || nombre.trim().isEmpty()) {
+                System.err.println("El nombre de usuario no puede estar vacío");
+                return false;
+            }
 
-        // Simulación local sin acceso a BDD: usuario hardcodeado
-        Usuario usuarioAlmacenado = new Usuario(1, "admin", "1234");
-        DtoUsuario dtoAlmacenado = new DtoUsuario(
-                usuarioAlmacenado.getId_Usuario(),
-                usuarioAlmacenado.getNombre(),
-                usuarioAlmacenado.getContrasenia()
-        );
+            if (contrasenia == null || contrasenia.isEmpty()) {
+                System.err.println("La contraseña no puede estar vacía");
+                return false;
+            }
 
-        // Generar hash MD5 de la contraseña ingresada
-        String hashIngresado = new Usuario().generarHashMD5(contrasenia);
+            //Obtener el usuario de la base de datos
+            DtoUsuario usuarioBDD = daoUsuario.ObtenerUsuarioPorNombre(nombre);
 
-        // Comparar nombre y hash de contraseña
-        if (!dtoAlmacenado.getNombre().equals(nombre)) {
+            //Verificar si el usuario existe
+            if (usuarioBDD == null) {
+                System.err.println("Usuario no encontrado en la base de datos");
+                return false;
+            }
+
+            //Generar hash MD5 de la contraseña ingresada
+            String hashIngresado = new Usuario().generarHashMD5(contrasenia);
+
+            //Comparar el hash ingresado con el hash almacenado en la BDD
+            String hashAlmacenado = usuarioBDD.getHashContrasenia();
+
+            //Verificar si las contraseñas coinciden
+            boolean autenticacionExitosa = hashAlmacenado.equals(hashIngresado);
+
+            if (autenticacionExitosa) {
+                System.out.println("Autenticación exitosa para el usuario: " + nombre);
+            } else {
+                System.err.println("Contraseña incorrecta para el usuario: " + nombre);
+            }
+
+            return autenticacionExitosa;
+
+        } catch (Exception e) {
+            System.err.println("Error durante la autenticación: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
-        return dtoAlmacenado.getHashContrasenia().equals(hashIngresado);
     }
 }
