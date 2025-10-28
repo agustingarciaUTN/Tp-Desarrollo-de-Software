@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import Huesped.DtoHuesped;
+
 public class Pantalla {
 
     // private GestorHuesped gestorHuesped;
@@ -333,4 +335,171 @@ public class Pantalla {
 
 
 
+
+    private void iniciarModificacionHuesped(DtoHuesped dtoHuesped){ //Paso1 CU10
+    boolean salir = false;
+        while(!salir){
+            
+            System.out.println("========================================");
+
+            mostrarDatosHuesped(dtoHuesped);
+
+            int opcion = -1;
+            try {
+                opcion = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                continue;
+            }
+
+            System.out.println();
+
+            switch(opcion){
+                case 1:
+                    // cambiar apellido;
+                    clearScreen();
+                    break;
+                case 2:
+                   // cambiar nombre;
+                   clearScreen();
+                    break;
+                case 3:
+                    // cambiar tipo documento;
+                    clearScreen();
+                    break;
+                case 4:
+                   // cambiar numero documento;
+                   clearScreen();
+                    break;
+                case 5:
+                    // cambiar cuit;
+                    clearScreen();
+                    break;
+                case 6:
+                    // cambiar posicion iva;
+                    clearScreen();
+                    break;
+                case 7:
+                    // cambiar fecha nacimiento;   
+                    clearScreen();
+                    break;
+                case 8:
+                    // cambiar direccion;
+                    clearScreen();
+                    break;
+                case 9:
+                    // cambiar telefono;
+                    clearScreen();
+                    break;
+                case 10:
+                    // cambiar email;
+                    clearScreen();
+                    break;
+                case 11:
+                    // cambiar ocupacion;
+                    clearScreen();
+                    break;
+                case 12:
+                    // cambiar nacionalidad;
+                    clearScreen();
+                    break;
+                 case 13: 
+                    // Al pulsar SIGUIENTE validamos omisiones. Si hay errores, no salimos. Paso2 CU10
+                    if (pulsarSiguiente(dtoHuesped)) {
+                        salir = true;
+                    } else {
+                        // quedarse en la pantalla para que el actor corrija
+                        salir = false;
+                    }
+                    break;
+                case 14:
+                    //cancelar
+                    salir = true;
+                    break;
+                case 15:
+                    //borrar
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+    private boolean pulsarSiguiente(DtoHuesped dtoHuesped){ //Paso2.A` CU10
+        List<String> errores = new ArrayList<>();
+
+        // helper lambda para pruebas de "blank"
+        java.util.function.Predicate<Object> isBlank = o -> {
+            if (o == null) return true;
+            if (o instanceof String) return ((String)o).trim().isEmpty();
+            if (o instanceof Number) return ((Number)o).longValue() == 0;
+            return false;
+        };
+
+        if (isBlank.test(dtoHuesped.getApellido())) errores.add("Apellido");
+        if (isBlank.test(dtoHuesped.getNombres())) errores.add("Nombre");
+        if (isBlank.test(dtoHuesped.getTipoDocumento())) errores.add("Tipo de documento");
+        if (isBlank.test(dtoHuesped.getDocumento())) errores.add("Número de documento");
+         if (isBlank.test(dtoHuesped.getPosicionIva())) {
+           // setear pos iva como consumidor final (valor por defecto)
+        }
+        if (isBlank.test(dtoHuesped.getFechaNacimiento())) errores.add("Fecha de nacimiento");
+        // validar direccion (no implementado aun)
+        if (isBlank.test(dtoHuesped.getTelefono())) errores.add("Teléfono");
+        if (isBlank.test(dtoHuesped.getOcupacion())) errores.add("Ocupación");
+        if (isBlank.test(dtoHuesped.getNacionalidad())) errores.add("Nacionalidad");
+
+        if (!errores.isEmpty()){ //Paso2.A.1 CU10
+            System.out.println("\n*** ERROR: Faltan los siguientes datos obligatorios (omisiones): ***");
+            for (String e : errores){
+                System.out.println("- " + e);
+            }
+            System.out.println("Por favor complete los campos indicados. Los campos no se han blanqueado.\n");
+            pausa(); 
+            return false; //Paso2.A.2 CU10
+        }
+
+        // No hay omisiones -> puede continuar
+        return true;
+    }
+    private void mostrarDatosHuesped(DtoHuesped dtoHuesped){
+        System.out.println("---- DATOS DEL HUESPED ----");
+        System.out.println("1. Apellido: " + dtoHuesped.getApellido());
+        System.out.println("2. Nombre: " + dtoHuesped.getNombres());
+        System.out.println("3. Tipo de documento: " + dtoHuesped.getTipoDocumento());
+        System.out.println("4. Número de documento: " + dtoHuesped.getDocumento());
+        System.out.println("5. CUIT: " + dtoHuesped.getCuit());
+        System.out.println("6. Posición IVA: " + dtoHuesped.getPosicionIva());
+        System.out.println("7. Fecha de nacimiento: " + dtoHuesped.getFechaNacimiento());
+       // mostrarDireccionHuesped(dtoHuesped); // ns como c hace esto tdv
+        System.out.println("9. Teléfono: " + dtoHuesped.getTelefono());
+        System.out.println("10. Email: " + dtoHuesped.getEmail());
+        System.out.println("11. Ocupación: " + dtoHuesped.getOcupacion());
+        System.out.println("12. Nacionalidad: " + dtoHuesped.getNacionalidad());
+        System.out.println("13. SIGUIENTE");
+        System.out.println("14. CANCELAR");
+        System.out.println("15. BORRAR HUESPED");
+        System.out.println("---------------------------\n");
+    }
+
+    public static void clearScreen() {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
 }
+
+    /*mostrarDireccionHuesped(DtoHuesped dtoHuesped){
+        System.out.println("---- DIRECCIÓN DEL HUESPED ----");
+        System.out.println("Calle: " + dtoHuesped.getDireccion().getCalle());
+        System.out.println("Número: " + dtoHuesped.getDireccion().getNumero());
+        System.out.println("Piso: " + dtoHuesped.getDireccion().getPiso());
+        System.out.println("Departamento: " + dtoHuesped.getDireccion().getDepartamento());
+        System.out.println("Ciudad: " + dtoHuesped.getDireccion().getCiudad());
+        System.out.println("Provincia: " + dtoHuesped.getDireccion().getProvincia());
+        System.out.println("Código Postal: " + dtoHuesped.getDireccion().getCodigoPostal());
+        System.out.println("-------------------------------\n");
+    } */
+
+
+} 
