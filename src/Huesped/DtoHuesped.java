@@ -16,6 +16,7 @@ public class DtoHuesped {
     private String email;
     private String ocupacion;
     private String nacionalidad;
+    private DtoDireccion dtoDireccion;
 
     // Constructor con todos los datos
     public DtoHuesped(String nombres, String apellido, int telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
@@ -103,4 +104,14 @@ public class DtoHuesped {
     public void setNacionalidad(String nacionalidad) {
         this.nacionalidad = nacionalidad;
     }
+    public void setDireccion(DtoDireccion dtoDireccion){ this.dtoDireccion = dtoDireccion; }
+    
+    public boolean estanVacios() {
+        boolean apellidoVacio = (apellido == null || apellido.trim().isEmpty());
+        boolean nombresVacio = (nombres == null || nombres.trim().isEmpty());
+        boolean tipoDocVacio = (tipoDocumento == null);
+        boolean docVacio = (documento <= 0);
+        return apellidoVacio && nombresVacio && tipoDocVacio && docVacio;
+    }
+    
 }

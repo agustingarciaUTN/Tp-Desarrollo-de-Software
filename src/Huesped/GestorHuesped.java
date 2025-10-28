@@ -4,6 +4,7 @@ package Huesped;
 
 import Dominio.Huesped;
 import java.util.List;
+import java.util.ArrayList;
 
 public class GestorHuesped {
     //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
@@ -18,7 +19,7 @@ public class GestorHuesped {
         this.daoDireccion = daoDireccion;
     }
 
-    public boolean buscarHuesped(DtoHuesped datos){
+    public ArrayList<DtoHuesped> buscarHuesped(DtoHuesped datos){
         // presentar en pantalla los inputs necesarios de
         //apellido.
         //▪ Nombres.
@@ -33,14 +34,14 @@ public class GestorHuesped {
         //dao busca con los criterios pasados los huespedes, devuelve dtos? -> Esto va en la
         // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
        
-        List<DtoHuesped> listaHuespedes;
+        ArrayList<DtoHuesped> listaHuespedes;
 
         
         if (datos.estanVacios()) {
-            listaHuespedes = DaoHuesped.obtenerTodosLosHuespedes(); 
+            listaHuespedes = daoHuesped.obtenerTodosLosHuespedes(); 
         }
         else {
-            listaHuespedes = DaoHuesped.obtenerHuespedesPorCriterios(datos);
+            listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
         }
         
         //ver si existe concordancia, si no pasar al cu11 y finalizar este cu.
@@ -53,13 +54,7 @@ public class GestorHuesped {
         //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
         // esto tampoco lo hace el gestor
         
-        if (listaHuespedes.isEmpty()) {
-            pantalla.mostrarListaVacia();
-            this.darAltaHuesped ();
-        }
-        else {
-            pantalla.mostrarListaHuespedes(listaHuespedes);
-        }
+        return listaHuespedes;
         
         // presentar los datos de los dto encontrados en pantalla de la manera correcta
         // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
@@ -71,14 +66,6 @@ public class GestorHuesped {
         
     }
     
-    public void seleccionaHuesped (DtoHuesped huespedSeleccionado) {
-        if (huespedSeleccionado == null) {
-            this.darAltaHuesped();
-        }
-        else {
-            this.modificarHuesped();
-        }
-    }
 
     public boolean darAltaHuesped(){
         //precondicion haberse ejecutado el cu2, buscar huesped
