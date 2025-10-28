@@ -13,22 +13,6 @@ import java.sql.SQLException;
 
 public class DaoHuesped implements DaoHuespedInterfaz {
 
-    //estos son los atributos que necesita la clase para conectarse a la DB
-    private static final String DB_URL =;
-    private static final String USER =;
-    private static final String PASS =;
-
-    //metodo para realizarla coneccion a la DB
-    private Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(DB_URL, USER, PASS);
-    }
-
-    public boolean CrearHuesped(DtoHuesped dto){}
-    public boolean ModificarHuesped(int idUsuario){}
-    public boolean EliminarHuesped(int idUsuario){}
-    public DtoHuesped ObtenerHuesped(int idUsuario){}
-
-
     public boolean crearHuesped(DtoHuesped dto){
      
     }
