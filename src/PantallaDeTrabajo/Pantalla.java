@@ -415,11 +415,12 @@ public class Pantalla {
                     }
                     break;
                 case 14:
-                    //cancelar
-                    salir = true;
+                    pulsarCancelar(salir);
+                    System.out.println("Modificación cancelada.\n");
                     break;
                 case 15:
-                    //borrar
+                    //CU11
+                    System.out.println("Huésped borrado del sistema.\n");
                     salir = true;
                     break;
                 default:
@@ -427,7 +428,7 @@ public class Pantalla {
             }
         }
     }
-    private boolean pulsarSiguiente(DtoHuesped dtoHuesped){ //Paso2.A` CU10
+    private boolean pulsarSiguiente(DtoHuesped dtoHuesped){ //Paso2.A CU10
         List<String> errores = new ArrayList<>();
 
         // helper lambda para pruebas de "blank"
@@ -460,10 +461,41 @@ public class Pantalla {
             pausa(); 
             return false; //Paso2.A.2 CU10
         }
-
-        // No hay omisiones -> puede continuar
-        return true;
+        // FALTA APLICAR CASO DONDE DOCUMENTO YA EXISTE EN EL SISTEMA PASO2.B CU10
+        // FALTA APLICAR CAMBIOS EN LOS DTOS/BDD
+        System.out.println("La operación ha culminado con éxito.\n");
+        return true;  // No hay omisiones -> puede continuar Paso2 CU10
     }
+    
+    private void pulsarCancelar(boolean salir){ //Paso3 CU10
+        System.out.print("\n¿Desea cancelar la modificación del huésped? ");
+        System.out.print("1. SI");
+        System.out.print("2. NO");
+        while (true) {
+            System.out.print("Ingrese una opción: ");
+        int opt = -1;
+            try {
+                opt = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                
+            }
+            switch (opt){
+                case 1:
+                    System.out.println("\nModificación cancelada.\n");
+                    salir = true;
+                    return;
+                case 2:
+                    System.out.println("\nContinuando con la modificación.\n");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+       
     private void mostrarDatosHuesped(DtoHuesped dtoHuesped){
         System.out.println("---- DATOS DEL HUESPED ----");
         System.out.println("1. Apellido: " + dtoHuesped.getApellido());
@@ -487,7 +519,7 @@ public class Pantalla {
     public static void clearScreen() {
     System.out.print("\033[H\033[2J");
     System.out.flush();
-}
+    }
 
     /*mostrarDireccionHuesped(DtoHuesped dtoHuesped){
         System.out.println("---- DIRECCIÓN DEL HUESPED ----");
