@@ -143,10 +143,9 @@ public class Pantalla {
             System.out.println("----------------------------------------");
             System.out.println("1. Buscar huesped (CU2)");
             System.out.println("2. Dar de alta huesped (CU9)");
-            System.out.println("3. Gestionar reservas");
-            System.out.println("4. Gestionar habitaciones");
-            System.out.println("5. Gestionar servicios");
-            System.out.println("6. Cerrar sesión");
+            System.out.println("3. Dar de baja huesped ");
+            System.out.println("4. Modificar Huesped");
+            System.out.println("5. Cerrar sesión");
             System.out.println("========================================");
             System.out.print("Ingrese una opción: ");
 
@@ -240,7 +239,7 @@ public class Pantalla {
     
     private TipoDocumento validarYLeerTipoDocumento() {
         while (true) {
-            System.out.print("Tipo de Documento (DNI, PASAPORTE, LE, LC, OTRO): ");
+            System.out.print("Tipo de Documento (DNI, Pasaporte, Libreta de Enrolamiento (LE), Libreta Civica(LC)): ");
             String tipoStr = scanner.nextLine().trim().toUpperCase();
             if (tipoStr.isEmpty()) {
                 return null; // El usuario omitió este criterio.
@@ -248,7 +247,7 @@ public class Pantalla {
             try {
                 return TipoDocumento.valueOf(tipoStr); // Intenta convertir el String al enum.
             } catch (IllegalArgumentException e) {
-                System.out.println("❌ Error: Tipo de documento no válido. Los valores posibles son DNI, PASAPORTE, LE, LC, OTRO.");
+                System.out.println("❌ Error: Tipo de documento no válido. Los valores posibles son DNI, PASAPORTE, Libreta de Enrolamiento, Libreta Civica.");
             }
         }
     }
