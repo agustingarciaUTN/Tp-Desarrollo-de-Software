@@ -14,11 +14,11 @@ import java.sql.SQLException;
 public class DaoHuesped implements DaoHuespedInterfaz {
 
     public boolean crearHuesped(DtoHuesped dto){
-     
+     return false;
     }
     
-    public boolean modificarHuesped(int idUsuario){}
-    public boolean eliminarHuesped(int idUsuario){}
+    public boolean modificarHuesped(int idUsuario){return false;}
+
     
     public ArrayList<DtoHuesped> obtenerTodosLosHuespedes (){
        
@@ -183,6 +183,95 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     retornar el objeto Huesped
     de lo contrario:
     retornar null'''*/
+
+    /**
+     * Obtiene el id_direccion asociado a un huésped
+     * @param tipoDocumento Tipo de documento del huésped
+     * @param nroDocumento Número de documento del huésped
+     * @return ID de la dirección o -1 si no existe
+     */
+    public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
+        String sql = "SELECT id_direccion FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tipoDocumento);
+            ps.setLong(2, nroDocumento);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_direccion");
+                }
+            }
+
+            return -1;
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener ID de dirección: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    /**
+     * Elimina un huésped de la base de datos (borrado físico)
+     * @param tipoDocumento Tipo de documento del huésped
+     * @param nroDocumento Número de documento del huésped
+     * @return true si se eliminó exitosamente
+     */
+    public boolean eliminarHuesped(String tipoDocumento, long nroDocumento) {
+        String sql = "DELETE FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tipoDocumento);
+            ps.setLong(2, nroDocumento);
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Huésped eliminado exitosamente");
+                return true;
+            }
+            return false;
+
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar huésped: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Elimina una dirección de la base de datos
+     * @param idDireccion ID de la dirección a eliminar
+     * @return true si se eliminó exitosamente
+     */
+    public boolean eliminarDireccion(int idDireccion) {
+        if (idDireccion <= 0) {
+            return false;
+        }
+
+        String sql = "DELETE FROM direccion WHERE id_direccion = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idDireccion);
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Dirección eliminada exitosamente");
+                return true;
+            }
+            return false;
+
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar dirección: " + e.getMessage());
+            return false;
+        }
+    }
 }
 
 //queremos tener diferentes metodos para devolver por ej una lista de dto?
