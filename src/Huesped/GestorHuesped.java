@@ -1,11 +1,11 @@
 package Huesped;
 
 //PROBANDO
-
-import Dominio.Huesped;
+import enums.PosIva;
 import enums.TipoDocumento;
-
+import Dominio.Huesped;
 import java.util.List;
+import java.util.ArrayList;
 
 public class GestorHuesped {
     //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
@@ -20,7 +20,7 @@ public class GestorHuesped {
         this.daoDireccion = daoDireccion;
     }
 
-    public boolean buscarHuesped(DtoHuesped datos){
+    public ArrayList<DtoHuesped> buscarHuesped(DtoHuesped datos){
         // presentar en pantalla los inputs necesarios de
         //apellido.
         //▪ Nombres.
@@ -35,14 +35,14 @@ public class GestorHuesped {
         //dao busca con los criterios pasados los huespedes, devuelve dtos? -> Esto va en la
         // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
        
-        List<DtoHuesped> listaHuespedes;
+        ArrayList<DtoHuesped> listaHuespedes;
 
         
         if (datos.estanVacios()) {
-            listaHuespedes = DaoHuesped.obtenerTodosLosHuespedes(); 
+            listaHuespedes = daoHuesped.obtenerTodosLosHuespedes(); 
         }
         else {
-            listaHuespedes = DaoHuesped.obtenerHuespedesPorCriterios(datos);
+            listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
         }
         
         //ver si existe concordancia, si no pasar al cu11 y finalizar este cu.
@@ -55,13 +55,7 @@ public class GestorHuesped {
         //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
         // esto tampoco lo hace el gestor
         
-        if (listaHuespedes.isEmpty()) {
-            pantalla.mostrarListaVacia();
-            this.darAltaHuesped ();
-        }
-        else {
-            pantalla.mostrarListaHuespedes(listaHuespedes);
-        }
+        return listaHuespedes;
         
         // presentar los datos de los dto encontrados en pantalla de la manera correcta
         // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
@@ -73,14 +67,6 @@ public class GestorHuesped {
         
     }
     
-    public void seleccionaHuesped (DtoHuesped huespedSeleccionado) {
-        if (huespedSeleccionado == null) {
-            this.darAltaHuesped();
-        }
-        else {
-            this.modificarHuesped();
-        }
-    }
 
     public boolean darAltaHuesped(){
         //precondicion haberse ejecutado el cu2, buscar huesped
@@ -110,6 +96,29 @@ public class GestorHuesped {
         //No y termina
         //Si y volves al principio de todo
         // Segun el diagrama de secuencia no lo hace el gestor
+        return false;
+    }
+
+    public boolean darDeBajaHuesped(){
+        //primero verificar que existe
+        //ejecutar el buscarHuesped()
+
+            //si no existe, no se ejecuta y mostramos mensaje de que no existe.
+
+        //Verificar si el huesped se alojo alguna vez en el hotel (hizo el check in)
+            //si lo hizo, no se pde eliminar
+            //mostramos mensaje correspondiente
+            //presione cualq tecla y termina el cu
+
+        //Mostramos los datos, nombre, apellido, tipoDoc, nroDoc
+        //Botones ELIMINAR CANCELAR0
+            //toca Cancelar
+            //termina el cu
+
+        //toca Eliminar, borramos el huesped. Se ocupa el DAO
+        //mostramos mensaje de eliminacion y presione cualq tecla,
+        //termina el cu
+        return false;
     }
 
     public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
@@ -191,7 +200,25 @@ public class GestorHuesped {
         if(dtoHuesped.getNacionalidad() == null || dtoHuesped.getNacionalidad().isBlank()) {
             errores.add("Nacionalidad");
         }
-
+        if(dtoHuesped.getDireccion().getCalle() == null || dtoHuesped.getDireccion().getCalle().isBlank()) {
+            errores.add("Calle");
+        }
+        if(dtoHuesped.getDireccion().getNumero() <= 0) {
+            errores.add("Número de dirección");
+        }
+        if(dtoHuesped.getDireccion().getLocalidad() == null || dtoHuesped.getDireccion().getLocalidad().isBlank()) {
+            errores.add("Ciudad");
+        }
+        if(dtoHuesped.getDireccion().getCodPostal() <= 0L ) {
+            errores.add("Código postal");
+        }
+        if(dtoHuesped.getDireccion().getProvincia() == null || dtoHuesped.getDireccion().getProvincia().isBlank()) {
+            errores.add("Provincia");
+        }
+        if(dtoHuesped.getDireccion().getPais() == null || dtoHuesped.getDireccion().getPais().isBlank()) {
+            errores.add("País");
+        }
+        // Evaluamos si hay errores ( y los comentamos) o si no los hay
         if (!errores.isEmpty()) {
             System.out.println("\n*** ERROR: Faltan o son inválidos los siguientes datos obligatorios: ***");
             for (String e : errores){
@@ -211,6 +238,7 @@ public class GestorHuesped {
         }
         return false;
     }
+
 }
 
        

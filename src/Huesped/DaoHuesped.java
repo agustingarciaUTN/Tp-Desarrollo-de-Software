@@ -13,52 +13,9 @@ import java.sql.SQLException;
 
 public class DaoHuesped implements DaoHuespedInterfaz {
 
-    public boolean crearHuesped(DtoHuesped dto){
-     
-    }
+    public boolean crearHuesped(DtoHuesped dto){return false;}
     
-    public boolean modificarHuesped(DtoHuesped original, DtoHuesped modificado){
-        String sql = "UPDATE huesped SET apellido = ?, nombres = ?, tipo_documento = ?, numero_documento = ?, cuit = ?, posicion_iva = ?, fecha_nacimiento = ?, telefono = ?, email = ?, ocupacion = ?, nacionalidad = ?, direccion_id = ? WHERE tipo_documento = ? AND numero_documento = ?";
-
-        try (Connection conn = Coneccion.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, modificado.getApellido());
-            pstmt.setString(2, modificado.getNombres());
-            pstmt.setString(3, modificado.getTipoDocumento() != null ? modificado.getTipoDocumento().name() : null);
-            pstmt.setLong(4, modificado.getDocumento());
-            pstmt.setString(5, modificado.getCuit());
-            pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().name() : null);
-
-            if (modificado.getFechaNacimiento() != null) {
-                pstmt.setDate(7, new java.sql.Date(modificado.getFechaNacimiento().getTime()));
-            } else {
-                pstmt.setNull(7, java.sql.Types.DATE);
-            }
-
-            pstmt.setInt(8, modificado.getTelefono());
-            pstmt.setString(9, modificado.getEmail());
-            pstmt.setString(10, modificado.getOcupacion());
-            pstmt.setString(11, modificado.getNacionalidad());
-
-            if (modificado.getDireccion() != null && modificado.getDireccion().getId() > 0) {
-                pstmt.setInt(12, modificado.getDireccion().getId());
-            } else {
-                pstmt.setNull(12, java.sql.Types.INTEGER);
-            }
-
-            // WHERE params: original tipo + numero
-            pstmt.setString(13, original.getTipoDocumento() != null ? original.getTipoDocumento().name() : null);
-            pstmt.setLong(14, original.getDocumento());
-
-            int updated = pstmt.executeUpdate();
-            return updated > 0;
-        } catch (SQLException e) {
-            System.err.println("Error al modificar huésped: " + e.getMessage());
-            return false;
-        }
-    }
-    public boolean eliminarHuesped(int idUsuario){}
+    public boolean eliminarHuesped(int idUsuario){ return false;}
     
     public ArrayList<DtoHuesped> obtenerTodosLosHuespedes (){
        
@@ -182,7 +139,6 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         
     }
 
-
     public boolean docExistente(DtoHuesped criterios){
     
         ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
@@ -252,6 +208,48 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     }
 
 
+   
+    public boolean modificarHuesped(DtoHuesped original, DtoHuesped modificado){
+        String sql = "UPDATE huesped SET apellido = ?, nombres = ?, tipo_documento = ?, numero_documento = ?, cuit = ?, posicion_iva = ?, fecha_nacimiento = ?, telefono = ?, email = ?, ocupacion = ?, nacionalidad = ?, direccion_id = ? WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, modificado.getApellido());
+            pstmt.setString(2, modificado.getNombres());
+            pstmt.setString(3, modificado.getTipoDocumento() != null ? modificado.getTipoDocumento().name() : null);
+            pstmt.setLong(4, modificado.getDocumento());
+            pstmt.setString(5, modificado.getCuit());
+            pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().name() : null);
+
+            if (modificado.getFechaNacimiento() != null) {
+                pstmt.setDate(7, new java.sql.Date(modificado.getFechaNacimiento().getTime()));
+            } else {
+                pstmt.setNull(7, java.sql.Types.DATE);
+            }
+
+            pstmt.setInt(8, modificado.getTelefono());
+            pstmt.setString(9, modificado.getEmail());
+            pstmt.setString(10, modificado.getOcupacion());
+            pstmt.setString(11, modificado.getNacionalidad());
+
+            if (modificado.getDireccion() != null && modificado.getDireccion().getId() > 0) {
+                pstmt.setInt(12, modificado.getDireccion().getId());
+            } else {
+                pstmt.setNull(12, java.sql.Types.INTEGER);
+            }
+
+            // WHERE params: original tipo + numero
+            pstmt.setString(13, original.getTipoDocumento() != null ? original.getTipoDocumento().name() : null);
+            pstmt.setLong(14, original.getDocumento());
+
+            int updated = pstmt.executeUpdate();
+            return updated > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al modificar huésped: " + e.getMessage());
+            return false;
+        }
+    }
     /* Crear un nuevo huésped
     method CrearHuesped(DtoHuesped dto) -> boolean:
     iniciar conexión a la base de datos
@@ -273,7 +271,6 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     retornar true
     de lo contrario:
     retornar false
-
     // Eliminar un huésped
     method EliminarHuesped(int idUsuario) -> boolean:
     iniciar conexión a la base de datos

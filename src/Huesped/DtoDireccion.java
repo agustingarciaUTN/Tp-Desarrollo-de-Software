@@ -25,7 +25,6 @@ public class DtoDireccion {
 
     // Getters y Setters
     public void setId(int ID){this.ID = ID;}
-    public int getId(){ return this.ID; }
     public String getCalle() {
         return calle;
     }
