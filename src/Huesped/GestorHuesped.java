@@ -1,8 +1,16 @@
 package Huesped;
 
 //PROBANDO
-
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import enums.TipoDocumento;
 import Dominio.Huesped;
+import Estadia.GestorEstadia;
+import Estadia.DaoEstadia;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -13,27 +21,16 @@ public class GestorHuesped {
     //los daos que utilizara el gestor (son de tipo interfaz por SOLID)
     private final DaoHuespedInterfaz daoHuesped;
     private final DaoDireccionInterfaz daoDireccion;
+    private GestorEstadia gestorEstadia;
 
     public GestorHuesped(DaoHuespedInterfaz daoHuesped, DaoDireccionInterfaz daoDireccion) {
         this.daoHuesped = daoHuesped;
         this.daoDireccion = daoDireccion;
+        this.gestorEstadia = new GestorEstadia(new DaoEstadia());
     }
 
     public ArrayList<DtoHuesped> buscarHuesped(DtoHuesped datos){
-        // presentar en pantalla los inputs necesarios de
-        //apellido.
-        //▪ Nombres.
-        //▪ Tipo de documento: [DNI, LE, LC,
-        //Pasaporte, Otro]
-        //▪ Número de documento.
-        //puede no poner ninguno, como algunos. Manejar esto.
-        // Presiona buscar (hacer boton o algo por el estilo)
-        //Según el diagrama de secuencia el ingreso y presionar buscar se hace en la pantalla
-        // y luego se le pasan los datos ingresados al gestor, y se maneja lo de que no 
-        // ingrese ningún dato o algunos.
-        //dao busca con los criterios pasados los huespedes, devuelve dtos? -> Esto va en la
-        // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
-       
+
         ArrayList<DtoHuesped> listaHuespedes;
 
         
@@ -44,30 +41,12 @@ public class GestorHuesped {
             listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
         }
         
-        //ver si existe concordancia, si no pasar al cu11 y finalizar este cu.
-        //si encuentra seguir
-        // presentar los datos de los dto encontrados en pantalla de la manera correcta
-        // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
-        //Seleccionar una persona de alguna manera -> no lo hace el gestor
-        //Presiona siguiente. -> no lo hace el gestor
-        //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
-        //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
-        // esto tampoco lo hace el gestor
-        
         return listaHuespedes;
-        
-        // presentar los datos de los dto encontrados en pantalla de la manera correcta
-        // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
-        //Seleccionar una persona de alguna manera -> no lo hace el gestor
-        //Presiona siguiente. -> no lo hace el gestor
-        //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
-        //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
-        // esto tampoco lo hace el gestor
-        
+
     }
     
 
-    public boolean darAltaHuesped(){
+   /* public boolean darAltaHuesped(){
         //precondicion haberse ejecutado el cu2, buscar huesped
         //una vez ejecutado el buscarHuesped(), se puede ahora ejecutar este
 
@@ -118,26 +97,143 @@ public class GestorHuesped {
         //actualizamos los datos, persistir con dao en la bdd
         //mensaje de exito
         //termina
+    }*/
+
+
+    /* Valida si un huésped puede ser eliminado del sistema
+     * Un huésped solo puede eliminarse si NUNCA se alojó en el hotel
+     * @param tipoDocumento Tipo de documento del huésped
+     * @param nroDocumento Número de documento del huésped
+     * @return true si puede eliminarse (no tiene estadías), false si no puede
+     */
+    public boolean puedeEliminarHuesped(String tipoDocumento, long nroDocumento) {
+        if (tipoDocumento == null || tipoDocumento.trim().isEmpty()) {
+            System.err.println("El tipo de documento no puede estar vacío");
+            return false;
+        }
+
+        if (nroDocumento <= 0) {
+            System.err.println("El número de documento no es válido");
+            return false;
+        }
+
+        // Verificar si el huésped tiene estadías registradas
+        boolean tieneEstadias = gestorEstadia.huespedSeAlojoAlgunaVez(tipoDocumento, nroDocumento);
+
+        return !tieneEstadias; // Retorna true solo si NO tiene estadías
     }
 
-    public boolean darDeBajaHuesped(){
-        //primero verificar que existe
-        //ejecutar el buscarHuesped()
+    /**
+     * Elimina un huésped del sistema (borrado físico)
+     * También elimina su dirección asociada
+     * @param tipoDocumento Tipo de documento del huésped
+     * @param nroDocumento Número de documento del huésped
+     * @return true si se eliminó exitosamente
+     */
+    public boolean eliminarHuesped(String tipoDocumento, long nroDocumento) {
+        try {
+            // NIVEL 2.1: Verificar que puede eliminarse (ya valida que no tenga estadías)
+            if (!puedeEliminarHuesped(tipoDocumento, nroDocumento)) {
+                System.err.println("El huésped no puede ser eliminado porque tiene estadías registradas");
+                registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Tiene estadías registradas");
+                return false;
+            }
 
-            //si no existe, no se ejecuta y mostramos mensaje de que no existe.
+            // NIVEL 2.2: Verificar que no tenga reservas pendientes/activas
+            if (tieneReservasPendientes(tipoDocumento, nroDocumento)) {
+                System.err.println("El huésped tiene reservas pendientes y no puede ser eliminado");
+                registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Tiene reservas pendientes");
+                return false;
+            }
 
-        //Verificar si el huesped se alojo alguna vez en el hotel (hizo el check in)
-            //si lo hizo, no se pde eliminar
-            //mostramos mensaje correspondiente
-            //presione cualq tecla y termina el cu
+            // 2. Obtener el ID de la dirección antes de eliminar el huésped
+            int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
 
-        //Mostramos los datos, nombre, apellido, tipoDoc, nroDoc
-        //Botones ELIMINAR CANCELAR0
-            //toca Cancelar
-            //termina el cu
+            // 3. Eliminar el huésped
+            boolean huespedEliminado = daoHuesped.eliminarHuesped(tipoDocumento, nroDocumento);
 
-        //toca Eliminar, borramos el huesped. Se ocupa el DAO
-        //mostramos mensaje de eliminacion y presione cualq tecla,
-        //termina el cu
+            if (!huespedEliminado) {
+                System.err.println("No se pudo eliminar el huésped");
+                registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de BD");
+                return false;
+            }
+
+            // 4. Si tenía dirección, eliminarla también
+            if (idDireccion > 0) {
+                boolean direccionEliminada = daoHuesped.eliminarDireccion(idDireccion);
+                if (!direccionEliminada) {
+                    System.err.println("Advertencia: El huésped fue eliminado pero hubo un error al eliminar su dirección");
+                }
+            }
+
+            // NIVEL 2.3: Registrar auditoría de eliminación exitosa
+            registrarAuditoriaExitosa(tipoDocumento, nroDocumento);
+
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error al eliminar huésped: " + e.getMessage());
+            registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Excepción: " + e.getMessage());
+            return false;
+        }
     }
+
+    /**
+     * NIVEL 2.2: Verifica si un huésped tiene reservas pendientes o activas
+     * Reserva pendiente = fecha_inicio >= HOY y no tiene check-in
+     */
+    private boolean tieneReservasPendientes(String tipoDocumento, long nroDocumento) {
+        // Consultar si existe en reserva_huesped con reservas activas/pendientes
+        // Por ahora retornamos false (implementar cuando tengas el módulo de reservas)
+
+        // TODO: Implementar cuando tengas DaoReserva
+        // return daoReserva.tieneReservasPendientes(tipoDocumento, nroDocumento);
+
+        return false; // Por ahora permite eliminar sin verificar reservas
+    }
+
+    /**
+     * NIVEL 2.3: Registra en log la eliminación exitosa de un huésped
+     */
+    private void registrarAuditoriaExitosa(String tipoDocumento, long nroDocumento) {
+        String timestamp = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
+        String mensaje = String.format("[AUDITORÍA] %s - Huésped eliminado: %s %d - Usuario: Sistema",
+                timestamp, tipoDocumento, nroDocumento);
+
+        System.out.println(mensaje);
+
+        // Opcional: Escribir a archivo de log
+        escribirLog(mensaje);
+    }
+
+    /**
+     * NIVEL 2.3: Registra en log un intento fallido de eliminación
+     */
+    private void registrarAuditoriaFallida(String tipoDocumento, long nroDocumento, String motivo) {
+        String timestamp = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
+        String mensaje = String.format("[AUDITORÍA] %s - Intento fallido de eliminar huésped: %s %d - Motivo: %s",
+                timestamp, tipoDocumento, nroDocumento, motivo);
+
+        System.err.println(mensaje);
+
+        // Opcional: Escribir a archivo de log
+        escribirLog(mensaje);
+    }
+
+    /**
+     * NIVEL 2.3: Escribe un mensaje en el archivo de auditoría
+     */
+    private void escribirLog(String mensaje) {
+        try (java.io.FileWriter fw = new java.io.FileWriter("auditoria_huespedes.log", true);
+             java.io.BufferedWriter bw = new java.io.BufferedWriter(fw);
+             java.io.PrintWriter out = new java.io.PrintWriter(bw)) {
+
+            out.println(mensaje);
+
+        } catch (java.io.IOException e) {
+            System.err.println("No se pudo escribir en el archivo de auditoría: " + e.getMessage());
+        }
+    }
+
+// FIN DE LOS MÉTODOS A AGREGAR
 }
