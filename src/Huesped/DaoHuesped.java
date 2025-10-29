@@ -5,26 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import Dominio.Huesped;
 import Usuario.DtoUsuario;
-import BaseDeDatos.Coneccion;
+import BaseDedatos.Coneccion;
 import enums.TipoDocumento;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public class DaoHuesped implements DaoHuespedInterfaz {
-
-    //estos son los atributos que necesita la clase para conectarse a la DB
-    private static final String DB_URL =;
-    private static final String USER =;
-    private static final String PASS =;
-
-    //metodo para realizarla coneccion a la DB
-    private Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(DB_URL, USER, PASS);
-    }
-
-    public boolean CrearHuesped(DtoHuesped dto){}
-    public boolean ModificarHuesped(int idUsuario){}
-    public boolean EliminarHuesped(int idUsuario){}
-    public DtoHuesped ObtenerHuesped(int idUsuario){}
-
 
     public boolean crearHuesped(DtoHuesped dto){
      
@@ -75,7 +62,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     
     public ArrayList<DtoHuesped> obtenerTodosLosHuespedes (){
        
-        List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
+        ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
 
         String sql = "SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped";
         //Usamos try-with-resources para manejar la conexión y la sentencia
@@ -120,9 +107,9 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     
     public ArrayList<DtoHuesped> obtenerHuespedesPorCriterio(DtoHuesped criterios){
     
-        List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
+        ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
         
-        StringBuffer sql = new StringBuffer("SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT apellido, nombres, tipo_documento, numero_documento FROM huesped WHERE 1=1");
         
         //Creamos una lista para guardar los parámetros que realmente usaremos
         List<Object> params = new ArrayList<>();
