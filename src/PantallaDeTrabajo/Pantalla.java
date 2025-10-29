@@ -7,26 +7,23 @@ import Usuario.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Pantalla {
 
     private GestorHuesped gestorHuesped;
     private final Scanner scanner;//para la entrada por teclado
-    // private GestorHuesped gestorHuesped;
+    private GestorUsuario gestorUsuario;
     private boolean usuarioAutenticado;
     private String nombreUsuarioActual;
 
 
     //constructor (hay que ver como lo vamos a llamar)
-    public Pantalla(){
+    public Pantalla() {
         //inicializamos el gestor huesped
-        // DaoHuespedInterfaz daoHuesped = new DaoHuesped();
-        // DaoDireccionInterfaz daoDireccion = new DaoDireccion();
-        //this.gestorHuesped = new GestorHuesped(daoHuesped, daoDireccion);
+        DaoHuespedInterfaz daoHuesped = new DaoHuesped();
+        DaoDireccionInterfaz daoDireccion = new DaoDireccion();
+        this.gestorHuesped = new GestorHuesped(daoHuesped, daoDireccion);
 
         //inicializamos el gestor usuario
         DaoUsuarioInterfaz daoUsuario = new DaoUsuario();
@@ -39,13 +36,13 @@ public class Pantalla {
     }
 
     //METODO PRINCIPAL PARA INICIAR EL SISTEMA
-    public void iniciarSistema(){
+    public void iniciarSistema() {
         System.out.println("========================================");
         System.out.println("   SISTEMA DE GESTION HOTELERA");
         System.out.println("========================================\n");
 
         //Primero autenticar
-        if(autenticarUsuario()){
+        if (autenticarUsuario()) {
             //Si la autenticacion es exitosa, mostrar menu principal
             mostrarMenuPrincipal();
         } else {
@@ -58,12 +55,12 @@ public class Pantalla {
     }
 
     //METODO PARA CU AUTENTICAR USUARIO
-    private boolean autenticarUsuario(){
+    private boolean autenticarUsuario() {
         System.out.println("-- AUTENTICACION DE USUARIO --\n");
 
         boolean autenticacionExitosa = false;
 
-        while(!autenticacionExitosa){
+        while (!autenticacionExitosa) {
             //Paso 2: El sistema presenta la pantalla para autenticar al usuario
             System.out.println("Por favor, ingrese sus credenciales:");
 
@@ -77,7 +74,7 @@ public class Pantalla {
             //Validar con el gestor
             boolean credencialesValidas = gestorUsuario.autenticarUsuario(nombre, contrasenia);
 
-            if(credencialesValidas){
+            if (credencialesValidas) {
                 //Autenticacion exitosa
                 this.usuarioAutenticado = true;
                 this.nombreUsuarioActual = nombre;
@@ -115,10 +112,10 @@ public class Pantalla {
                     continue;
                 }
 
-                if(opcion == 2){
+                if (opcion == 2) {
                     System.out.println("\nCerrando el sistema...");
                     return false; //Sale sin autenticar
-                } else if(opcion == 1){
+                } else if (opcion == 1) {
                     System.out.println("\n-- Intente nuevamente --\n");
                     //Paso 3.A.4: El CU continua en el paso 2 (se repite el while)
                 } else {
@@ -131,11 +128,11 @@ public class Pantalla {
     }
 
     //METODO PARA MOSTRAR MENU PRINCIPAL
-    private void mostrarMenuPrincipal(){
+    private void mostrarMenuPrincipal() {
         //Paso 4: El sistema presenta la pantalla principal
         boolean salir = false;
 
-        while(!salir && usuarioAutenticado){
+        while (!salir && usuarioAutenticado) {
             System.out.println("========================================");
             System.out.println("        MENU PRINCIPAL");
             System.out.println("========================================");
@@ -161,7 +158,7 @@ public class Pantalla {
 
             System.out.println();
 
-            switch(opcion){
+            switch (opcion) {
                 case 1:
                     iniciarBusquedaHuesped();
                     break;
@@ -183,7 +180,7 @@ public class Pantalla {
                 case 6:
                     System.out.print("¿Está seguro que desea cerrar sesión? (SI/NO): ");
                     String confirmar = scanner.nextLine().trim();
-                    if(confirmar.equalsIgnoreCase("SI")){
+                    if (confirmar.equalsIgnoreCase("SI")) {
                         System.out.println("\nCerrando sesión...\n");
                         salir = true;
                         usuarioAutenticado = false;
@@ -197,12 +194,12 @@ public class Pantalla {
     }
 
     //METODO AUXILIAR PARA PAUSAR
-    private void pausa(){
+    private void pausa() {
         System.out.print("Presione ENTER para continuar...");
         scanner.nextLine();
         System.out.println();
     }
-    
+
     public void iniciarBusquedaHuesped() {
         System.out.println("========================================");
         System.out.println("        BÚSQUEDA DE HUÉSPED 🔎");
@@ -215,14 +212,14 @@ public class Pantalla {
             System.out.println("\nNo se encontraron huéspedes con los criterios especificados.");
             System.out.print("¿Desea dar de alta un nuevo huésped? (SI/NO): ");
             if (scanner.nextLine().trim().equalsIgnoreCase("SI")) {
-                this.iniciarAltaHuesped();
+                System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
             }
         } else {
             this.seleccionarHuespedDeLista(huespedesEncontrados);
         }
         pausa();
     }
-    
+
     private DtoHuesped leerCriteriosDeBusqueda() {
         DtoHuesped criterios = new DtoHuesped();
         System.out.println("Ingrese uno o más criterios (presione ENTER para omitir).");
@@ -236,7 +233,7 @@ public class Pantalla {
         }
         return criterios;
     }
-    
+
     private TipoDocumento validarYLeerTipoDocumento() {
         while (true) {
             System.out.print("Tipo de Documento (DNI, Pasaporte, Libreta de Enrolamiento (LE), Libreta Civica(LC)): ");
@@ -251,7 +248,7 @@ public class Pantalla {
             }
         }
     }
-    
+
     private long validarYLeerNumeroDocumento() {
         while (true) {
             System.out.print("Número de Documento: ");
@@ -266,7 +263,7 @@ public class Pantalla {
             }
         }
     }
-    
+
     private void seleccionarHuespedDeLista(List<DtoHuesped> huespedes) {
         mostrarListaHuespedes(huespedes);
         System.out.print("Ingrese el ID del huésped para modificar, o 0 para dar de alta uno nuevo: ");
@@ -274,12 +271,12 @@ public class Pantalla {
 
         if (seleccion > 0 && seleccion <= huespedes.size()) {
             DtoHuesped huespedSeleccionado = huespedes.get(seleccion - 1);
-            this.iniciarModificacionHuesped(huespedSeleccionado);
+            System.out.println("llegamos a modificar el huesped");//this.iniciarModificacionHuesped(huespedSeleccionado);
         } else {
-            this.iniciarAltaHuesped();
+            System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
         }
     }
-    
+
     private void mostrarListaHuespedes(List<DtoHuesped> huespedes) {
         System.out.println("\n-- Huéspedes Encontrados --");
         System.out.printf("%-5s %-20s %-20s %s%n", "ID", "APELLIDO", "NOMBRES", "DOCUMENTO");
@@ -291,7 +288,7 @@ public class Pantalla {
         }
         System.out.println("-----------------------------------------------------------------");
     }
-    
+
     private int leerOpcionNumerica() {
         try {
             return scanner.nextInt();
@@ -301,7 +298,7 @@ public class Pantalla {
             scanner.nextLine(); // Limpia el buffer del scanner
         }
     }
-
+}
   /*  //METODO PARA CU9 DAR DE ALTA HUESPED
     public void iniciarAltaHuesped(){//este metodo debe tener el mismo nombre que el CU?
 
@@ -460,7 +457,7 @@ public class Pantalla {
 
             Si el try funciona (el dato se parsea bien), salís del while.
 
-            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
+            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.
         }
 
         System.out.println("Numero de Documento: ");
