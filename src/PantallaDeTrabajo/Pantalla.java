@@ -4,6 +4,11 @@ package PantallaDeTrabajo;
 import Usuario.*;
 
 import java.util.ArrayList;
+<<<<<<< Updated upstream
+=======
+import java.util.Date;
+import java.util.InputMismatchException;
+>>>>>>> Stashed changes
 import java.util.List;
 import java.util.Scanner;
 
@@ -356,6 +361,7 @@ public class Pantalla {
 
             System.out.println();
 
+<<<<<<< Updated upstream
             switch(opcion){
                 case 1:
                     // cambiar apellido;
@@ -426,6 +432,9 @@ public class Pantalla {
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.\n");
             }
+=======
+            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.
+>>>>>>> Stashed changes
         }
     }
     private boolean pulsarSiguiente(DtoHuesped dtoHuesped){ //Paso2.A CU10
@@ -521,6 +530,7 @@ public class Pantalla {
     System.out.flush();
     }
 
+<<<<<<< Updated upstream
     /*mostrarDireccionHuesped(DtoHuesped dtoHuesped){
         System.out.println("---- DIRECCIÓN DEL HUESPED ----");
         System.out.println("Calle: " + dtoHuesped.getDireccion().getCalle());
@@ -535,3 +545,251 @@ public class Pantalla {
 
 
 } 
+=======
+ private void iniciarModificacionHuesped(DtoHuesped dtoHuesped){ //Metodo para Modificar Huesped CU10
+    boolean salir = false;
+    DtoHuesped dtoHuespedModificado = dtoHuesped;
+    String tipoDocStr = "";
+    String posIvaStr = "";
+        while(!salir){
+            
+            System.out.println("========================================");
+
+            mostrarDatosHuesped(dtoHuespedModificado);
+
+            int opcion = -1;
+            try {
+                opcion = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                continue;
+            }
+
+            System.out.println();
+
+            switch(opcion){
+                case 1:
+                    dtoHuespedModificado.setApellido(scanner.nextLine().trim());
+                    break;
+                case 2:
+                   dtoHuespedModificado.setNombres(scanner.nextLine().trim());
+                    break;
+                case 3:
+                   tipoDocStr = scanner.nextLine().trim().toUpperCase();
+                    break;
+                case 4:
+                   dtoHuespedModificado.setDocumento(scanner.nextLong());
+                    break;
+                case 5:
+                    dtoHuespedModificado.setCuit(scanner.nextLine().trim());
+                    break;
+                case 6:
+                    posIvaStr = scanner.nextLine().trim().toUpperCase();
+                    break;
+                 case 7:
+                    dtoHuespedModificado.setFechaNacimiento(leerFecha("Fecha de nacimiento", dtoHuespedModificado.getFechaNacimiento()));
+                     break;
+                case 8:
+                    cambiardireccionHuesped(dtoHuespedModificado.getDireccion());
+                    break;
+                case 9:
+                    dtoHuespedModificado.setTelefono(scanner.nextInt());
+                    break;
+                case 10:
+                    dtoHuespedModificado.setEmail(scanner.nextLine().trim());
+                    break;
+                case 11:
+                    dtoHuespedModificado.setOcupacion(scanner.nextLine().trim());
+                    break;
+                case 12:
+                    dtoHuespedModificado.setNacionalidad(scanner.nextLine().trim());
+                    break;
+                 case 13: 
+                    // Al pulsar SIGUIENTE validamos omisiones. Si hay errores, no salimos. Paso2 CU10
+                    if (gestorHuesped.validarDatos(dtoHuespedModificado, tipoDocStr, posIvaStr)) {
+                        if(gestorHuesped.tipoynroDocExistente(dtoHuespedModificado)){
+                            System.out.println("¡CUIDADO! El tipo y número de documento ya existen en el sistema");
+                            System.out.println("1. ACEPTAR IGUALMENTE");
+                            System.out.println("2. CORREGIR");
+                            System.out.print("Ingrese una opción: ");
+                            int opcionDoc = -1;
+                            try {
+                                opcionDoc = scanner.nextInt();
+                                scanner.nextLine(); //consumir salto de linea
+                            } catch (Exception e) {
+                                scanner.nextLine(); //limpiar buffer
+                                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                                break;
+                            }
+                            if (opcionDoc == 2) {
+                                // quedarse en la pantalla para que el actor corrija
+                                break;
+                            }
+                        } else{
+                            gestorHuesped.modificarHuesped(dtoHuesped, dtoHuespedModificado);
+                            System.out.println("La operacion ha culminado con éxito.\n");
+                            salir = true;
+                        }
+                    } else {
+                        // quedarse en la pantalla para que el actor corrija. Mensajes enviados en validarDatos
+                    }
+                    break;
+                case 14:
+                    pulsarCancelar(salir);
+                    System.out.println("Modificación cancelada.\n");
+                    break;
+                case 15:
+                    //CU11
+                    System.out.println("Falta CU11, Huésped borrado del sistema. \n");
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+    
+private void cambiardireccionHuesped(DtoDireccion direccion){
+    boolean salir = false;
+    while(!salir){
+        mostrarDireccionHuesped(direccion);
+        System.out.println("Selecciona el dato a cambiar /n");
+        System.out.println("1. Calle");
+        System.out.println("2. Numero");
+        System.out.println("3. Departamento");
+        System.out.println("4. Piso");
+        System.out.println("5. Codigo Postal");
+        System.out.println("6. Localidad");
+        System.out.println("7. Provincia");
+        System.out.println("8. Pais");
+        System.out.println("9. VOLVER");
+        System.out.print("Ingrese una opción: ");
+        int opcion = -1;
+        try {
+            opcion = scanner.nextInt();
+            scanner.nextLine(); //consumir salto de linea
+        } catch (Exception e) {
+            scanner.nextLine(); //limpiar buffer
+            System.out.println("\nOpción inválida. Intente nuevamente.\n");
+            return;
+        }
+        switch(opcion){
+            case 1:
+                direccion.setCalle(scanner.nextLine().trim());
+                break;
+            case 2:
+                direccion.setNumero(scanner.nextInt());
+                break;
+            case 3:
+                direccion.setDepartamento(scanner.nextLine().trim());
+                break;
+            case 4:
+                direccion.setPiso(scanner.nextInt());
+                break;
+            case 5:
+                direccion.setCodPostal(scanner.nextInt());
+                break;
+            case 6:
+                direccion.setLocalidad(scanner.nextLine().trim());
+                break;
+            case 7:
+                direccion.setProvincia(scanner.nextLine().trim());
+                break;
+            case 8:
+                direccion.setPais(scanner.nextLine().trim());
+            break;
+            case 9:
+                return;
+            default:
+                System.out.println("Opción inválida. Intente nuevamente.\n");
+        }
+    }
+}
+    private void pulsarCancelar(boolean salir){ //Paso3 CU10
+        System.out.print("\n¿Desea cancelar la modificación del huésped? ");
+        System.out.print("1. SI");
+        System.out.print("2. NO");
+        int opt = -1;
+        while (true) {
+            System.out.print("Ingrese una opción: ");
+            try {
+                opt = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                
+            }
+            switch (opt){
+                case 1:
+                    System.out.println("\nModificación cancelada.\n");
+                    salir = true;
+                    return;
+                case 2:
+                    System.out.println("\nContinuando con la modificación.\n");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+       
+    private void mostrarDatosHuesped(DtoHuesped dtoHuesped){
+        System.out.println("---- DATOS DEL HUESPED ----");
+        System.out.println("1. Apellido: " + dtoHuesped.getApellido());
+        System.out.println("2. Nombre: " + dtoHuesped.getNombres());
+        System.out.println("3. Tipo de documento: " + dtoHuesped.getTipoDocumento());
+        System.out.println("4. Número de documento: " + dtoHuesped.getDocumento());
+        System.out.println("5. CUIT: " + dtoHuesped.getCuit());
+        System.out.println("6. Posición IVA: " + dtoHuesped.getPosicionIva());
+        System.out.println("7. Fecha de nacimiento: " + dtoHuesped.getFechaNacimiento());
+        mostrarDireccionHuesped(dtoHuesped.getDireccion()); 
+        System.out.println("9. Teléfono: " + dtoHuesped.getTelefono());
+        System.out.println("10. Email: " + dtoHuesped.getEmail());
+        System.out.println("11. Ocupación: " + dtoHuesped.getOcupacion());
+        System.out.println("12. Nacionalidad: " + dtoHuesped.getNacionalidad());
+        System.out.println("13. SIGUIENTE");
+        System.out.println("14. CANCELAR");
+        System.out.println("15. BORRAR HUESPED");
+        System.out.println("---------------------------\n");
+    }
+
+    private void mostrarDireccionHuesped(DtoDireccion direccion){
+        System.out.println("8. DIRECCIÓN DEL HUESPED");
+        System.out.println("Calle: " + direccion.getCalle());
+        System.out.println("Número: " + direccion.getNumero());
+        System.out.println("Departamento: " + direccion.getDepartamento());
+        System.out.println("Piso: " + direccion.getPiso());
+        System.out.println("Código Postal: " + direccion.getCodPostal());
+        System.out.println("Localidad: " + direccion.getLocalidad());
+        System.out.println("Provincia: " + direccion.getProvincia());
+        System.out.println("País: " + direccion.getPais());
+        System.out.println("-------------------------------\n");
+    }
+
+
+    /*
+     * Lee una fecha desde la entrada en formato dd/MM/yyyy.
+     * Si el usuario ingresa línea vacía, devuelve current (mantiene la fecha actual).
+     */
+    private Date leerFecha(String etiqueta, Date current) {
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        formato.setLenient(false);
+        while (true) {
+            String actual = (current == null) ? "vacío" : formato.format(current);
+            System.out.print(etiqueta + " (dd/MM/yyyy) [ENTER para mantener: " + actual + "]: ");
+            String linea = scanner.nextLine().trim();
+            if (linea.isEmpty()) {
+                return current;
+            }
+            try {
+                return formato.parse(linea);
+            } catch (ParseException e) {
+                System.out.println("Formato inválido. Use dd/MM/yyyy. Intente nuevamente.");
+            }
+        }
+    }
+}
+>>>>>>> Stashed changes

@@ -3,6 +3,8 @@ package Huesped;
 //PROBANDO
 
 import Dominio.Huesped;
+import enums.TipoDocumento;
+
 import java.util.List;
 
 public class GestorHuesped {
@@ -110,30 +112,11 @@ public class GestorHuesped {
         // Segun el diagrama de secuencia no lo hace el gestor
     }
 
-    public boolean modificarHuesped(){
-        //ponemos todos los datos del huesped en pantalla
-        //Botones SIGUIENTE, CANCELAR Y BORRAR
-
-            //el actor blaquea 1 o + datos y toca SIGUIENTE
-            //mostramos mensaje detallando omisiones hechas
-            //volvemos al paso anterior
-
-            //ya existe el document
-            //misma logica que el dar el alta
-
-            //Cancelar
-            //misma logica que dar de alta
-
-            //BORRAR
-            //ejecutar cu11 "dar de baja huesped"
-
-        //Modifica los datos, toca siguiente
-        //actualizamos los datos, persistir con dao en la bdd
-        //mensaje de exito
-        //termina
+    public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
+        daoHuesped.modificarHuesped(dtoHuespedOriginal, dtoHuespedModificado);
     }
 
-    public boolean darDeBajaHuesped(){
+ //   public boolean darDeBajaHuesped(){
         //primero verificar que existe
         //ejecutar el buscarHuesped()
 
@@ -152,5 +135,82 @@ public class GestorHuesped {
         //toca Eliminar, borramos el huesped. Se ocupa el DAO
         //mostramos mensaje de eliminacion y presione cualq tecla,
         //termina el cu
+ //   }
+ public boolean validarDatos(DtoHuesped dtoHuesped, String TipoDoc, String PosIva) {
+        List<String> errores = new ArrayList<>();
+
+        if (dtoHuesped.getApellido() == null || dtoHuesped.getApellido().isBlank()) {
+            errores.add("Apellido");
+        }
+        if (dtoHuesped.getNombres() == null || dtoHuesped.getNombres().isBlank()) {
+            errores.add("Nombres");
+        }
+
+        // Validar que TipoDoc no sea nulo/blank y que exista en el enum TipoDocumento
+      if (TipoDoc == null || TipoDoc.isBlank()) {
+            errores.add("Tipo de documento");
+        } else {
+            String tipoDocNormalized = TipoDoc.trim().toUpperCase();
+            try {
+                dtoHuesped.setTipoDocumento(TipoDocumento.valueOf(tipoDocNormalized));
+            } catch (IllegalArgumentException ex) {
+                errores.add("Tipo de documento (valor inválido)");
+            }
+        }
+        if (dtoHuesped.getDocumento() <= 0L) {
+            errores.add("Número de documento");
+        }
+        if(dtoHuesped.getCuit() == null || dtoHuesped.getCuit().isBlank()) {
+            errores.add("CUIT");
+        }
+        if (PosIva == null || PosIva.isBlank()) {
+            // Si querés asignar por omisión:
+            dtoHuesped.setPosicionIva(enums.PosIva.ConsumidorFinal);
+        } else {
+            String posIvaNormalized = PosIva.trim().toUpperCase();
+            try {
+                dtoHuesped.setPosicionIva(enums.PosIva.valueOf(posIvaNormalized));
+            } catch (IllegalArgumentException ex) {
+                errores.add("Posición frente al IVA (valor inválido)");
+            }
+        }
+        
+        if(dtoHuesped.getFechaNacimiento() == null) {
+            errores.add("Fecha de nacimiento");
+        }
+        // validar dirección
+        if (dtoHuesped.getTelefono() <= 0L) {
+            errores.add("Teléfono");
+        }
+        if(dtoHuesped.getEmail() == null || dtoHuesped.getEmail().isBlank()) {
+            errores.add("Email");
+        }
+        if(dtoHuesped.getOcupacion() == null || dtoHuesped.getOcupacion().isBlank()) {
+            errores.add("Ocupación");
+        }
+        if(dtoHuesped.getNacionalidad() == null || dtoHuesped.getNacionalidad().isBlank()) {
+            errores.add("Nacionalidad");
+        }
+
+        if (!errores.isEmpty()) {
+            System.out.println("\n*** ERROR: Faltan o son inválidos los siguientes datos obligatorios: ***");
+            for (String e : errores){
+                System.out.println("- " + e);
+            }
+            System.out.println("Por favor complete/corrija los campos indicados. Los campos no se han blanqueado.\n");
+            return false;
+        }
+
+        System.out.println("La operación ha culminado con éxito.\n");
+        return true;
+    }    
+
+    public boolean tipoynroDocExistente(DtoHuesped dtoHuesped) {
+        if(daoHuesped.docExistente(dtoHuesped)){  //consultar dao si existe un huesped con ese tipo y nro de doc
+            return true; //retornar true si existe, false si no
+        }
+        return false;
     }
 }
+
+       

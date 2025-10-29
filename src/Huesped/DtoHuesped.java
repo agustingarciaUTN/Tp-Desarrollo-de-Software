@@ -103,4 +103,21 @@ public class DtoHuesped {
     public void setNacionalidad(String nacionalidad) {
         this.nacionalidad = nacionalidad;
     }
+<<<<<<< Updated upstream
+=======
+    public void setDireccion(DtoDireccion dtoDireccion)
+    { this.dtoDireccion = dtoDireccion;
+     }
+    public DtoDireccion getDireccion(){
+         return this.dtoDireccion;
+    }
+    public boolean estanVacios() {
+        boolean apellidoVacio = (apellido == null || apellido.trim().isEmpty());
+        boolean nombresVacio = (nombres == null || nombres.trim().isEmpty());
+        boolean tipoDocVacio = (tipoDocumento == null);
+        boolean docVacio = (documento <= 0);
+        return apellidoVacio && nombresVacio && tipoDocVacio && docVacio;
+    }
+    
+>>>>>>> Stashed changes
 }

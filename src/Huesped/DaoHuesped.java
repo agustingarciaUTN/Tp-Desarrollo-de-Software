@@ -8,9 +8,6 @@ import Usuario.DtoUsuario;
 import BaseDeDatos.Coneccion;
 import enums.TipoDocumento;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 public class DaoHuesped implements DaoHuespedInterfaz {
 
     //estos son los atributos que necesita la clase para conectarse a la DB
@@ -33,7 +30,47 @@ public class DaoHuesped implements DaoHuespedInterfaz {
      
     }
     
-    public boolean modificarHuesped(int idUsuario){}
+    public boolean modificarHuesped(DtoHuesped original, DtoHuesped modificado){
+        String sql = "UPDATE huesped SET apellido = ?, nombres = ?, tipo_documento = ?, numero_documento = ?, cuit = ?, posicion_iva = ?, fecha_nacimiento = ?, telefono = ?, email = ?, ocupacion = ?, nacionalidad = ?, direccion_id = ? WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, modificado.getApellido());
+            pstmt.setString(2, modificado.getNombres());
+            pstmt.setString(3, modificado.getTipoDocumento() != null ? modificado.getTipoDocumento().name() : null);
+            pstmt.setLong(4, modificado.getDocumento());
+            pstmt.setString(5, modificado.getCuit());
+            pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().name() : null);
+
+            if (modificado.getFechaNacimiento() != null) {
+                pstmt.setDate(7, new java.sql.Date(modificado.getFechaNacimiento().getTime()));
+            } else {
+                pstmt.setNull(7, java.sql.Types.DATE);
+            }
+
+            pstmt.setInt(8, modificado.getTelefono());
+            pstmt.setString(9, modificado.getEmail());
+            pstmt.setString(10, modificado.getOcupacion());
+            pstmt.setString(11, modificado.getNacionalidad());
+
+            if (modificado.getDireccion() != null && modificado.getDireccion().getId() > 0) {
+                pstmt.setInt(12, modificado.getDireccion().getId());
+            } else {
+                pstmt.setNull(12, java.sql.Types.INTEGER);
+            }
+
+            // WHERE params: original tipo + numero
+            pstmt.setString(13, original.getTipoDocumento() != null ? original.getTipoDocumento().name() : null);
+            pstmt.setLong(14, original.getDocumento());
+
+            int updated = pstmt.executeUpdate();
+            return updated > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al modificar huésped: " + e.getMessage());
+            return false;
+        }
+    }
     public boolean eliminarHuesped(int idUsuario){}
     
     public ArrayList<DtoHuesped> obtenerTodosLosHuespedes (){
@@ -157,6 +194,77 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         return huespedesEncontrados;
         
     }
+
+
+    public boolean docExistente(DtoHuesped criterios){
+    
+        ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
+        
+        StringBuilder sql = new StringBuilder("tipo_documento, numero_documento FROM huesped WHERE 1=1");
+        
+        //Creamos una lista para guardar los parámetros que realmente usaremos
+        List<Object> params = new ArrayList<>();
+
+        if (criterios.getTipoDocumento() != null) {
+            sql.append(" AND tipo_documento = ?");
+            params.add(criterios.getTipoDocumento().name()); //.name() es para devolver el valor del enum como string
+        }
+        if (criterios.getDocumento() > 0) {
+            sql.append(" AND numero_documento = ?");
+            params.add(criterios.getDocumento());
+        }
+
+        //Ejecutamos la consulta con los parámetros recolectados
+        try (Connection conn = Coneccion.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString());) {
+
+            // Asignamos los parámetros con sus tipos correctos
+           for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    pstmt.setString(i + 1, (String) param);
+                } else if (param instanceof Long) {
+                    pstmt.setLong(i + 1, (Long) param);
+                }
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                //Mapeamos los resultados a DTOs
+                 while (rs.next()) {
+                // Para cada fila, creamos un nuevo DTO
+                DtoHuesped huespedDTO = new DtoHuesped();
+                
+                //Mapeamos cada columna al atributo correspondiente del DTO
+                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                
+                //Para el enum cambia
+                //Primero leemos el tipo de documento como string y despues lo convertimos a enum
+                String tipoDocumentoStr = rs.getString("tipo_documento");
+                try {
+                 if (tipoDocumentoStr != null) {
+                 huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
+                }
+                } catch (IllegalArgumentException e) {
+                  System.err.println("Valor de tipo_documento no válido en la BD: " + tipoDocumentoStr);
+                }
+
+                //Añadimos el DTO a nuestra lista
+                huespedesEncontrados.add(huespedDTO);
+            }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al buscar huéspedes por criterio: " + e.getMessage());
+        }
+
+        if(huespedesEncontrados.size()>0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     /* Crear un nuevo huésped
     method CrearHuesped(DtoHuesped dto) -> boolean:
     iniciar conexión a la base de datos
