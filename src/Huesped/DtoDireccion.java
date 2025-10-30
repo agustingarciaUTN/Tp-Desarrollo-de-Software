@@ -31,7 +31,6 @@ public class DtoDireccion {
     public int getId() {
         return ID;
     }
-
     public void setId(int id) {
         this.ID = id;
     }

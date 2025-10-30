@@ -34,9 +34,7 @@ public class DtoHuesped {
         this.nacionalidad = nacionalidad;
     }
     
-    public DtoHuesped (){
-        this.posicionIva = PosIva.ConsumidorFinal; // Establecemos el valor por defecto
-    }
+    public DtoHuesped (){}
 
     // Getters y Setters
     public String getNombres() {

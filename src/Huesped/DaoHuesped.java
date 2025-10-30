@@ -19,11 +19,11 @@ public class DaoHuesped implements DaoHuespedInterfaz {
        
         ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
 
-        String sql = "SELECT h.apellido, h.nombres, h.tipo_documento, h.numero_documento, h.telefono, h.cuit, h.nacionalidad, " +
-                   "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, e.email " +
+       String sql = "SELECT h.apellido, h.nombres, h.tipo_documento, h.numero_documento, h.telefono, h.cuit, h.nacionalidad, " +
+                   "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, MAX(e.email) as email " +
                    "FROM huesped h " +
-                   "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.nro_documento";
-        //Usamos try-with-resources para manejar la conexión y la sentencia
+                   "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.nro_documento " +
+                   "GROUP BY h.tipo_documento, h.numero_documento, h.apellido, h.nombres, h.telefono, h.cuit, h.nacionalidad, h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion";
         try (Connection conn = Coneccion.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql);) {
@@ -85,9 +85,9 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     
         ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
         
-        StringBuilder sql = new StringBuilder(
+       StringBuilder sql = new StringBuilder(
             "SELECT h.apellido, h.nombres, h.tipo_documento, h.numero_documento, h.telefono, h.cuit, h.nacionalidad, " +
-            "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, e.email " +
+            "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, MAX(e.email) as email " + // <-- MAX() añadido
             "FROM huesped h " +
             "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.nro_documento " +
             "WHERE 1=1");
@@ -110,11 +110,12 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             params.add(criterios.getTipoDocumento().name()); 
         }
         if (criterios.getDocumento() > 0) {
-            sql.append(" AND h.numero_documento = ?"); // <-- Se agregó h.
+            sql.append(" AND h.numero_documento = ?");
             params.add(criterios.getDocumento());
         }
 
         //Ejecutamos la consulta con los parámetros recolectados
+        sql.append(" GROUP BY h.tipo_documento, h.numero_documento, h.apellido, h.nombres, h.telefono, h.cuit, h.nacionalidad, h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion");
         try (Connection conn = Coneccion.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql.toString());) {
 
@@ -153,7 +154,6 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                     huespedDTO.setIdDireccion(0); //0 indica que no hay direccion asociada
                 }
 
-
                 //Para el enum cambia
                 //Primero leemos el tipo de documento como string y despues lo convertimos a enum
                 String tipoDocumentoStr = rs.getString("tipo_documento");
@@ -161,16 +161,16 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 // Convertimos y establecemos la posición IVA usando el método fromString
                 huespedDTO.setPosicionIva(PosIva.fromString(posicionIvaStr));
                 try {
-                 if (tipoDocumentoStr != null) {
-                 huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
-                }
+                    if (tipoDocumentoStr != null) {
+                        huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
+                    }
                 } catch (IllegalArgumentException e) {
-                  System.err.println("Valor de tipo_documento no válido en la BD: " + tipoDocumentoStr);
-                }
+                        System.err.println("Valor de tipo_documento no válido en la BD: " + tipoDocumentoStr);
+                    }
 
-                //Añadimos el DTO a nuestra lista
-                huespedesEncontrados.add(huespedDTO);
-            }
+                    //Añadimos el DTO a nuestra lista
+                    huespedesEncontrados.add(huespedDTO);
+                }
             }
 
         } catch (SQLException e) {
@@ -180,7 +180,88 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         return huespedesEncontrados;
         
     }
+public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
+        String sql = "SELECT id_direccion FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
 
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tipoDocumento);
+            ps.setLong(2, nroDocumento);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_direccion");
+                }
+            }
+
+            return -1;
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener ID de dirección: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    /**
+     * Elimina un huésped de la base de datos (borrado físico)
+     * @param tipoDocumento Tipo de documento del huésped
+     * @param nroDocumento Número de documento del huésped
+     * @return true si se eliminó exitosamente
+     */
+    public boolean eliminarHuesped(String tipoDocumento, long nroDocumento) {
+        String sql = "DELETE FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tipoDocumento);
+            ps.setLong(2, nroDocumento);
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Huésped eliminado exitosamente");
+                return true;
+            }
+            return false;
+
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar huésped: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Elimina una dirección de la base de datos
+     * @param idDireccion ID de la dirección a eliminar
+     * @return true si se eliminó exitosamente
+     */
+    public boolean eliminarDireccion(int idDireccion) {
+        if (idDireccion <= 0) {
+            return false;
+        }
+
+        String sql = "DELETE FROM direccion WHERE id_direccion = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idDireccion);
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Dirección eliminada exitosamente");
+                return true;
+            }
+            return false;
+
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar dirección: " + e.getMessage());
+            return false;
+        }
+    }
     public boolean docExistente(DtoHuesped criterios){
     
         ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();
@@ -249,8 +330,6 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         }
     }
 
-
-   
     public boolean modificarHuesped(DtoHuesped original, DtoHuesped modificado){
         Connection conn = null;
         try {

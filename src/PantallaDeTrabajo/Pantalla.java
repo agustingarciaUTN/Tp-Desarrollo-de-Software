@@ -7,11 +7,7 @@ import Usuario.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Pantalla {
 
@@ -23,7 +19,7 @@ public class Pantalla {
 
 
     //constructor (hay que ver como lo vamos a llamar)
-    public Pantalla(){
+    public Pantalla() {
         //inicializamos el gestor huesped
         DaoHuespedInterfaz daoHuesped = new DaoHuesped();
         DaoDireccionInterfaz daoDireccion = new DaoDireccion();
@@ -40,13 +36,13 @@ public class Pantalla {
     }
 
     //METODO PRINCIPAL PARA INICIAR EL SISTEMA
-    public void iniciarSistema(){
+    public void iniciarSistema() {
         System.out.println("========================================");
         System.out.println("   SISTEMA DE GESTION HOTELERA");
         System.out.println("========================================\n");
 
         //Primero autenticar
-        if(autenticarUsuario()){
+        if (autenticarUsuario()) {
             //Si la autenticacion es exitosa, mostrar menu principal
             mostrarMenuPrincipal();
         } else {
@@ -59,12 +55,12 @@ public class Pantalla {
     }
 
     //METODO PARA CU AUTENTICAR USUARIO
-    private boolean autenticarUsuario(){
+    private boolean autenticarUsuario() {
         System.out.println("-- AUTENTICACION DE USUARIO --\n");
 
         boolean autenticacionExitosa = false;
 
-        while(!autenticacionExitosa){
+        while (!autenticacionExitosa) {
             //Paso 2: El sistema presenta la pantalla para autenticar al usuario
             System.out.println("Por favor, ingrese sus credenciales:");
 
@@ -76,15 +72,15 @@ public class Pantalla {
             String contrasenia = scanner.nextLine(); //en consola no se puede ocultar realmente
 
             //Validar con el gestor
-            boolean credencialesValidas = true;
+            boolean credencialesValidas = gestorUsuario.autenticarUsuario(nombre, contrasenia);
 
-            if(credencialesValidas){
+            if (credencialesValidas) {
                 //Autenticacion exitosa
                 this.usuarioAutenticado = true;
                 this.nombreUsuarioActual = nombre;
                 System.out.println("\n¡Autenticación exitosa! Bienvenido, " + nombre + "\n");
                 autenticacionExitosa = true;
-           /*  } else {
+            } else {
                 //Paso 3.A: El usuario o la contraseña son inválidos
                 //Paso 3.A.1: El sistema muestra el mensaje de error
                 System.out.println("\n*** ERROR ***");
@@ -116,15 +112,15 @@ public class Pantalla {
                     continue;
                 }
 
-                if(opcion == 2){
+                if (opcion == 2) {
                     System.out.println("\nCerrando el sistema...");
                     return false; //Sale sin autenticar
-                } else if(opcion == 1){
+                } else if (opcion == 1) {
                     System.out.println("\n-- Intente nuevamente --\n");
                     //Paso 3.A.4: El CU continua en el paso 2 (se repite el while)
                 } else {
                     System.out.println("\nOpción inválida. Intente nuevamente.\n");
-                }*/
+                }
             }
         }
 
@@ -132,11 +128,11 @@ public class Pantalla {
     }
 
     //METODO PARA MOSTRAR MENU PRINCIPAL
-    private void mostrarMenuPrincipal(){
+    private void mostrarMenuPrincipal() {
         //Paso 4: El sistema presenta la pantalla principal
         boolean salir = false;
 
-        while(!salir && usuarioAutenticado){
+        while (!salir && usuarioAutenticado) {
             System.out.println("========================================");
             System.out.println("        MENU PRINCIPAL");
             System.out.println("========================================");
@@ -144,7 +140,7 @@ public class Pantalla {
             System.out.println("----------------------------------------");
             System.out.println("1. Buscar huesped (CU2)");
             System.out.println("2. Dar de alta huesped (CU9)");
-            System.out.println("3. Dar de baja huesped ");
+            System.out.println("3. Dar de baja huesped (CU11) ");
             System.out.println("4. Modificar Huesped");
             System.out.println("5. Cerrar sesión");
             System.out.println("========================================");
@@ -162,7 +158,7 @@ public class Pantalla {
 
             System.out.println();
 
-            switch(opcion){
+            switch (opcion) {
                 case 1:
                     iniciarBusquedaHuesped();
                     break;
@@ -170,8 +166,7 @@ public class Pantalla {
                     // iniciarAltaHuesped();
                     break;
                 case 3:
-                    System.out.println("Funcionalidad en desarrollo...\n");
-                    pausa();
+                    iniciarBajaHuesped();
                     break;
                 case 4:
                     System.out.println("Funcionalidad en desarrollo...\n");
@@ -184,7 +179,7 @@ public class Pantalla {
                 case 6:
                     System.out.print("¿Está seguro que desea cerrar sesión? (SI/NO): ");
                     String confirmar = scanner.nextLine().trim();
-                    if(confirmar.equalsIgnoreCase("SI")){
+                    if (confirmar.equalsIgnoreCase("SI")) {
                         System.out.println("\nCerrando sesión...\n");
                         salir = true;
                         usuarioAutenticado = false;
@@ -198,12 +193,12 @@ public class Pantalla {
     }
 
     //METODO AUXILIAR PARA PAUSAR
-    private void pausa(){
+    public void pausa() {
         System.out.print("Presione ENTER para continuar...");
         scanner.nextLine();
         System.out.println();
     }
-    
+
     public void iniciarBusquedaHuesped() {
         System.out.println("========================================");
         System.out.println("        BÚSQUEDA DE HUÉSPED 🔎");
@@ -216,28 +211,90 @@ public class Pantalla {
             System.out.println("\nNo se encontraron huéspedes con los criterios especificados.");
             System.out.print("¿Desea dar de alta un nuevo huésped? (SI/NO): ");
             if (scanner.nextLine().trim().equalsIgnoreCase("SI")) {
-                //this.iniciarAltaHuesped();
+                System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
             }
         } else {
             this.seleccionarHuespedDeLista(huespedesEncontrados);
         }
         pausa();
     }
-    
+
     private DtoHuesped leerCriteriosDeBusqueda() {
         DtoHuesped criterios = new DtoHuesped();
         System.out.println("Ingrese uno o más criterios (presione ENTER para omitir).");
-        System.out.print("Apellido que comience con: ");
-        criterios.setApellido(scanner.nextLine().trim());
-        System.out.print("Nombres que comiencen con: ");
-        criterios.setNombres(scanner.nextLine().trim());
-        criterios.setTipoDocumento(validarYLeerTipoDocumento());
-        if (criterios.getTipoDocumento() != null) {
-            criterios.setDocumento(validarYLeerNumeroDocumento());
+
+        // VALIDACIÓN DE APELLIDO
+        while (true) {
+            System.out.print("Apellido que comience con: ");
+            String apellido = scanner.nextLine().trim();
+
+            if (apellido.isEmpty()) {
+                break; // Usuario omite este criterio
+            }
+
+            // Validar longitud
+            if (apellido.length() < 2) {
+                System.out.println("⚠ El apellido debe tener al menos 2 caracteres. Intente nuevamente.");
+                continue;
+            }
+
+            if (apellido.length() > 100) {
+                System.out.println("⚠ El apellido no puede exceder los 100 caracteres. Intente nuevamente.");
+                continue;
+            }
+
+            // Validar que solo contenga letras, espacios y caracteres válidos (á, é, í, ó, ú, ñ)
+            if (!apellido.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
+                System.out.println("⚠ El apellido solo puede contener letras y espacios. Intente nuevamente.");
+                continue;
+            }
+
+            criterios.setApellido(apellido);
+            break;
         }
+
+        // VALIDACIÓN DE NOMBRES
+        while (true) {
+            System.out.print("Nombres que comiencen con: ");
+            String nombres = scanner.nextLine().trim();
+
+            if (nombres.isEmpty()) {
+                break; // Usuario omite este criterio
+            }
+
+            // Validar longitud
+            if (nombres.length() < 2) {
+                System.out.println("⚠ Los nombres deben tener al menos 2 caracteres. Intente nuevamente.");
+                continue;
+            }
+
+            if (nombres.length() > 100) {
+                System.out.println("⚠ Los nombres no pueden exceder los 100 caracteres. Intente nuevamente.");
+                continue;
+            }
+
+            // Validar que solo contenga letras, espacios y caracteres válidos
+            if (!nombres.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
+                System.out.println("⚠ Los nombres solo pueden contener letras y espacios. Intente nuevamente.");
+                continue;
+            }
+
+            criterios.setNombres(nombres);
+            break;
+        }
+
+        // VALIDACIÓN DE TIPO DE DOCUMENTO (sin cambios, ya está bien)
+        criterios.setTipoDocumento(validarYLeerTipoDocumento());
+
+        // VALIDACIÓN DE NÚMERO DE DOCUMENTO
+        if (criterios.getTipoDocumento() != null) {
+            criterios.setDocumento(validarYLeerNumeroDocumento(criterios.getTipoDocumento()));
+        }
+
         return criterios;
     }
-    
+
+
     private TipoDocumento validarYLeerTipoDocumento() {
         while (true) {
             System.out.print("Tipo de Documento (DNI, Pasaporte, Libreta de Enrolamiento (LE), Libreta Civica(LC)): ");
@@ -252,22 +309,45 @@ public class Pantalla {
             }
         }
     }
-    
-    private long validarYLeerNumeroDocumento() {
+
+    private long validarYLeerNumeroDocumento(TipoDocumento tipoDoc) {
         while (true) {
             System.out.print("Número de Documento: ");
             String numeroStr = scanner.nextLine().trim();
+
             if (numeroStr.isEmpty()) {
-                return 0; // Se devuelve 0 si se omite, el gestor lo ignorará.
+                return 0; // Se devuelve 0 si se omite
             }
+
             try {
-                return Long.parseLong(numeroStr); // Intenta convertir el String a long.
+                long numero = Long.parseLong(numeroStr);
+
+                // VALIDACIÓN DE RANGO SEGÚN TIPO DE DOCUMENTO
+                if (tipoDoc == TipoDocumento.DNI) {
+                    if (numero < 0 || numero > 99999999) {
+                        System.out.println("⚠ El DNI debe estar entre 0 y 99.999.999. Intente nuevamente.");
+                        continue;
+                    }
+                } else if (tipoDoc == TipoDocumento.LE || tipoDoc == TipoDocumento.LC) {
+                    if (numero < 0 || numero > 99999999) {
+                        System.out.println("⚠ La " + tipoDoc.name() + " debe estar entre 0 y 99.999.999. Intente nuevamente.");
+                        continue;
+                    }
+                } else if (tipoDoc == TipoDocumento.PASAPORTE) {
+                    if (numero <= 0) {
+                        System.out.println("⚠ El número de pasaporte debe ser mayor a 0. Intente nuevamente.");
+                        continue;
+                    }
+                }
+
+                return numero;
+
             } catch (NumberFormatException e) {
-                System.out.println("❌ Error: El número de documento debe ser un valor numérico. Intente de nuevo.");
+                System.out.println("⚠ El número de documento debe ser un valor numérico. Intente nuevamente.");
             }
         }
     }
-    
+
     private void seleccionarHuespedDeLista(List<DtoHuesped> huespedes) {
         mostrarListaHuespedes(huespedes);
         System.out.print("Ingrese el ID del huésped para modificar, o 0 para dar de alta uno nuevo: ");
@@ -277,10 +357,10 @@ public class Pantalla {
             DtoHuesped huespedSeleccionado = huespedes.get(seleccion - 1);
             this.iniciarModificacionHuesped(huespedSeleccionado);
         } else {
-           // this.iniciarAltaHuesped();
+            System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
         }
     }
-    
+
     private void mostrarListaHuespedes(List<DtoHuesped> huespedes) {
         System.out.println("\n-- Huéspedes Encontrados --");
         System.out.printf("%-5s %-20s %-20s %s%n", "ID", "APELLIDO", "NOMBRES", "DOCUMENTO");
@@ -292,7 +372,7 @@ public class Pantalla {
         }
         System.out.println("-----------------------------------------------------------------");
     }
-    
+
     private int leerOpcionNumerica() {
         try {
             return scanner.nextInt();
@@ -303,254 +383,113 @@ public class Pantalla {
         }
     }
 
-  /*  //METODO PARA CU9 DAR DE ALTA HUESPED
-    public void iniciarAltaHuesped(){//este metodo debe tener el mismo nombre que el CU?
 
-        //no se si es necesario, despues habra que ver la parte estetica
-        System.out.println("========================================");
-        System.out.println("-- CU9: DAR DE ALTA HUESPED --");
+    public void iniciarBajaHuesped() {
+        System.out.println("\n========================================");
+        System.out.println("   CU11: DAR DE BAJA HUÉSPED");
         System.out.println("========================================\n");
 
-        boolean continuarCargando = true;//bandera
+        // Paso 1: Buscar el huésped a eliminar
+        System.out.println("Primero debe buscar el huésped que desea eliminar.\n");
 
-        while(continuarCargando) {
-            //metodo para pedir datos
-            DtoHuesped datosIngresados = mostrarYPedirDatosFormulario();
+        DtoHuesped criterios = leerCriteriosDeBusqueda();
+        ArrayList<DtoHuesped> huespedesEncontrados = gestorHuesped.buscarHuesped(criterios);
 
-            System.out.println("\nAcciones: 1 = SIGUIENTE, 2 = CANCELAR");
-            System.out.print("Ingrese una opcion: ");
-            int opcionBoton = scanner.nextInt();
-            scanner.nextLine();//para consumir el salto de linea
+        if (huespedesEncontrados.isEmpty()) {
+            System.out.println("\nNo se encontraron huéspedes con los criterios especificados.");
+            System.out.println("No hay huéspedes para eliminar.\n");
+            pausa();
+            return; // Termina el CU
+        }
 
-            if (opcionBoton == 1) {//presiono SIGUIENTE
-                System.out.println("Procesando datos...\n");
+        // Mostrar lista de huéspedes encontrados
+        mostrarListaHuespedes(huespedesEncontrados);
 
+        System.out.print("\nIngrese el número del huésped que desea eliminar (0 para cancelar): ");
+        int seleccion = leerOpcionNumerica();
 
-                //aca hay que llamar al gestor para que valide los datos
-                //List<String> errores = gestorHuesped.validarDatos(datosIngresados);
-                List<String> errores = new ArrayList<>();
+        if (seleccion == 0) {
+            System.out.println("Eliminación cancelada.\n");
+            return; // Termina el CU
+        }
 
-                if(!errores.isEmpty()){
-                    System.out.println("*** ERROR: Se encontraron los siguientes errores: ***");
-                    for(String error : errores){
-                        System.out.println("- " + error);
-                    }
-                    System.out.println("Por favor, ingrese los datos nuevamente\n");
-                    pausa();
-                    continue; //fuerza al inicio del while
-                }
+        if (seleccion < 1 || seleccion > huespedesEncontrados.size()) {
+            System.out.println("Selección inválida. Eliminación cancelada.\n");
+            pausa();
+            return; // Termina el CU
+        }
 
-                System.out.println("El huesped '" + datosIngresados.getNombres() + " " + datosIngresados.getApellido() +"' ha sido satisfactoriamente cargado al sistema.");
+        // Huésped seleccionado
+        DtoHuesped huespedSeleccionado = huespedesEncontrados.get(seleccion - 1);
 
-                System.out.print("\n¿Desea cargar otro huesped? (SI/NO): ");
+        // Paso 2: Validar si el huésped puede ser eliminado
+        String tipoDoc = huespedSeleccionado.getTipoDocumento().name();
+        long nroDoc = huespedSeleccionado.getDocumento();
 
-                //validacion de ingreso correcto
-                String ingresoOtroHuesped = scanner.nextLine().trim();
-                while (!ingresoOtroHuesped.equalsIgnoreCase("NO") && !ingresoOtroHuesped.equalsIgnoreCase("SI")) {
-                    System.out.print("Ingreso invalido. ¿Desea cargar otro huesped? (SI/NO): ");
-                    ingresoOtroHuesped = scanner.nextLine().trim();
-                }
+        boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
 
-                //si ingreso NO termina el bucle, si ingreso SI se repite
-                if (ingresoOtroHuesped.equalsIgnoreCase("NO")) {
-                    continuarCargando = false;
-                }
-                System.out.println();
+        if (!puedeEliminar) {
+            // Flujo Alternativo 2.A: El huésped se alojó alguna vez
+            System.out.println("\n*** NO SE PUEDE ELIMINAR ***");
+            System.out.println("El huésped se ha alojado en el hotel en alguna oportunidad.");
+            System.out.println("Por razones de auditoría, el huésped NO puede ser eliminado del sistema.");
+            System.out.println("*****************************\n");
 
-            } else if (opcionBoton == 2) {//presiono CANCELAR
+            pausa();
+            return; // Termina el CU (Flujo Alternativo 2.A.1)
+        }
 
-                //validacion de ingreso correcto (capaz esto puede ser una funcion aparte, habria que ver como manejar los mensajes distintos)
-                String ingresoCancelarAlta = scanner.nextLine().trim();
-                while (!ingresoCancelarAlta.equalsIgnoreCase("NO") && !ingresoCancelarAlta.equalsIgnoreCase("SI")) {
-                    System.out.print("Ingreso invalido. ¿Desea cancelar el alta de huesped? (SI/NO): ");
-                    ingresoCancelarAlta = scanner.nextLine().trim();
-                }
+        // Paso 2 (continuación): El huésped NUNCA se alojó, se puede eliminar
+        System.out.println("\nLos datos del huésped que será eliminado son:");
+        System.out.println("----------------------------------------");
+        System.out.println("Nombre:    " + huespedSeleccionado.getNombres());
+        System.out.println("Apellido:  " + huespedSeleccionado.getApellido());
+        System.out.println("Documento: " + huespedSeleccionado.getTipoDocumento().name() + " " + huespedSeleccionado.getDocumento());
+        System.out.println("----------------------------------------\n");
 
-                if (ingresoCancelarAlta.equalsIgnoreCase("SI")) {
-                    System.out.println("\nAlta cancelada.\n");
-                    continuarCargando = false;//termina el bucle
-                } else {
-                    System.out.println();
-                }
-                //si ingresa NO, el bucle se repite y vuelve a pedir los datos (no se si esta bien que tenga que ingresar todo de 0)
+        System.out.println("¿Está seguro que desea ELIMINAR este huésped?");
+        System.out.println("1. ELIMINAR");
+        System.out.println("2. CANCELAR");
+        System.out.print("Ingrese una opción: ");
+
+        int opcion = leerOpcionNumerica();
+
+        if (opcion == 1) {
+            // Paso 3: El actor presiona "ELIMINAR"
+            System.out.println("\nEliminando huésped...");
+
+            boolean eliminado = gestorHuesped.eliminarHuesped(tipoDoc, nroDoc);
+
+            if (eliminado) {
+                // Éxito
+                System.out.println("\n*** ELIMINACIÓN EXITOSA ***");
+                System.out.println("Los datos del huésped " + huespedSeleccionado.getNombres() + " " + huespedSeleccionado.getApellido());
+                System.out.println("(" + huespedSeleccionado.getTipoDocumento().name() + " " + huespedSeleccionado.getDocumento() + ")");
+                System.out.println("han sido eliminados del sistema.");
+                System.out.println("***************************\n");
             } else {
-                System.out.println("Ingreso invalido. Intente nuevamente.\n");
+                // Error
+                System.out.println("\n*** ERROR ***");
+                System.out.println("No se pudo eliminar el huésped.");
+                System.out.println("Intente nuevamente o contacte al administrador.");
+                System.out.println("*************\n");
             }
-        }//fin while
+
+        } else if (opcion == 2) {
+            // Flujo Alternativo 3.A: El actor presiona "CANCELAR"
+            System.out.println("\nEliminación cancelada.\n");
+        } else {
+            System.out.println("\nOpción inválida. Eliminación cancelada.\n");
+        }
+
+        // Paso 4: El actor presiona cualquier tecla
+        pausa();
 
         System.out.println("========================================");
-        System.out.println("-- FIN CU9: DAR DE ALTA HUESPED --");
+        System.out.println("   FIN CU11: DAR DE BAJA HUÉSPED");
         System.out.println("========================================\n");
-        pausa();
-    }//fin iniciarAltaHuesped
-
-    //metodo privado para pedir los datos del huesped a ingresar
-    private DtoHuesped mostrarYPedirDatosFormulario(){
-        System.out.println("--- FORMULARIO DE DATOS DEL HUESPED ---");
-        System.out.println("(Ingrese los datos solicitados)\n");
-
-                System.out.print("\n¿Desea cancelar el alta del huesped? (SI/NO): ");
-
-        //Aqui iria la logica para pedir todos los datos del huesped
-        //Por ahora retorna un DTO vacio
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //logica de la pantalla
-    //Interfaz
-    //Llamar gestores, y sus caso de uso
-
-
-    //recordar que existen distintos tipo de habtiacion
-    //queremos especificar eso? diria que si pq en diseno lo van a pedir
-
-    //recordad que limite de habitaciones es 48
-    //Tipo | Cantidad de habitaciones | Costo x noche
-    //Individual Estándar | 10 | $ 50.800
-    //Doble Estándar | 18 | $ 70.230
-    //Doble Superior | 8 | $ 90.560
-    //Superior Family Plan | 10 | $ 110.500
-    //Suite Doble | 2 | $ 128.600
-
-    //Tener en cuenta
-    //1. El que hace la reserva tiene que tener 18 o mas anos
-    //2. Existe un descuento especial si la reserva es por mas de x cantidad de noche, variable por habitacion.
-    //3. Si factura un 3ero, se piden datos y debe ser persona juridica.
-    //4. Se debe dar la posibilidad de que nos digan si quieren facturar los consumos aparte, en otra factura.
-    //5. La factura se tiene que saldar al abandonar la habitacion
-    //6. Las facturas no pueden re imprimirse, ni anularse sino que se generarán las notas de crédito pertinente para subsanar los problemas contables
-    //7. El check in se hace a partir de las 12
-    //8, El check out se hace a las 10 hasta las 11
-    //9. Se permite permanencia en el hotel por un costo extra del 50% a la habitacion.
-    //10. A las 18 los rajamos o les hacemos una nueva reserva, pde ser en las mismas o diff habitaciones.
-
-    //Servicios disponibles, Lavado y Planchado, Sauna y Bar.
-
-
-
-}
-        System.out.println("Nombres: ");
-        String nombres = scanner.nextLine();
-
-        System.out.println("Tipo de Documento (DNI, LE, LC, PASAPORTE, OTRO): ");//poner todos en mayuscula facilita la validacion
-        String tipoDocStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
-        TipoDocumento tipoDocumento = null;
-        try {
-            tipoDocumento = TipoDocumento.valueOf(tipoDocStr); // Convierte String a Enum
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: Tipo de documento inválido.");
-            // Manejar el error, volver a pedir
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
-
-            /*Poner la lectura dentro de un bucle while.
-
-            Dentro del while, usar un try-catch.
-
-            Si el try funciona (el dato se parsea bien), salís del while.
-
-            Si el catch se activa (el usuario puso algo mal), mostrás un mensaje de error claro y el while se repite, volviendo a pedir el dato.*/
-
-       /*  System.out.println("Numero de Documento: ");
-        long numeroDocumento = scanner.nextLong();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("CUIT: ");//no obligatorio
-        String cuit = scanner.nextLine();
-
-        System.out.println("Posición Frente al IVA (Consumidor Final, Monotributista, Responsable Inscripto, Excento): ");//por defecto consumidor final
-        String posIvaStr = scanner.nextLine().toUpperCase(); // Convertir a mayúsculas
-        PosIva posIva = null;
-        try {
-            posIva = PosIva.valueOf(posIvaStr); // Convierte String a Enum
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: Posición Frente al IVA inválida.");
-            // Manejar el error, volver a pedir
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A ENUM
-            //aca se aniade la complejidad de validar consumidor final, teniendo en cuenta que el valor del enum es ConsumidorFinal, sin espacios
-        }
-
-        System.out.println("Fecha de Nacimiento (dd/mm/aaaa): ");
-        String fechaNacimientoString = scanner.nextLine();
-        Date fechaNacimiento = null;
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            fechaNacimiento = formatoFecha.parse(fechaNacimientoString);
-        } catch (ParseException e) {
-            System.out.println("Formato de fecha inválido. Use dd/MM/yyyy.");
-            // manejar reintento o dejar fechaNacimiento en null según la lógica de la aplicación
-            //ACA HAY QUE VER COMO MANEJAR QUE INGRESA MAL. NO SE SI ESTA BIEN VERIFICARLO ACA PERO
-            //ES LA UNICA FORMA QUE ENCONTRE DE PASAR DE STRING A DATE
-        }
-
-        System.out.println("Calle: ");
-        String calleDireccion = scanner.nextLine();
-
-        System.out.println("Numero: ");
-        int numeroDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("Departamento: ");//supongo que es opcional
-        String departamentoDireccion = scanner.nextLine();
-
-        System.out.println("Piso: ");//supongo que es opcional
-        int pisoDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("Codigo Postal: ");
-        int codPostalDireccion = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("Localidad: ");
-        String localidadDireccion = scanner.nextLine();
-
-        System.out.println("Provincia: ");
-        String provinciaDireccion = scanner.nextLine();
-
-        System.out.println("Pais: ");
-        String paisDireccion = scanner.nextLine();
-
-        System.out.println("Telefono: ");
-        int telefono = scanner.nextInt();
-        scanner.nextLine(); //consumir salto de línea
-
-        System.out.println("Email: ");//no obligatorio
-        String email = scanner.nextLine();
-
-        System.out.println("Ocupacion: ");
-        String ocupacion = scanner.nextLine();
-
-        System.out.println("Nacionalidad: ");
-        String nacionalidad = scanner.nextLine();
-
-        // Crear los DTOs (aún no tenemos el ID de dirección)
-        DtoDireccion direccionDto = new DtoDireccion(calleDireccion, numeroDireccion, departamentoDireccion, pisoDireccion, codPostalDireccion, localidadDireccion, provinciaDireccion, paisDireccion);
-        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumento, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
-
-        //asociamos el la direccion con el huesped
-        huespedDto.setDireccion(direccionDto);
-
-
-        System.out.println("--- Fin Formulario ---");
-        return huespedDto; // Devolver el DTO con los datos cargados
-
     }
-
-        return new DtoHuesped();
-    }*/
+    // Paso 5: El CU termina
 
 
  private void iniciarModificacionHuesped(DtoHuesped dtoHuesped){ //Metodo para Modificar Huesped CU10
