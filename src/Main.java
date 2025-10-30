@@ -21,7 +21,7 @@ public class Main {
         // 2. Llamamos al método que inicia el Caso de Uso 9
         //    ¡Aquí es donde comenzará tu programa!
         pantallaPrincipal.iniciarAltaHuesped();
-dec
+
         // (Más adelante, aquí podrías agregar un menú principal para
         //  llamar a otros CUs, como el CU02 de tu compañero)
 
