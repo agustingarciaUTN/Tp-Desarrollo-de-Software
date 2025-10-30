@@ -5,14 +5,14 @@ public class DtoDireccion {
     private String calle;
     private Integer numero;
     private String departamento;
-    private Integer piso;
+    private String piso;
     private Integer codPostal;
     private String localidad;
     private String provincia;
     private String pais;
 
     // Constructor con todos los datos
-    public DtoDireccion(String calle, Integer numero, String departamento, Integer piso, Integer codPostal, String localidad, String provincia, String pais) {
+    public DtoDireccion(String calle, Integer numero, String departamento, String piso, Integer codPostal, String localidad, String provincia, String pais) {
         this.calle = calle;
         this.numero = numero;
         this.departamento = departamento;
@@ -44,10 +44,10 @@ public class DtoDireccion {
     public void setDepartamento(String departamento) {
         this.departamento = departamento;
     }
-    public Integer getPiso() {
+    public String getPiso() {
         return piso;
     }
-    public void setPiso(Integer piso) {
+    public void setPiso(String piso) {
         this.piso = piso;
     }
     public Integer getCodPostal() {

@@ -7,6 +7,7 @@ import Excepciones.PersistenciaException;
 import enums.PosIva;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class GestorHuesped {
@@ -75,8 +76,8 @@ public class GestorHuesped {
         }
 
 
-        if (datos.getTelefono() == null || datos.getTelefono() <= 0) {
-            errores.add("El Teléfono es obligatorio y debe ser positivo.");
+        if (datos.getTelefono() == null) {
+            errores.add("El Teléfono es obligatorio.");
         }
         if (datos.getOcupacion() == null || datos.getOcupacion().trim().isEmpty()) {
             errores.add("La Ocupación es obligatoria.");
@@ -137,7 +138,7 @@ public class GestorHuesped {
         }
     }
 
-    public boolean buscarHuesped(DtoHuesped datos){
+    /*public boolean buscarHuesped(DtoHuesped datos){
         // presentar en pantalla los inputs necesarios de
         //apellido.
         //▪ Nombres.
@@ -196,9 +197,9 @@ public class GestorHuesped {
         else {
             this.modificarHuesped();
         }
-    }
+    }*/
 
-    public boolean darAltaHuesped(){
+    //public boolean darAltaHuesped(){
         //precondicion haberse ejecutado el cu2, buscar huesped
         //una vez ejecutado el buscarHuesped(), se puede ahora ejecutar este
 
@@ -228,7 +229,7 @@ public class GestorHuesped {
         // Segun el diagrama de secuencia no lo hace el gestor
     }
 
-    public boolean modificarHuesped(){
+   // public boolean modificarHuesped(){
         //ponemos todos los datos del huesped en pantalla
         //Botones SIGUIENTE, CANCELAR Y BORRAR
 
@@ -249,9 +250,9 @@ public class GestorHuesped {
         //actualizamos los datos, persistir con dao en la bdd
         //mensaje de exito
         //termina
-    }
+    //}
 
-    public boolean darDeBajaHuesped(){
+    //public boolean darDeBajaHuesped(){
         //primero verificar que existe
         //ejecutar el buscarHuesped()
 
@@ -270,8 +271,8 @@ public class GestorHuesped {
         //toca Eliminar, borramos el huesped. Se ocupa el DAO
         //mostramos mensaje de eliminacion y presione cualq tecla,
         //termina el cu
-    }
-}
+    //}
+//}
 
 
 

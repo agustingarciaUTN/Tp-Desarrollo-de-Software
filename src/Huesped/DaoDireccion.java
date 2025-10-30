@@ -21,7 +21,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
                 pstmt.setString(1, dto.getCalle());
                 pstmt.setInt(2, dto.getNumero());
                 pstmt.setString(3, dto.getDepartamento());
-                pstmt.setInt(4, dto.getPiso());
+                pstmt.setString(4, dto.getPiso());
                 pstmt.setInt(5, dto.getCodPostal());
                 pstmt.setString(6, dto.getLocalidad());
                 pstmt.setString(7, dto.getProvincia());

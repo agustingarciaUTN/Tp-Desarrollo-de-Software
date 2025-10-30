@@ -166,7 +166,8 @@ public class Pantalla {
         System.out.println("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
         String departamentoDireccion = scanner.nextLine();
 
-        Integer pisoDireccion = pedirEntero("Piso (ingrese 0 si no aplica): ");
+        System.out.println("Piso (ingrese - si no aplica): ");
+        String pisoDireccion = scanner.nextLine();
 
         Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
@@ -179,7 +180,8 @@ public class Pantalla {
         System.out.println("Pais: ");
         String paisDireccion = scanner.nextLine();
 
-        Integer telefono = pedirEntero("Teléfono: ");
+        System.out.println("Teléfono: ");
+        String telefono = scanner.nextLine();
 
         System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
         String email = scanner.nextLine();
@@ -211,6 +213,7 @@ public class Pantalla {
         Integer valor = null; // Usamos la clase wrapper para permitir null
         boolean valido = false;
         while (!valido) {
+            System.out.println(mensaje);
             String entrada = scanner.nextLine(); // leemos siempre como String
 
             if (entrada.trim().isEmpty()) {

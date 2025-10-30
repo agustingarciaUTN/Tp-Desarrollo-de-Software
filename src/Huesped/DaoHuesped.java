@@ -17,19 +17,19 @@ import java.sql.ResultSet;
 public class DaoHuesped implements DaoHuespedInterfaz {
 
     //estos son los atributos que necesita la clase para conectarse a la DB
-    private static final String DB_URL =;
-    private static final String USER =;
-    private static final String PASS =;
+    //private static final String DB_URL =;
+    //private static final String USER =;
+    //private static final String PASS =;
 
     //metodo para realizarla coneccion a la DB
-    private Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(DB_URL, USER, PASS);
-    }
+    //private Connection getConnection() throws SQLException{
+    //    return DriverManager.getConnection(DB_URL, USER, PASS);
+    //}
 
-    public boolean CrearHuesped(DtoHuesped dto){}
-    public boolean ModificarHuesped(int idUsuario){}
-    public boolean EliminarHuesped(int idUsuario){}
-    public DtoHuesped ObtenerHuesped(int idUsuario){}
+    //public boolean CrearHuesped(DtoHuesped dto){}
+    public boolean modificarHuesped(int idUsuario){return false;}
+    //public boolean EliminarHuesped(int idUsuario){}
+    //public DtoHuesped ObtenerHuesped(int idUsuario){}
 
 
     public boolean crearHuesped(DtoHuesped dto) throws PersistenciaException {
@@ -44,7 +44,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
 
             pstmt.setString(1, dto.getNombres());
             pstmt.setString(2, dto.getApellido());
-            pstmt.setInt(3, dto.getTelefono());
+            pstmt.setString(3, dto.getTelefono());
             pstmt.setString(4, dto.getTipoDocumento().name()); // Guardamos el Enum como String
             pstmt.setLong(5, dto.getDocumento());
             pstmt.setString(6, dto.getCuit());
@@ -72,10 +72,10 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         }
     }
     
-    public boolean modificarHuesped(int idUsuario){}
-    public boolean eliminarHuesped(int idUsuario){}
-    
-    public List<DtoHuesped> obtenerTodosLosHuespedes (){
+    //public boolean modificarHuesped(int idUsuario){}
+    public boolean eliminarHuesped(int idUsuario){return true;}
+    public List<DtoHuesped> obtenerTodosLosHuespedes (){return null;}
+    /*public List<DtoHuesped> obtenerTodosLosHuespedes (){
        
         List<DtoHuesped> huespedesEncontrados = new ArrayList<>();
 
@@ -118,7 +118,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
 
         //Devolvemos la lista (puede estar vacía, pero nunca será nula)
         return huespedesEncontrados;
-    }
+    }*/
     
     public List<DtoHuesped> obtenerHuespedesPorCriterio(DtoHuesped criterios){
     

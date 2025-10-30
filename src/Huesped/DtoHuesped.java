@@ -7,7 +7,7 @@ import java.util.Date;
 public class DtoHuesped {
     private String nombres;
     private String apellido;
-    private Integer telefono;
+    private String telefono;
     private TipoDocumento tipoDocumento;
     private Long documento;
     private String cuit;
@@ -19,7 +19,7 @@ public class DtoHuesped {
     private DtoDireccion dtoDireccion;
 
     // Constructor con todos los datos
-    public DtoHuesped(String nombres, String apellido, Integer telefono, TipoDocumento tipoDocumento, Long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
+    public DtoHuesped(String nombres, String apellido, String telefono, TipoDocumento tipoDocumento, Long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
         this.nombres = nombres;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -50,10 +50,10 @@ public class DtoHuesped {
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
-    public Integer getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
-    public void setTelefono(Integer telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
     public TipoDocumento getTipoDocumento() {

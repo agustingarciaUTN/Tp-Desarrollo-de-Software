@@ -7,7 +7,7 @@ import java.util.Date;
 public class Huesped {
     private String nombres;
     private String apellido;
-    private int telefono;
+    private String telefono;
     private TipoDocumento tipoDocumento;
     private long documento;
     private String cuit;
@@ -23,7 +23,7 @@ public class Huesped {
     }
 
     // Constructor con todos los datos
-    public Huesped(String nombres, String apellido, int telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
+    public Huesped(String nombres, String apellido, String telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
         this.nombres = nombres;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -59,10 +59,10 @@ public class Huesped {
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
     public TipoDocumento getTipoDocumento() {
