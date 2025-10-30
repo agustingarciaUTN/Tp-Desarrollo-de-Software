@@ -39,6 +39,10 @@ public class GestorHuesped {
         else {
             listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
         }
+
+        for (DtoHuesped huesped : listaHuespedes) {
+            asignarDireccionAHuesped(huesped);
+        }
         
         return listaHuespedes;
 
