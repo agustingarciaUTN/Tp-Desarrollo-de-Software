@@ -11,6 +11,10 @@ public class DtoDireccion {
     private String provincia;
     private String pais;
 
+    // Constructor por defecto
+    public DtoDireccion() {
+    }
+
     // Constructor con todos los datos
     public DtoDireccion(String calle, int numero, String departamento, int piso, int codPostal, String localidad, String provincia, String pais) {
         this.calle = calle;
@@ -24,7 +28,13 @@ public class DtoDireccion {
     }
 
     // Getters y Setters
-    public void setId(int ID){this.ID = ID;}
+    public int getId() {
+        return ID;
+    }
+
+    public void setId(int id) {
+        this.ID = id;
+    }
     public String getCalle() {
         return calle;
     }

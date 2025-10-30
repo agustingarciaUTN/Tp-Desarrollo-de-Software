@@ -36,7 +36,6 @@ public class GestorHuesped {
         // parte de DAO, el gestor nomás le pasa los datos y luego recibe los resultados
        
         ArrayList<DtoHuesped> listaHuespedes;
-
         
         if (datos.estanVacios()) {
             listaHuespedes = daoHuesped.obtenerTodosLosHuespedes(); 
@@ -44,16 +43,11 @@ public class GestorHuesped {
         else {
             listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
         }
-        
-        //ver si existe concordancia, si no pasar al cu11 y finalizar este cu.
-        //si encuentra seguir
-        // presentar los datos de los dto encontrados en pantalla de la manera correcta
-        // manera: Esta lista contiene como columnas los datos mencionados en el paso 2.
-        //Seleccionar una persona de alguna manera -> no lo hace el gestor
-        //Presiona siguiente. -> no lo hace el gestor
-        //Chequear si no selecciono nadie y apreto siguiente, ir al cu11.
-        //si apreto bien ir al cu10. y terminar. -> Segun el diagrama de secuencia
-        // esto tampoco lo hace el gestor
+
+        // Para cada huésped encontrado, intentamos asignar su dirección
+        for (DtoHuesped huesped : listaHuespedes) {
+            asignarDireccionAHuesped(huesped);
+        }
         
         return listaHuespedes;
         
@@ -122,6 +116,10 @@ public class GestorHuesped {
     }
 
     public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
+        // Aseguramos que ambos DTOs tengan sus direcciones completas antes de la modificación
+        asignarDireccionAHuesped(dtoHuespedOriginal);
+        asignarDireccionAHuesped(dtoHuespedModificado);
+        
         daoHuesped.modificarHuesped(dtoHuespedOriginal, dtoHuespedModificado);
     }
 
@@ -155,16 +153,9 @@ public class GestorHuesped {
             errores.add("Nombres");
         }
 
-        // Validar que TipoDoc no sea nulo/blank y que exista en el enum TipoDocumento
-      if (TipoDoc == null || TipoDoc.isBlank()) {
+        // Validar tipo de documento
+        if (dtoHuesped.getTipoDocumento() == null) {
             errores.add("Tipo de documento");
-        } else {
-            String tipoDocNormalized = TipoDoc.trim().toUpperCase();
-            try {
-                dtoHuesped.setTipoDocumento(TipoDocumento.valueOf(tipoDocNormalized));
-            } catch (IllegalArgumentException ex) {
-                errores.add("Tipo de documento (valor inválido)");
-            }
         }
         if (dtoHuesped.getDocumento() <= 0L) {
             errores.add("Número de documento");
@@ -235,6 +226,24 @@ public class GestorHuesped {
     public boolean tipoynroDocExistente(DtoHuesped dtoHuesped) {
         if(daoHuesped.docExistente(dtoHuesped)){  //consultar dao si existe un huesped con ese tipo y nro de doc
             return true; //retornar true si existe, false si no
+        }
+        return false;
+    }
+
+    /**
+     * Obtiene y asigna los datos completos de la dirección al DtoHuesped
+     * @param dtoHuesped El DTO del huésped al que se le asignará la dirección
+     * @return true si se pudo asignar la dirección, false si hubo algún error
+     */
+    public boolean asignarDireccionAHuesped(DtoHuesped dtoHuesped) {
+        if (dtoHuesped == null || dtoHuesped.getIdDireccion() <= 0) {
+            return false;
+        }
+
+        DtoDireccion dtoDireccion = daoDireccion.ObtenerDireccion(dtoHuesped.getIdDireccion());
+        if (dtoDireccion != null) {
+            dtoHuesped.setDireccion(dtoDireccion);
+            return true;
         }
         return false;
     }
