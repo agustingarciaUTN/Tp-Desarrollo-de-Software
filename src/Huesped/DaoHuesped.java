@@ -5,14 +5,14 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
-import Dominio.Huesped;
-import Usuario.DtoUsuario;
-import BaseDeDatos.Coneccion;
 
-import java.sql.Connection;
+
+import Excepciones.PersistenciaException;
+import BaseDedatos.Coneccion;
+import enums.TipoDocumento;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class DaoHuesped implements DaoHuespedInterfaz {
 
@@ -32,8 +32,44 @@ public class DaoHuesped implements DaoHuespedInterfaz {
     public DtoHuesped ObtenerHuesped(int idUsuario){}
 
 
-    public boolean crearHuesped(DtoHuesped dto){
-     
+    public boolean crearHuesped(DtoHuesped dto) throws PersistenciaException {
+
+        // Asume que la columna en tu BD se llama 'id_direccion' preguntar como se llama bien
+        String sql = "INSERT INTO huesped (nombres, apellido, telefono, tipo_documento, numero_documento, " +
+                "cuit, posicion_iva, fecha_nacimiento, email, ocupacion, nacionalidad, id_direccion) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, dto.getNombres());
+            pstmt.setString(2, dto.getApellido());
+            pstmt.setInt(3, dto.getTelefono());
+            pstmt.setString(4, dto.getTipoDocumento().name()); // Guardamos el Enum como String
+            pstmt.setLong(5, dto.getDocumento());
+            pstmt.setString(6, dto.getCuit());
+            pstmt.setString(7, dto.getPosicionIva().name());
+
+            // Convertir java.util.Date (del DTO) a java.sql.Date (para JDBC)
+            pstmt.setDate(8, new java.sql.Date(dto.getFechaNacimiento().getTime()));
+
+            pstmt.setString(9, dto.getEmail());
+            pstmt.setString(10, dto.getOcupacion());
+            pstmt.setString(11, dto.getNacionalidad());
+
+
+            // Obtenemos el ID de la dirección (que ya se creó y seteó en el DTO)
+            pstmt.setInt(12, dto.getDireccion().getId());
+
+            int filasAfectadas = pstmt.executeUpdate();
+
+            // Devuelve true si se insertó al menos 1 fila
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new PersistenciaException("Error al intentar crear el huésped en la BD", e);
+        }
     }
     
     public boolean modificarHuesped(int idUsuario){}
@@ -159,6 +195,39 @@ public class DaoHuesped implements DaoHuespedInterfaz {
 
         return huespedesEncontrados;
         
+    }
+
+
+
+    public DtoHuesped buscarPorTipoYNumeroDocumento(TipoDocumento tipoDoc, Long numDoc) throws PersistenciaException {
+        // Devuelve un DTO si lo encuentra, o null si no existe
+        String sql = "SELECT * FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Usamos .name() para convertir el Enum a String
+            pstmt.setString(1, tipoDoc.name());
+            pstmt.setLong(2, numDoc);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    //encuentra un duplicado, guardamos los datos principales del existente para mostrarlos
+                    //ESTO NO ESTABA EN EL CU9, PERO ME PARECE UN BUEN ANIADIDO
+                    DtoHuesped h = new DtoHuesped();
+                    h.setNombres(rs.getString("nombres"));
+                    h.setApellido(rs.getString("apellido"));
+                    h.setTipoDocumento(TipoDocumento.valueOf(rs.getString("tipo_documento")));
+                    h.setDocumento(rs.getLong("numero_documento"));
+
+                    return h;
+                }
+            }
+        } catch (SQLException e) {
+            //por si hay error en la coneccion con la db
+            throw new PersistenciaException("Error al buscar huésped por documento", e);
+        }
+        return null; // No encontró duplicado
     }
     /* Crear un nuevo huésped
     method CrearHuesped(DtoHuesped dto) -> boolean:

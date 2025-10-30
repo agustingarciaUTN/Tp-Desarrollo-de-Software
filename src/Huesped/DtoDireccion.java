@@ -3,16 +3,16 @@ package Huesped;
 public class DtoDireccion {
     private int ID;
     private String calle;
-    private int numero;
+    private Integer numero;
     private String departamento;
-    private int piso;
-    private int codPostal;
+    private Integer piso;
+    private Integer codPostal;
     private String localidad;
     private String provincia;
     private String pais;
 
     // Constructor con todos los datos
-    public DtoDireccion(String calle, int numero, String departamento, int piso, int codPostal, String localidad, String provincia, String pais) {
+    public DtoDireccion(String calle, Integer numero, String departamento, Integer piso, Integer codPostal, String localidad, String provincia, String pais) {
         this.calle = calle;
         this.numero = numero;
         this.departamento = departamento;
@@ -25,16 +25,17 @@ public class DtoDireccion {
 
     // Getters y Setters
     public void setId(int ID){this.ID = ID;}
+    public int getId(){return this.ID;}
     public String getCalle() {
         return calle;
     }
     public void setCalle(String calle) {
         this.calle = calle;
     }
-    public int getNumero() {
+    public Integer getNumero() {
         return numero;
     }
-    public void setNumero(int numero) {
+    public void setNumero(Integer numero) {
         this.numero = numero;
     }
     public String getDepartamento() {
@@ -43,16 +44,16 @@ public class DtoDireccion {
     public void setDepartamento(String departamento) {
         this.departamento = departamento;
     }
-    public int getPiso() {
+    public Integer getPiso() {
         return piso;
     }
-    public void setPiso(int piso) {
+    public void setPiso(Integer piso) {
         this.piso = piso;
     }
-    public int getCodPostal() {
+    public Integer getCodPostal() {
         return codPostal;
     }
-    public void setCodPostal(int codPostal) {
+    public void setCodPostal(Integer codPostal) {
         this.codPostal = codPostal;
     }
     public String getLocalidad() {
