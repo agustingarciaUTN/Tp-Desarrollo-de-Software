@@ -136,4 +136,21 @@ public class DtoHuesped {
             return PosIva.ConsumidorFinal;
         }
     }
+    public DtoHuesped(DtoHuesped original) {
+        this.nombres = original.nombres;
+        this.apellido = original.apellido;
+        this.telefono = original.telefono;
+        this.tipoDocumento = original.tipoDocumento;
+        this.documento = original.documento;
+        this.cuit = original.cuit;
+        this.posicionIva = original.posicionIva;
+        this.fechaNacimiento = original.fechaNacimiento;
+        this.email = original.email;
+        this.ocupacion = original.ocupacion;
+        this.nacionalidad = original.nacionalidad;
+        this.idDireccion = original.idDireccion;
+        
+        // Copiamos la referencia de la dirección (se edita por separado)
+        this.dtoDireccion = original.dtoDireccion;
+    }
 }

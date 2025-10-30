@@ -555,7 +555,7 @@ public class Pantalla {
 
  private void iniciarModificacionHuesped(DtoHuesped dtoHuesped){ //Metodo para Modificar Huesped CU10
     boolean salir = false;
-    DtoHuesped dtoHuespedModificado = dtoHuesped;
+    DtoHuesped dtoHuespedModificado = new DtoHuesped(dtoHuesped);
     String tipoDocStr = "";
     String posIvaStr = "";
         while(!salir){
@@ -586,8 +586,17 @@ public class Pantalla {
                    dtoHuespedModificado.setNombres(scanner.nextLine().trim());
                     break;
                 case 3:
-                    System.out.print("Nuevo Tipo de Documento (DNI, PASAPORTE, LE, LC, OTRO): ");
-                   tipoDocStr = scanner.nextLine().trim().toUpperCase();
+                    System.out.print("Nuevo Tipo de Documento (DNI, PASAPORTE, LE, LC): ");
+                    tipoDocStr = scanner.nextLine().trim().toUpperCase();
+
+                    // FALTABA ESTO: Asignar el valor al DTO modificado
+                    try {
+                        dtoHuespedModificado.setTipoDocumento(TipoDocumento.valueOf(tipoDocStr));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("❌ Error: Tipo de documento no válido. Se mantiene el valor anterior.");
+                        // Invalidamos tipoDocStr para que la validación posterior lo note
+                        tipoDocStr = "ERROR"; 
+                    }
                     break;
                 case 4:
                     System.out.print("Nuevo Número de Documento: ");
@@ -633,7 +642,7 @@ public class Pantalla {
                     break;
                 case 9:
                     System.out.print("Nuevo Teléfono: ");
-                    dtoHuespedModificado.setTelefono(scanner.nextInt());
+                    dtoHuespedModificado.setTelefono(scanner.nextLong());
                     break;
                 case 10:
                     System.out.print("Nuevo Email: ");
@@ -667,10 +676,15 @@ public class Pantalla {
                             if (opcionDoc == 2) {
                                 // quedarse en la pantalla para que el actor corrija
                                 break;
-                            }
-                        } else{
+                            }else if (opcionDoc != 1) {
+                                System.out.println("Opción inválida. Intente nuevamente.\n");
+                                break;
+                            }   else{
+                                gestorHuesped.modificarHuesped(dtoHuesped, dtoHuespedModificado);
+                                salir = true; 
+                            } 
+                        }else{
                             gestorHuesped.modificarHuesped(dtoHuesped, dtoHuespedModificado);
-                            System.out.println("La operacion ha culminado con éxito.\n");
                             salir = true;
                         }
                     } else {
@@ -695,13 +709,7 @@ public class Pantalla {
     
 public void cambiarDireccionHuesped(DtoDireccion direccion){
     if (direccion == null) {
-        System.out.println("\nNo hay dirección asociada al huésped.");
-        System.out.println("¿Desea agregar una nueva dirección? (S/N)");
-        String respuesta = scanner.nextLine().trim().toUpperCase();
-        if (respuesta.equals("S")) {
-            direccion = new DtoDireccion();
-            // Agregar lógica para crear nueva dirección
-        }
+        System.out.println("\nNo hay dirección asociada al huésped.");        
         return;
     }
     
@@ -729,27 +737,35 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
         }
         switch(opcion){
             case 1:
+                System.out.print("Nueva Calle: ");
                 direccion.setCalle(scanner.nextLine().trim());
                 break;
             case 2:
+                System.out.print("Nuevo Número: ");
                 direccion.setNumero(scanner.nextInt());
                 break;
             case 3:
+                System.out.print("Nuevo Departamento: ");
                 direccion.setDepartamento(scanner.nextLine().trim());
                 break;
             case 4:
+                System.out.print("Nuevo Piso: ");
                 direccion.setPiso(scanner.nextInt());
                 break;
             case 5:
+                System.out.print("Nuevo Código Postal: ");
                 direccion.setCodPostal(scanner.nextInt());
                 break;
             case 6:
+                System.out.print("Nueva Localidad: ");
                 direccion.setLocalidad(scanner.nextLine().trim());
                 break;
             case 7:
+                System.out.print("Nueva Provincia: ");
                 direccion.setProvincia(scanner.nextLine().trim());
                 break;
             case 8:
+                System.out.print("Nuevo País: ");  
                 direccion.setPais(scanner.nextLine().trim());
             break;
             case 9:
@@ -799,7 +815,7 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
         System.out.println("7. Fecha de nacimiento: " + dtoHuesped.getFechaNacimiento());
         System.out.println("8. Dirección, pulsa para mas informacion"); 
         System.out.println("9. Teléfono: " + dtoHuesped.getTelefono());
-        System.out.println("10. Email: " + dtoHuesped.getEmail());
+        System.out.println("10. Agregar Email");
         System.out.println("11. Ocupación: " + dtoHuesped.getOcupacion());
         System.out.println("12. Nacionalidad: " + dtoHuesped.getNacionalidad());
         System.out.println("13. SIGUIENTE");

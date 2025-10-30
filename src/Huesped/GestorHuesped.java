@@ -115,14 +115,34 @@ public class GestorHuesped {
         return false;
     }
 
-    public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
-        // Aseguramos que ambos DTOs tengan sus direcciones completas antes de la modificación
+    public boolean modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
+        // 1. Aseguramos que el DTO original tenga su dirección (para el WHERE del DAO)
         asignarDireccionAHuesped(dtoHuespedOriginal);
-        asignarDireccionAHuesped(dtoHuespedModificado);
-        
+        // 2. Actualizamos la tabla 'huesped' (nombre, apellido, id_direccion, etc.)
+       
+        // 3. ACTUALIZAMOS LA TABLA 'direccion' (Esto era lo que faltaba)
+        if (dtoHuespedModificado.getDireccion() != null && dtoHuespedModificado.getIdDireccion() > 0) {
+            try {
+                // Asignamos el ID de dirección (que está en DtoHuesped) al DtoDireccion
+                dtoHuespedModificado.getDireccion().setId(dtoHuespedModificado.getIdDireccion());
+                
+                // Llamamos al DAO de Dirección para que persista los cambios
+                daoDireccion.ModificarDireccion(dtoHuespedModificado.getDireccion());
+                System.out.println("Tabla dirección modificada.");
+            } catch (Excepciones.PersistenciaException e) {
+                System.err.println("Error al intentar modificar la dirección en la BD: " + e.getMessage());
+                return false;
+                // En un futuro, aquí deberías manejar una lógica de "rollback" 
+                // por si el huésped se actualizó pero la dirección falló.
+            }
+        }
         daoHuesped.modificarHuesped(dtoHuespedOriginal, dtoHuespedModificado);
+        System.out.println("Tabla huesped modificada.");
+        System.out.println("La operación ha culminado con éxito.");
+        return true;
     }
 
+        
  //   public boolean darDeBajaHuesped(){
         //primero verificar que existe
         //ejecutar el buscarHuesped()
@@ -152,10 +172,10 @@ public class GestorHuesped {
         if (dtoHuesped.getNombres() == null || dtoHuesped.getNombres().isBlank()) {
             errores.add("Nombres");
         }
-
-        // Validar tipo de documento
-        if (dtoHuesped.getTipoDocumento() == null) {
-            errores.add("Tipo de documento");
+        if ("ERROR".equals(TipoDoc)) {
+        errores.add("Tipo de documento (valor inválido)");
+        } else if (dtoHuesped.getTipoDocumento() == null) {
+        errores.add("Tipo de documento");
         }
         if (dtoHuesped.getDocumento() <= 0L) {
             errores.add("Número de documento");
@@ -167,12 +187,7 @@ public class GestorHuesped {
             // Si querés asignar por omisión:
             dtoHuesped.setPosicionIva(enums.PosIva.ConsumidorFinal);
         } else {
-            String posIvaNormalized = PosIva.trim().toUpperCase();
-            try {
-                dtoHuesped.setPosicionIva(enums.PosIva.valueOf(posIvaNormalized));
-            } catch (IllegalArgumentException ex) {
-                errores.add("Posición frente al IVA (valor inválido)");
-            }
+            dtoHuesped.setPosicionIva(enums.PosIva.fromString(PosIva));
         }
         
         if(dtoHuesped.getFechaNacimiento() == null) {
@@ -218,8 +233,6 @@ public class GestorHuesped {
             System.out.println("Por favor complete/corrija los campos indicados. Los campos no se han blanqueado.\n");
             return false;
         }
-
-        System.out.println("La operación ha culminado con éxito.\n");
         return true;
     }    
 

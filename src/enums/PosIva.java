@@ -3,7 +3,7 @@ package enums;
 public enum PosIva {
     ConsumidorFinal("Consumidor Final"),
     Monotributista("Monotributista"),
-    ResponsableInscripto("Responsable Inscripto"),
+    ResponsableInscripto("Responsable inscripto"),
     Excento("Excento");
 
     private final String displayName;

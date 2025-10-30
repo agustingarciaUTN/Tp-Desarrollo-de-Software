@@ -9,9 +9,6 @@ import BaseDedatos.Coneccion;
 import enums.TipoDocumento;
 import enums.PosIva;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 public class DaoHuesped implements DaoHuespedInterfaz {
 
     public boolean crearHuesped(DtoHuesped dto){return false;}
@@ -25,7 +22,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         String sql = "SELECT h.apellido, h.nombres, h.tipo_documento, h.numero_documento, h.telefono, h.cuit, h.nacionalidad, " +
                    "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, e.email " +
                    "FROM huesped h " +
-                   "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.numero_documento";
+                   "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.nro_documento";
         //Usamos try-with-resources para manejar la conexión y la sentencia
         try (Connection conn = Coneccion.getConnection();
              Statement stmt = conn.createStatement();
@@ -47,6 +44,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 huespedDTO.setNacionalidad(rs.getString("nacionalidad"));
                 huespedDTO.setOcupacion(rs.getString("ocupacion"));
                 huespedDTO.setFechaNacimiento(rs.getDate("fecha_nacimiento"));
+                huespedDTO.setEmail(rs.getString("email"));
 
                 //Si hay direccion asociada, seteamos el idDireccion en el DTO
                 int idDir = rs.getInt("id_direccion");
@@ -91,7 +89,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             "SELECT h.apellido, h.nombres, h.tipo_documento, h.numero_documento, h.telefono, h.cuit, h.nacionalidad, " +
             "h.fecha_nacimiento, h.id_direccion, h.pos_iva, h.ocupacion, e.email " +
             "FROM huesped h " +
-            "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.numero_documento " +
+            "LEFT JOIN email_huesped e ON h.tipo_documento = e.tipo_documento AND h.numero_documento = e.nro_documento " +
             "WHERE 1=1");
         
         //Creamos una lista para guardar los parámetros que realmente usaremos
@@ -107,12 +105,12 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             sql.append(" AND nombres LIKE ?");
             params.add(criterios.getNombres() + "%");
         }
-        if (criterios.getTipoDocumento() != null) {
-            sql.append(" AND tipo_documento = ?");
-            params.add(criterios.getTipoDocumento().name()); //.name() es para devolver el valor del enum como string
+       if (criterios.getTipoDocumento() != null) {
+            sql.append(" AND h.tipo_documento = ?"); // <-- Se agregó h.
+            params.add(criterios.getTipoDocumento().name()); 
         }
         if (criterios.getDocumento() > 0) {
-            sql.append(" AND numero_documento = ?");
+            sql.append(" AND h.numero_documento = ?"); // <-- Se agregó h.
             params.add(criterios.getDocumento());
         }
 
@@ -145,6 +143,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 huespedDTO.setNacionalidad(rs.getString("nacionalidad"));
                 huespedDTO.setOcupacion(rs.getString("ocupacion"));
                 huespedDTO.setFechaNacimiento(rs.getDate("fecha_nacimiento"));
+                huespedDTO.setEmail(rs.getString("email"));
 
                 //Si hay direccion asociada, seteamos el idDireccion en el DTO
                 int idDir = rs.getInt("id_direccion");
@@ -159,13 +158,8 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 //Primero leemos el tipo de documento como string y despues lo convertimos a enum
                 String tipoDocumentoStr = rs.getString("tipo_documento");
                 String posicionIvaStr = rs.getString("pos_iva");
-                try{
-                    if (posicionIvaStr != null) {
-                    huespedDTO.setPosicionIva(PosIva.valueOf(posicionIvaStr.toUpperCase()));
-                }
-                }catch (IllegalArgumentException e) {
-                    System.err.println("Valor de posicion_iva no válido en la BD: " + posicionIvaStr);
-                }
+                // Convertimos y establecemos la posición IVA usando el método fromString
+                huespedDTO.setPosicionIva(PosIva.fromString(posicionIvaStr));
                 try {
                  if (tipoDocumentoStr != null) {
                  huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));
@@ -264,17 +258,17 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             conn.setAutoCommit(false); // Iniciamos una transacción
 
             // 1. Actualizar la tabla huesped
-            String sqlHuesped = "UPDATE huesped SET apellido = ?, nombres = ?, tipo_documento = ?, numero_documento = ?, " +
-                              "cuit = ?, pos_iva = ?, fecha_nacimiento = ?, telefono = ?, ocupacion = ?, " +
-                              "nacionalidad = ?, id_direccion = ? WHERE tipo_documento = ? AND numero_documento = ?";
-
+           String sqlHuesped = "UPDATE huesped SET apellido = ?, nombres = ?, tipo_documento = ?, numero_documento = ?, " +
+                  "cuit = ?, pos_iva = ?::\"Pos_IVA\", fecha_nacimiento = ?, telefono = ?, ocupacion = ?, " +
+                  "nacionalidad = ?, id_direccion = ? WHERE tipo_documento = ? AND numero_documento = ?";
+                  
             try (PreparedStatement pstmt = conn.prepareStatement(sqlHuesped)) {
                 pstmt.setString(1, modificado.getApellido());
                 pstmt.setString(2, modificado.getNombres());
                 pstmt.setString(3, modificado.getTipoDocumento() != null ? modificado.getTipoDocumento().name() : null);
                 pstmt.setLong(4, modificado.getDocumento());
                 pstmt.setString(5, modificado.getCuit());
-                pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().name() : null);
+                pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().toString() : null);
 
                 if (modificado.getFechaNacimiento() != null) {
                     pstmt.setDate(7, new java.sql.Date(modificado.getFechaNacimiento().getTime()));
@@ -299,18 +293,19 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 pstmt.executeUpdate();
             }
 
-            // 2. Actualizar o insertar en la tabla email_huesped
-            String sqlEmail = "INSERT INTO email_huesped (tipo_documento, numero_documento, email) VALUES (?, ?, ?) " +
-                            "ON CONFLICT (tipo_documento, numero_documento) DO UPDATE SET email = EXCLUDED.email";
+            // 2. Insertar el nuevo email en la tabla email_huesped
+            // Si el huésped ya tiene ese email exacto, no hace nada (DO NOTHING).
+            String sqlEmail = "INSERT INTO email_huesped (tipo_documento, nro_documento, email) VALUES (?, ?, ?) " +
+                            "ON CONFLICT (tipo_documento, nro_documento, email) DO NOTHING";
             
             try (PreparedStatement pstmt = conn.prepareStatement(sqlEmail)) {
-                pstmt.setString(1, modificado.getTipoDocumento().name());
+                // Usamos .name() porque tipo_documento en la BD es un varchar/string
+                pstmt.setString(1, modificado.getTipoDocumento().name()); 
                 pstmt.setLong(2, modificado.getDocumento());
                 pstmt.setString(3, modificado.getEmail());
                 
                 pstmt.executeUpdate();
             }
-
             conn.commit(); // Confirmamos la transacción
             return true;
         } catch (SQLException e) {
