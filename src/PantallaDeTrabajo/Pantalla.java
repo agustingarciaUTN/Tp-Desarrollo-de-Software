@@ -449,42 +449,6 @@ public class Pantalla {
         }
         return tipoDoc;
     }
-
-    private PosIva pedirPosIva() {
-        PosIva posIva = null;
-        boolean valido = false;
-
-        // Mostrar opciones
-        StringBuilder opciones = new StringBuilder("Posición IVA (");
-        PosIva[] valores = PosIva.values();
-        for (int i = 0; i < valores.length; i++) {
-            opciones.append(valores[i].name());
-            if (i < valores.length - 1) {
-                opciones.append("/");
-            }
-        }
-        opciones.append(", por defecto Consumidor_Final): "); // Aclarar el default
-
-        while (!valido) {
-            System.out.print(opciones.toString());
-            String posIvaStr = scanner.nextLine().toUpperCase().trim();
-
-            // Permitir Enter para el valor por defecto
-            if (posIvaStr.isEmpty()) {
-                posIva = PosIva.ConsumidorFinal; // Asignar el default
-                valido = true;
-            } else {
-                try {
-                    posIva = PosIva.valueOf(posIvaStr);
-                    valido = true;
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para Consumidor_Final.");
-                }
-            }
-        }
-        return posIva;
-    }
-
     
     //METODO AUXILIAR PARA PAUSAR
     public void pausa() {
@@ -505,7 +469,7 @@ public class Pantalla {
             System.out.println("\nNo se encontraron huéspedes con los criterios especificados.");
             System.out.print("¿Desea dar de alta un nuevo huésped? (SI/NO): ");
             if (scanner.nextLine().trim().equalsIgnoreCase("SI")) {
-                System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
+                this.iniciarAltaHuesped();
             }
         } else {
             this.seleccionarHuespedDeLista(huespedesEncontrados);
@@ -527,16 +491,12 @@ public class Pantalla {
             }
 
             // Validar longitud
-            if (apellido.length() < 2) {
-                System.out.println("⚠ El apellido debe tener al menos 2 caracteres. Intente nuevamente.");
+            if (apellido.length() >= 2) {
+                System.out.println("⚠ Inserte solo la letra con la que comienza el apellido.");
                 continue;
             }
 
-            if (apellido.length() > 100) {
-                System.out.println("⚠ El apellido no puede exceder los 100 caracteres. Intente nuevamente.");
-                continue;
-            }
-
+           
             // Validar que solo contenga letras, espacios y caracteres válidos (á, é, í, ó, ú, ñ)
             if (!apellido.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
                 System.out.println("⚠ El apellido solo puede contener letras y espacios. Intente nuevamente.");
@@ -557,15 +517,11 @@ public class Pantalla {
             }
 
             // Validar longitud
-            if (nombres.length() < 2) {
-                System.out.println("⚠ Los nombres deben tener al menos 2 caracteres. Intente nuevamente.");
+            if (nombres.length() >= 2) {
+                System.out.println("⚠ Inserte solo la letra con la que comienza el nombre.");
                 continue;
             }
 
-            if (nombres.length() > 100) {
-                System.out.println("⚠ Los nombres no pueden exceder los 100 caracteres. Intente nuevamente.");
-                continue;
-            }
 
             // Validar que solo contenga letras, espacios y caracteres válidos
             if (!nombres.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$")) {
