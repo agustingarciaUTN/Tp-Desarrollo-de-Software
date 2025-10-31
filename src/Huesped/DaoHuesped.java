@@ -16,8 +16,8 @@ public class DaoHuesped implements DaoHuespedInterfaz {
 
         // Asume que la columna en tu BD se llama 'id_direccion' preguntar como se llama bien
         String sql = "INSERT INTO huesped (nombres, apellido, telefono, tipo_documento, numero_documento, " +
-                "cuit, pos_iva, fecha_nacimiento, ocupacion, nacionalidad, id_direccion) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "cuit, pos_iva, fecha_nacimiento, ocupacion, nacionalidad, id_direccion) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?::\"Pos_IVA\", ?, ?, ?, ?)";
 
         try (Connection conn = Coneccion.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -28,7 +28,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             pstmt.setString(4, dto.getTipoDocumento().name()); // Guardamos el Enum como String
             pstmt.setLong(5, dto.getDocumento());
             pstmt.setString(6, dto.getCuit());
-            pstmt.setString(7, dto.getPosicionIva().name());
+            pstmt.setString(7, dto.getPosicionIva().toString());
 
             // Convertir java.util.Date (del DTO) a java.sql.Date (para JDBC)
             pstmt.setDate(8, new java.sql.Date(dto.getFechaNacimiento().getTime()));
