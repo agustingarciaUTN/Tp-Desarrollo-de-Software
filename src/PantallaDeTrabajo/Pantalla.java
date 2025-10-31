@@ -527,13 +527,8 @@ public class Pantalla {
             }
 
             // Validar longitud
-            if (apellido.length() < 2) {
-                System.out.println("⚠ El apellido debe tener al menos 2 caracteres. Intente nuevamente.");
-                continue;
-            }
-
-            if (apellido.length() > 100) {
-                System.out.println("⚠ El apellido no puede exceder los 100 caracteres. Intente nuevamente.");
+            if (apellido.length() >= 2) {
+                System.out.println("⚠ El apellido debe tener solo un caracter. Intente nuevamente.");
                 continue;
             }
 
@@ -557,13 +552,8 @@ public class Pantalla {
             }
 
             // Validar longitud
-            if (nombres.length() < 2) {
-                System.out.println("⚠ Los nombres deben tener al menos 2 caracteres. Intente nuevamente.");
-                continue;
-            }
-
-            if (nombres.length() > 100) {
-                System.out.println("⚠ Los nombres no pueden exceder los 100 caracteres. Intente nuevamente.");
+            if (nombres.length() >= 2) {
+                System.out.println("⚠ Los nombres deben tener solo un caractere. Intente nuevamente.");
                 continue;
             }
 
