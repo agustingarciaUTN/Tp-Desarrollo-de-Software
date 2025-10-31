@@ -149,13 +149,23 @@ public class GestorHuesped {
                 return false;
             }
 
-            // 2. Obtener el ID de la dirección antes de eliminar el huésped
+        // 2. Obtener el ID de la dirección antes de eliminar el huésped
             int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
+            
+            // 2.5  Eliminar los emails
+            boolean emailsEliminados = daoHuesped.eliminarEmailsHuesped(tipoDocumento, nroDocumento);
+            
+            if (!emailsEliminados) {
+                 System.err.println("No se pudieron eliminar los emails asociados al huésped.");
+                 registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de emails (BD)");
+                 return false;
+            }
 
             // 3. Eliminar el huésped
             boolean huespedEliminado = daoHuesped.eliminarHuesped(tipoDocumento, nroDocumento);
 
             if (!huespedEliminado) {
+                // (Si esto falla ahora, es raro, pero la auditoría es correcta)
                 System.err.println("No se pudo eliminar el huésped");
                 registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de BD");
                 return false;

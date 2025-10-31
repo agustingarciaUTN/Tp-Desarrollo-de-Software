@@ -262,6 +262,27 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
             return false;
         }
     }
+
+    public boolean eliminarEmailsHuesped(String tipoDocumento, long nroDocumento) {
+        // Usamos nro_documento porque así se llama en email_huesped
+        String sql = "DELETE FROM email_huesped WHERE tipo_documento = ? AND nro_documento = ?";
+
+        try (Connection conn = Coneccion.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tipoDocumento);
+            ps.setLong(2, nroDocumento);
+
+            ps.executeUpdate();
+            
+            // Devolvemos true si la consulta se ejecutó (aunque haya borrado 0 filas)
+            return true; 
+
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar emails del huésped: " + e.getMessage());
+            return false;
+        }
+    }
     public boolean docExistente(DtoHuesped criterios){
     
         ArrayList<DtoHuesped> huespedesEncontrados = new ArrayList<>();

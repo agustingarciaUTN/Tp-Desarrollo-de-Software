@@ -12,6 +12,7 @@ public interface DaoHuespedInterfaz {
     boolean docExistente(DtoHuesped criterios);
     int obtenerIdDireccion(String tipoDocumento, long nroDocumento);
     boolean eliminarDireccion(int idDireccion);
+    boolean eliminarEmailsHuesped(String tipoDocumento, long nroDocumento);
 }
 //queremos tener diferentes metodos para devolver por ej una lista de dto?
 //tenemos que controlar excepciones
