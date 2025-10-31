@@ -355,7 +355,7 @@ public class Pantalla {
 
         if (seleccion > 0 && seleccion <= huespedes.size()) {
             DtoHuesped huespedSeleccionado = huespedes.get(seleccion - 1);
-            System.out.println("llegamos a modificar el huesped");//this.iniciarModificacionHuesped(huespedSeleccionado);
+            this.iniciarModificacionHuesped(huespedSeleccionado);
         } else {
             System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
         }
@@ -490,4 +490,360 @@ public class Pantalla {
         System.out.println("========================================\n");
     }
     // Paso 5: El CU termina
+
+
+ private void iniciarModificacionHuesped(DtoHuesped dtoHuesped){ //Metodo para Modificar Huesped CU10
+    boolean salir = false;
+    DtoHuesped dtoHuespedModificado = new DtoHuesped(dtoHuesped);
+    String tipoDocStr = "";
+    String posIvaStr = "";
+        while(!salir){
+            
+            System.out.println("========================================");
+
+            mostrarDatosHuesped(dtoHuespedModificado);
+
+            int opcion = -1;
+            try {
+                opcion = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                continue;
+            }
+
+            System.out.println();
+
+            switch(opcion){
+                case 1:
+                    System.out.print("Nuevo Apellido: ");
+                    dtoHuespedModificado.setApellido(scanner.nextLine().trim());
+                    break;
+                case 2:
+                    System.out.print("Nuevo Nombre: ");
+                   dtoHuespedModificado.setNombres(scanner.nextLine().trim());
+                    break;
+                case 3:
+                    System.out.print("Nuevo Tipo de Documento (DNI, PASAPORTE, LE, LC): ");
+                    tipoDocStr = scanner.nextLine().trim().toUpperCase();
+
+                    // FALTABA ESTO: Asignar el valor al DTO modificado
+                    try {
+                        dtoHuespedModificado.setTipoDocumento(TipoDocumento.valueOf(tipoDocStr));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("❌ Error: Tipo de documento no válido. Se mantiene el valor anterior.");
+                        // Invalidamos tipoDocStr para que la validación posterior lo note
+                        tipoDocStr = "ERROR"; 
+                    }
+                    break;
+                case 4:
+                    System.out.print("Nuevo Número de Documento: ");
+                   dtoHuespedModificado.setDocumento(scanner.nextLong());
+                    break;
+                case 5:
+                    System.out.print("Nuevo CUIT: ");
+                    dtoHuespedModificado.setCuit(scanner.nextLine().trim());
+                    break;
+                case 6:
+                    System.out.println("Nueva Posición Frente al IVA:");
+                    System.out.println("1. " + PosIva.ConsumidorFinal.getDisplayName());
+                    System.out.println("2. " + PosIva.Monotributista.getDisplayName());
+                    System.out.println("3. " + PosIva.ResponsableInscripto.getDisplayName());
+                    System.out.println("4. " + PosIva.Excento.getDisplayName());
+                    System.out.print("Ingrese una opción: ");
+                    try {
+                        int opcionIva = scanner.nextInt();
+                        scanner.nextLine(); // Consumir salto de línea
+                        switch (opcionIva) {
+                            case 1: posIvaStr = PosIva.ConsumidorFinal.getDisplayName(); break;
+                            case 2: posIvaStr = PosIva.Monotributista.getDisplayName(); break;
+                            case 3: posIvaStr = PosIva.ResponsableInscripto.getDisplayName(); break;
+                            case 4: posIvaStr = PosIva.Excento.getDisplayName(); break;
+                            default:
+                                System.out.println("Opción inválida. Se mantendrá el valor actual.");
+                                break;
+                        }
+                        if (opcionIva >= 1 && opcionIva <= 4) {
+                            dtoHuespedModificado.setPosicionIva(PosIva.fromString(posIvaStr));
+                        }
+                    } catch (Exception e) {
+                        scanner.nextLine(); // Limpiar el buffer
+                        System.out.println("Entrada inválida. Se mantendrá el valor actual.");
+                    }
+                    break;
+                 case 7:
+                    System.out.print("Nueva Fecha de Nacimiento (dd/MM/yyyy): ");
+                    dtoHuespedModificado.setFechaNacimiento(leerFecha("Fecha de nacimiento", dtoHuespedModificado.getFechaNacimiento()));
+                     break;
+                case 8:
+                    cambiarDireccionHuesped(dtoHuespedModificado.getDireccion());
+                    break;
+                case 9:
+                    System.out.print("Nuevo Teléfono: ");
+                    dtoHuespedModificado.setTelefono(scanner.nextLong());
+                    break;
+                case 10:
+                    System.out.print("Nuevo Email: ");
+                    dtoHuespedModificado.setEmail(scanner.nextLine().trim());
+                    break;
+                case 11:
+                    System.out.print("Nueva Ocupación: ");
+                    dtoHuespedModificado.setOcupacion(scanner.nextLine().trim());
+                    break;
+                case 12:
+                    System.out.print("Nueva Nacionalidad: ");
+                    dtoHuespedModificado.setNacionalidad(scanner.nextLine().trim());
+                    break;
+                 case 13: 
+                    // Al pulsar SIGUIENTE validamos omisiones. Si hay errores, no salimos. Paso2 CU10
+                    if (gestorHuesped.validarDatos(dtoHuespedModificado, tipoDocStr, posIvaStr)) {
+                        if(gestorHuesped.tipoynroDocExistente(dtoHuespedModificado)){
+                            System.out.println("¡CUIDADO! El tipo y número de documento ya existen en el sistema");
+                            System.out.println("1. ACEPTAR IGUALMENTE");
+                            System.out.println("2. CORREGIR");
+                            System.out.print("Ingrese una opción: ");
+                            int opcionDoc = -1;
+                            try {
+                                opcionDoc = scanner.nextInt();
+                                scanner.nextLine(); //consumir salto de linea
+                            } catch (Exception e) {
+                                scanner.nextLine(); //limpiar buffer
+                                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                                break;
+                            }
+                            if (opcionDoc == 2) {
+                                // quedarse en la pantalla para que el actor corrija
+                                break;
+                            }else if (opcionDoc != 1) {
+                                System.out.println("Opción inválida. Intente nuevamente.\n");
+                                break;
+                            }   else{
+                                gestorHuesped.modificarHuesped(dtoHuesped, dtoHuespedModificado);
+                                salir = true; 
+                            } 
+                        }else{
+                            gestorHuesped.modificarHuesped(dtoHuesped, dtoHuespedModificado);
+                            salir = true;
+                        }
+                    } else {
+                        // quedarse en la pantalla para que el actor corrija. Mensajes enviados en validarDatos
+                    }
+                    break;
+                case 14:
+                    BooleanRef salirRef = new BooleanRef(salir);
+                    pulsarCancelar(salirRef);
+                    salir = salirRef.getValue();
+                    break;
+                case 15:
+                    eliminarHuespedDesdeCU10(dtoHuesped);//CU11
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+
+    private void eliminarHuespedDesdeCU10(DtoHuesped dtoHuesped){
+        String tipoDoc = dtoHuesped.getTipoDocumento().name();
+        long nroDoc = dtoHuesped.getDocumento();
+
+        boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
+
+        if (!puedeEliminar) {
+            // Flujo Alternativo 2.A: El huésped se alojó alguna vez
+            System.out.println("\n*** NO SE PUEDE ELIMINAR ***");
+            System.out.println("El huésped se ha alojado en el hotel en alguna oportunidad.");
+            System.out.println("Por razones de auditoría, el huésped NO puede ser eliminado del sistema.");
+            System.out.println("*****************************\n");
+
+            pausa();
+            return; // Termina el CU (Flujo Alternativo 2.A.1)
+        }
+
+        // Paso 2 (continuación): El huésped NUNCA se alojó, se puede eliminar
+        System.out.println("\nLos datos del huésped que será eliminado son:");
+        System.out.println("----------------------------------------");
+        System.out.println("Nombre:    " + dtoHuesped.getNombres());
+        System.out.println("Apellido:  " + dtoHuesped.getApellido());
+        System.out.println("Documento: " + dtoHuesped.getTipoDocumento().name() + " " + dtoHuesped.getDocumento());
+        System.out.println("----------------------------------------\n");
+
+        System.out.println("¿Está seguro que desea ELIMINAR este huésped?");
+        System.out.println("1. ELIMINAR");
+        System.out.println("2. CANCELAR");
+        System.out.print("Ingrese una opción: ");
+
+        int opcion = leerOpcionNumerica();
+
+        if (opcion == 1) {
+            // Paso 3: El actor presiona "ELIMINAR"
+            System.out.println("\nEliminando huésped...");
+
+            boolean eliminado = gestorHuesped.eliminarHuesped(tipoDoc, nroDoc);
+
+            if (eliminado) {
+                // Éxito
+                System.out.println("\n*** ELIMINACIÓN EXITOSA ***");
+                System.out.println("Los datos del huésped " + dtoHuesped.getNombres() + " " + dtoHuesped.getApellido());
+                System.out.println("(" + dtoHuesped.getTipoDocumento().name() + " " + dtoHuesped.getDocumento() + ")");
+                System.out.println("han sido eliminados del sistema.");
+                System.out.println("***************************\n");
+            } else {
+                // Error
+                System.out.println("\n*** ERROR ***");
+                System.out.println("No se pudo eliminar el huésped.");
+                System.out.println("Intente nuevamente o contacte al administrador.");
+                System.out.println("*************\n");
+            }
+
+        } else if (opcion == 2) {
+            // Flujo Alternativo 3.A: El actor presiona "CANCELAR"
+            System.out.println("\nEliminación cancelada.\n");
+        } else {
+            System.out.println("\nOpción inválida. Eliminación cancelada.\n");
+        }
+    }
+    
+public void cambiarDireccionHuesped(DtoDireccion direccion){
+    if (direccion == null) {
+        System.out.println("\nNo hay dirección asociada al huésped.");        
+        return;
+    }
+    
+    boolean salir = false;
+    while(!salir){
+        System.out.println("\nSelecciona el dato a cambiar:");
+        System.out.println("1. Calle: " + direccion.getCalle());
+        System.out.println("2. Número: " + direccion.getNumero());
+        System.out.println("3. Departamento: " + direccion.getDepartamento());
+        System.out.println("4. Piso: " + direccion.getPiso());
+        System.out.println("5. Código Postal: " + direccion.getCodPostal());
+        System.out.println("6. Localidad: " + direccion.getLocalidad());
+        System.out.println("7. Provincia: " + direccion.getProvincia());
+        System.out.println("8. País: " + direccion.getPais());
+        System.out.println("9. VOLVER");
+        System.out.print("Ingrese una opción: ");
+        int opcion = -1;
+        try {
+            opcion = scanner.nextInt();
+            scanner.nextLine(); //consumir salto de linea
+        } catch (Exception e) {
+            scanner.nextLine(); //limpiar buffer
+            System.out.println("\nOpción inválida. Intente nuevamente.\n");
+            return;
+        }
+        switch(opcion){
+            case 1:
+                System.out.print("Nueva Calle: ");
+                direccion.setCalle(scanner.nextLine().trim());
+                break;
+            case 2:
+                System.out.print("Nuevo Número: ");
+                direccion.setNumero(scanner.nextInt());
+                break;
+            case 3:
+                System.out.print("Nuevo Departamento: ");
+                direccion.setDepartamento(scanner.nextLine().trim());
+                break;
+            case 4:
+                System.out.print("Nuevo Piso: ");
+                direccion.setPiso(scanner.nextInt());
+                break;
+            case 5:
+                System.out.print("Nuevo Código Postal: ");
+                direccion.setCodPostal(scanner.nextInt());
+                break;
+            case 6:
+                System.out.print("Nueva Localidad: ");
+                direccion.setLocalidad(scanner.nextLine().trim());
+                break;
+            case 7:
+                System.out.print("Nueva Provincia: ");
+                direccion.setProvincia(scanner.nextLine().trim());
+                break;
+            case 8:
+                System.out.print("Nuevo País: ");  
+                direccion.setPais(scanner.nextLine().trim());
+            break;
+            case 9:
+                return;
+            default:
+                System.out.println("Opción inválida. Intente nuevamente.\n");
+        }
+    }
+}
+    private void pulsarCancelar(BooleanRef salir){ //Paso3 CU10
+        System.out.print("\n¿Desea cancelar la modificación del huésped? ");
+        System.out.print("1. SI ");
+        System.out.print(" 2. NO \n");
+        int opt = -1;
+        while (true) {
+            System.out.print("Ingrese una opción: ");
+            try {
+                opt = scanner.nextInt();
+                scanner.nextLine(); //consumir salto de linea
+            } catch (Exception e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                
+            }
+            switch (opt){
+                case 1:
+                    System.out.println("\nModificación cancelada.\n");
+                    salir.setValue(true);
+                    return;
+                case 2:
+                    System.out.println("\nContinuando con la modificación.\n");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.\n");
+            }
+        }
+    }
+       
+    private void mostrarDatosHuesped(DtoHuesped dtoHuesped){
+        System.out.println("---- DATOS DEL HUESPED ----");
+        System.out.println("1. Apellido: " + dtoHuesped.getApellido());
+        System.out.println("2. Nombre: " + dtoHuesped.getNombres());
+        System.out.println("3. Tipo de documento: " + dtoHuesped.getTipoDocumento());
+        System.out.println("4. Número de documento: " + dtoHuesped.getDocumento());
+        System.out.println("5. CUIT: " + dtoHuesped.getCuit());
+        System.out.println("6. Posición IVA: " + dtoHuesped.getPosicionIva());
+        System.out.println("7. Fecha de nacimiento: " + dtoHuesped.getFechaNacimiento());
+        System.out.println("8. Dirección, pulsa para mas informacion"); 
+        System.out.println("9. Teléfono: " + dtoHuesped.getTelefono());
+        System.out.println("10. Agregar Email");
+        System.out.println("11. Ocupación: " + dtoHuesped.getOcupacion());
+        System.out.println("12. Nacionalidad: " + dtoHuesped.getNacionalidad());
+        System.out.println("13. SIGUIENTE");
+        System.out.println("14. CANCELAR");
+        System.out.println("15. BORRAR HUESPED");
+        System.out.println("---------------------------\n");
+    }
+
+   
+
+    /*
+     * Lee una fecha desde la entrada en formato dd/MM/yyyy.
+     * Si el usuario ingresa línea vacía, devuelve current (mantiene la fecha actual).
+     */
+    private Date leerFecha(String etiqueta, Date current) {
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        formato.setLenient(false);
+        while (true) {
+            String actual = (current == null) ? "vacío" : formato.format(current);
+            System.out.print(etiqueta + " (dd/MM/yyyy) [ENTER para mantener: " + actual + "]: ");
+            String linea = scanner.nextLine().trim();
+            if (linea.isEmpty()) {
+                return current;
+            }
+            try {
+                return formato.parse(linea);
+            } catch (ParseException e) {
+                System.out.println("Formato inválido. Use dd/MM/yyyy. Intente nuevamente.");
+            }
+        }
+    }
 }

@@ -1,6 +1,9 @@
 package Huesped;
 
+<<<<<<< HEAD
 //PROBANDO
+=======
+>>>>>>> cu10
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
@@ -39,6 +42,13 @@ public class GestorHuesped {
         }
         else {
             listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
+<<<<<<< HEAD
+=======
+        }
+
+        for (DtoHuesped huesped : listaHuespedes) {
+            asignarDireccionAHuesped(huesped);
+>>>>>>> cu10
         }
         
         return listaHuespedes;
@@ -146,13 +156,31 @@ public class GestorHuesped {
                 return false;
             }
 
+<<<<<<< HEAD
             // 2. Obtener el ID de la dirección antes de eliminar el huésped
             int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
+=======
+        // 2. Obtener el ID de la dirección antes de eliminar el huésped
+            int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
+            
+            // 2.5  Eliminar los emails
+            boolean emailsEliminados = daoHuesped.eliminarEmailsHuesped(tipoDocumento, nroDocumento);
+            
+            if (!emailsEliminados) {
+                 System.err.println("No se pudieron eliminar los emails asociados al huésped.");
+                 registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de emails (BD)");
+                 return false;
+            }
+>>>>>>> cu10
 
             // 3. Eliminar el huésped
             boolean huespedEliminado = daoHuesped.eliminarHuesped(tipoDocumento, nroDocumento);
 
             if (!huespedEliminado) {
+<<<<<<< HEAD
+=======
+                // (Si esto falla ahora, es raro, pero la auditoría es correcta)
+>>>>>>> cu10
                 System.err.println("No se pudo eliminar el huésped");
                 registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de BD");
                 return false;
@@ -235,5 +263,146 @@ public class GestorHuesped {
         }
     }
 
+<<<<<<< HEAD
 // FIN DE LOS MÉTODOS A AGREGAR
+=======
+    public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
+        
+        // 1. Aseguramos que el DTO original (para el WHERE) tenga su dirección
+        asignarDireccionAHuesped(dtoHuespedOriginal);
+
+        // 2. Verificamos si la dirección del DTO modificado existe.
+        // Si el DtoDireccion existe, significa que lo estamos modificando.
+        DtoDireccion direccionModificada = dtoHuespedModificado.getDireccion();
+
+        if (direccionModificada != null) {
+            try {
+                if (direccionModificada.getId() > 0) {
+                    // Si la dirección ya tiene un ID, la modificamos
+                    daoDireccion.ModificarDireccion(direccionModificada);
+                    // Nos aseguramos que el DTO Huesped tenga el ID correcto
+                    dtoHuespedModificado.setIdDireccion(direccionModificada.getId());
+                } else {
+                    // Si la dirección NO tiene ID (ID=0), es una dirección NUEVA
+                    // (Esto pasa si el huésped no tenía dirección y le agregaste una)
+                    DtoDireccion direccionNuevaCreada = daoDireccion.CrearDireccion(direccionModificada);
+                    
+                    // Actualizamos el DTO del Huesped con el ID de la dirección recién creada
+                    dtoHuespedModificado.setIdDireccion(direccionNuevaCreada.getId());
+                }
+            } catch (Excepciones.PersistenciaException e) {
+                System.err.println("Error al intentar persistir la dirección en la BD: " + e.getMessage());
+                // IMPORTANTE: Si falla la dirección, no debemos continuar con el huésped.
+                return; 
+            }
+        }
+        
+        // 3. Finalmente, actualizamos la tabla 'huesped'
+        // Ahora sí, 'dtoHuespedModificado.getIdDireccion()' tendrá el ID correcto (nuevo o modificado)
+        daoHuesped.modificarHuesped(dtoHuespedOriginal, dtoHuespedModificado);
+        System.out.println("“La operación ha culminado con éxito");
+    }
+    
+
+ public boolean validarDatos(DtoHuesped dtoHuesped, String TipoDoc, String PosIva) {
+        List<String> errores = new ArrayList<>();
+
+        if (dtoHuesped.getApellido() == null || dtoHuesped.getApellido().isBlank()) {
+            errores.add("Apellido");
+        }
+        if (dtoHuesped.getNombres() == null || dtoHuesped.getNombres().isBlank()) {
+            errores.add("Nombres");
+        }
+        if ("ERROR".equals(TipoDoc)) {
+        errores.add("Tipo de documento (valor inválido)");
+        } else if (dtoHuesped.getTipoDocumento() == null) {
+        errores.add("Tipo de documento");
+        }
+        if (dtoHuesped.getDocumento() <= 0L) {
+            errores.add("Número de documento");
+        }
+        if(dtoHuesped.getCuit() == null || dtoHuesped.getCuit().isBlank()) {
+            errores.add("CUIT");
+        }
+        if (PosIva == null || PosIva.isBlank()) {
+            // Si querés asignar por omisión:
+            dtoHuesped.setPosicionIva(enums.PosIva.ConsumidorFinal);
+        } else {
+            dtoHuesped.setPosicionIva(enums.PosIva.fromString(PosIva));
+        }
+        
+        if(dtoHuesped.getFechaNacimiento() == null) {
+            errores.add("Fecha de nacimiento");
+        }
+        // validar dirección
+        if (dtoHuesped.getTelefono() <= 0L) {
+            errores.add("Teléfono");
+        }
+        if(dtoHuesped.getEmail() == null || dtoHuesped.getEmail().isBlank()) {
+            errores.add("Email");
+        }
+        if(dtoHuesped.getOcupacion() == null || dtoHuesped.getOcupacion().isBlank()) {
+            errores.add("Ocupación");
+        }
+        if(dtoHuesped.getNacionalidad() == null || dtoHuesped.getNacionalidad().isBlank()) {
+            errores.add("Nacionalidad");
+        }
+        if(dtoHuesped.getDireccion().getCalle() == null || dtoHuesped.getDireccion().getCalle().isBlank()) {
+            errores.add("Calle");
+        }
+        if(dtoHuesped.getDireccion().getNumero() <= 0) {
+            errores.add("Número de dirección");
+        }
+        if(dtoHuesped.getDireccion().getLocalidad() == null || dtoHuesped.getDireccion().getLocalidad().isBlank()) {
+            errores.add("Ciudad");
+        }
+        if(dtoHuesped.getDireccion().getCodPostal() <= 0L ) {
+            errores.add("Código postal");
+        }
+        if(dtoHuesped.getDireccion().getProvincia() == null || dtoHuesped.getDireccion().getProvincia().isBlank()) {
+            errores.add("Provincia");
+        }
+        if(dtoHuesped.getDireccion().getPais() == null || dtoHuesped.getDireccion().getPais().isBlank()) {
+            errores.add("País");
+        }
+        // Evaluamos si hay errores ( y los comentamos) o si no los hay
+        if (!errores.isEmpty()) {
+            System.out.println("\n*** ERROR: Faltan o son inválidos los siguientes datos obligatorios: ***");
+            for (String e : errores){
+                System.out.println("- " + e);
+            }
+            System.out.println("Por favor complete/corrija los campos indicados. Los campos no se han blanqueado.\n");
+            return false;
+        }
+        return true;
+    }    
+
+    public boolean tipoynroDocExistente(DtoHuesped dtoHuesped) {
+        if(daoHuesped.docExistente(dtoHuesped)){  //consultar dao si existe un huesped con ese tipo y nro de doc
+            return true; //retornar true si existe, false si no
+        }
+        return false;
+    }
+
+    /**
+     * Obtiene y asigna los datos completos de la dirección al DtoHuesped
+     * @param dtoHuesped El DTO del huésped al que se le asignará la dirección
+     * @return true si se pudo asignar la dirección, false si hubo algún error
+     */
+    public boolean asignarDireccionAHuesped(DtoHuesped dtoHuesped) {
+        if (dtoHuesped == null || dtoHuesped.getIdDireccion() <= 0) {
+            return false;
+        }
+
+        DtoDireccion dtoDireccion = daoDireccion.ObtenerDireccion(dtoHuesped.getIdDireccion());
+        if (dtoDireccion != null) {
+            dtoHuesped.setDireccion(dtoDireccion);
+            return true;
+        }
+        return false;
+    }
+
+>>>>>>> cu10
 }
+
+       

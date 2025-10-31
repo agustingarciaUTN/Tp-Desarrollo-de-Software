@@ -7,7 +7,7 @@ import java.util.Date;
 public class DtoHuesped {
     private String nombres;
     private String apellido;
-    private int telefono;
+    private long telefono;
     private TipoDocumento tipoDocumento;
     private long documento;
     private String cuit;
@@ -17,9 +17,13 @@ public class DtoHuesped {
     private String ocupacion;
     private String nacionalidad;
     private DtoDireccion dtoDireccion;
+<<<<<<< HEAD
+=======
+    private int idDireccion;
+>>>>>>> cu10
 
     // Constructor con todos los datos
-    public DtoHuesped(String nombres, String apellido, int telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
+    public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
         this.nombres = nombres;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -33,9 +37,7 @@ public class DtoHuesped {
         this.nacionalidad = nacionalidad;
     }
     
-    public DtoHuesped (){
-        
-    }
+    public DtoHuesped (){}
 
     // Getters y Setters
     public String getNombres() {
@@ -50,10 +52,10 @@ public class DtoHuesped {
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
-    public int getTelefono() {
+    public long getTelefono() {
         return telefono;
     }
-    public void setTelefono(int telefono) {
+    public void setTelefono(long telefono) {
         this.telefono = telefono;
     }
     public TipoDocumento getTipoDocumento() {
@@ -105,6 +107,16 @@ public class DtoHuesped {
         this.nacionalidad = nacionalidad;
     }
     public void setDireccion(DtoDireccion dtoDireccion){ this.dtoDireccion = dtoDireccion; }
+<<<<<<< HEAD
+=======
+    public DtoDireccion getDireccion(){ return this.dtoDireccion; }
+    public int getIdDireccion() {
+        return idDireccion;
+    }
+    public void setIdDireccion(int idDireccion) {
+        this.idDireccion = idDireccion;
+    }
+>>>>>>> cu10
     
     public boolean estanVacios() {
         boolean apellidoVacio = (apellido == null || apellido.trim().isEmpty());
@@ -114,4 +126,38 @@ public class DtoHuesped {
         return apellidoVacio && nombresVacio && tipoDocVacio && docVacio;
     }
     
+<<<<<<< HEAD
+=======
+    // Método auxiliar para convertir string de la BD a PosIva
+    public static PosIva convertirPosIvaString(String posicionIvaStr) {
+        if (posicionIvaStr == null) {
+            return PosIva.ConsumidorFinal;
+        }
+        try {
+            // Eliminamos espacios y convertimos a mayúsculas
+            String posIvaSinEspacios = posicionIvaStr.replace(" ", "").toUpperCase();
+            return PosIva.valueOf(posIvaSinEspacios);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Valor de posicion_iva no válido: " + posicionIvaStr);
+            return PosIva.ConsumidorFinal;
+        }
+    }
+    public DtoHuesped(DtoHuesped original) {
+        this.nombres = original.nombres;
+        this.apellido = original.apellido;
+        this.telefono = original.telefono;
+        this.tipoDocumento = original.tipoDocumento;
+        this.documento = original.documento;
+        this.cuit = original.cuit;
+        this.posicionIva = original.posicionIva;
+        this.fechaNacimiento = original.fechaNacimiento;
+        this.email = original.email;
+        this.ocupacion = original.ocupacion;
+        this.nacionalidad = original.nacionalidad;
+        this.idDireccion = original.idDireccion;
+        
+        // Copiamos la referencia de la dirección (se edita por separado)
+        this.dtoDireccion = original.dtoDireccion;
+    }
+>>>>>>> cu10
 }

@@ -6,7 +6,11 @@ import java.sql.*;
 
 public class DaoDireccion implements DaoDireccionInterfaz {
 
+<<<<<<< HEAD
         //debe ser tipo DtoDireccion porque necesitamos el ID de la Direccion creada para asignarla al Huesped
+=======
+          //debe ser tipo DtoDireccion porque necesitamos el ID de la Direccion creada para asignarla al Huesped
+>>>>>>> cu10
         @Override
         public DtoDireccion CrearDireccion(DtoDireccion dto) throws PersistenciaException{
             // Lógica para crear una dirección en la base de datos
@@ -52,9 +56,32 @@ public class DaoDireccion implements DaoDireccionInterfaz {
         }
 
         @Override
-        public boolean ModificarDireccion(int idDireccion) {
-            // Lógica para modificar una dirección en la base de datos
-            return true;
+        public boolean ModificarDireccion(DtoDireccion dto) throws PersistenciaException {
+            String sql = "UPDATE direccion SET calle = ?, numero = ?, departamento = ?, piso = ?, \"codPostal\" = ?, localidad = ?, provincia = ?, pais = ? WHERE id_direccion = ?";
+            
+            try (Connection conn = Coneccion.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                
+                pstmt.setString(1, dto.getCalle());
+                pstmt.setInt(2, dto.getNumero());
+                pstmt.setString(3, dto.getDepartamento());
+                pstmt.setInt(4, dto.getPiso());
+                pstmt.setInt(5, dto.getCodPostal());
+                pstmt.setString(6, dto.getLocalidad());
+                pstmt.setString(7, dto.getProvincia());
+                pstmt.setString(8, dto.getPais());
+                pstmt.setInt(9, dto.getId());
+
+                int filasAfectadas = pstmt.executeUpdate();
+                if (filasAfectadas > 0) {
+                    return true;
+                } else {
+                    throw new PersistenciaException("No se encontró la dirección con ID: " + dto.getId(), null);
+                }
+                
+            } catch (SQLException e) {
+                throw new PersistenciaException("Error al modificar la dirección en la base de datos", e);
+            }
         }
 
         @Override
@@ -65,8 +92,36 @@ public class DaoDireccion implements DaoDireccionInterfaz {
 
         @Override
         public DtoDireccion ObtenerDireccion(int idDireccion) {
-            // Lógica para obtener una dirección de la base de datos
-            return null;
+            String sql = "SELECT id_direccion, calle, numero, departamento, piso, \"codPostal\", localidad, provincia, pais FROM direccion WHERE id_direccion = ?";
+            
+            try (Connection conn = Coneccion.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                
+                pstmt.setInt(1, idDireccion);
+                
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        DtoDireccion dtoDireccion = new DtoDireccion();
+                        
+                        dtoDireccion.setId(rs.getInt("id_direccion"));
+                        dtoDireccion.setCalle(rs.getString("calle"));
+                        dtoDireccion.setNumero(rs.getInt("numero"));
+                        dtoDireccion.setDepartamento(rs.getString("departamento"));
+                        dtoDireccion.setPiso(rs.getInt("piso"));
+                        dtoDireccion.setCodPostal(rs.getInt("codPostal"));
+                        dtoDireccion.setLocalidad(rs.getString("localidad"));
+                        dtoDireccion.setProvincia(rs.getString("provincia"));
+                        dtoDireccion.setPais(rs.getString("pais"));
+                        
+                        return dtoDireccion;
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al obtener la dirección de la base de datos: " + e.getMessage());
+                e.printStackTrace();
+            }
+            
+            return null; // Retorna null si no se encuentra la dirección o hay un error
         }
     }
 
