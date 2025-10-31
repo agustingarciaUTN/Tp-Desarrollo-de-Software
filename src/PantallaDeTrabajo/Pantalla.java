@@ -607,7 +607,8 @@ public class Pantalla {
             DtoHuesped huespedSeleccionado = huespedes.get(seleccion - 1);
             this.iniciarModificacionHuesped(huespedSeleccionado);
         } else {
-            System.out.println("llegamos a seguir dando de alta otro huesped");//this.iniciarAltaHuesped();
+            System.out.println("llegamos a seguir dando de alta otro huesped");
+            this.iniciarAltaHuesped();
         }
     }
 
