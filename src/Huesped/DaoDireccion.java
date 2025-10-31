@@ -10,7 +10,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
         @Override
         public DtoDireccion CrearDireccion(DtoDireccion dto) throws PersistenciaException{
             // Lógica para crear una dirección en la base de datos
-            String sql = "INSERT INTO direccion (calle, numero, departamento, piso, cod_postal, localidad, provincia, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO direccion (calle, numero, departamento, piso, \"codPostal\", localidad, provincia, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             //Cualquier objeto que pongamos dentro de los paréntesis del try (try (...)) será cerrado automáticamente por Java al final del bloque. No importa si el código termina bien o si falla con una excepción.
 

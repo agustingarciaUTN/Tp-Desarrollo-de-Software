@@ -6,9 +6,12 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import enums.PosIva;
 import enums.TipoDocumento;
 import Dominio.Huesped;
 import Estadia.GestorEstadia;
+import Excepciones.PersistenciaException;
 import Estadia.DaoEstadia;
 import java.util.List;
 import java.util.ArrayList;
@@ -48,59 +51,120 @@ public class GestorHuesped {
 
     }
     
+    public List<String> validarDatosHuesped(DtoHuesped datos){
+        List<String> errores = new ArrayList<>();
 
-   /* public boolean darAltaHuesped(){
-        //precondicion haberse ejecutado el cu2, buscar huesped
-        //una vez ejecutado el buscarHuesped(), se puede ahora ejecutar este
+        // Campos Obligatorios según CU09 especificación
+        if (datos.getApellido() == null || datos.getApellido().trim().isEmpty()) {
+            errores.add("El Apellido es obligatorio.");
+        }
+        if (datos.getNombres() == null || datos.getNombres().trim().isEmpty()) {
+            errores.add("Los Nombres son obligatorios.");
+        }
+        if (datos.getTipoDocumento() == null) {
+            errores.add("El Tipo de Documento es obligatorio.");
+        }
+        if (datos.getDocumento() <= 0) {
+            // Asumiendo que Documento ahora es Long y lo pediste con pedirLongOpcional
+            errores.add("El Número de Documento es obligatorio y debe ser positivo.");
+        }
+        if (datos.getFechaNacimiento() == null) {
+            errores.add("La Fecha de Nacimiento es obligatoria.");
+        } else {
+            //regla de que la fecha no puede ser futura
+            if (datos.getFechaNacimiento().after(new Date())) { // new Date() es la fecha/hora actual
+                errores.add("La Fecha de Nacimiento no puede ser futura.");
+            }
+            // Podrías añadir validación de mayoría de edad si es necesario aquí
+        }
 
-        //pantalla presenta datos, inputs (algunos obligariorios y otros no)
-        // y botones Siguiente y Cancelar -> no lo hace el gestor
+        // Validación de Dirección (asumiendo que DtoHuesped tiene getDireccion())
+        DtoDireccion direccion = datos.getDireccion();
+        if (direccion == null) {
+            errores.add("Los datos de la Dirección son obligatorios.");
+        } else {
+            if (direccion.getCalle() == null || direccion.getCalle().trim().isEmpty()) {
+                errores.add("La Calle de la dirección es obligatoria.");
+            }
+            if (direccion.getNumero() <= 0) {
+                errores.add("El Número de la dirección es obligatorio y debe ser positivo.");
+            }
+            if (direccion.getLocalidad() == null || direccion.getLocalidad().trim().isEmpty()) {
+                errores.add("La Localidad de la dirección es obligatoria.");
+            }
+            if (direccion.getProvincia() == null || direccion.getProvincia().trim().isEmpty()) {
+                errores.add("La Provincia de la dirección es obligatoria.");
+            }
+            if (direccion.getPais() == null || direccion.getPais().trim().isEmpty()) {
+                errores.add("El País de la dirección es obligatorio.");
+            }
+            if (direccion.getCodPostal() <= 0) {
+                errores.add("El Código Postal es obligatorio y debe ser positivo.");
+            }
+        }
 
-            //no ingresa todos los obligatorios y toca siguiente
-            //Mostramos un mensaje de error detallando cada una de las omisiones. (podemos concatenar un string si es que falla)
-            //vuelve a pedir ingreso de datos ->Puede haber otro error de validación
 
-            //ya existe el huesped y por lo tanto el dni, mostrar mensaje CUIDADO ... -> según el 
-            // diagrama de secuencia lo hace la pantalla
-            //Botones aceptar igualmente o corregir -> pantalla
-                //Aceptar igualmente lleva a seguir por el flujo normal -> crea el huesped y la direccion
-                //Corregir vuelve a pedir el ingreso del dni solamente -> pantalla
+        if (datos.getTelefono() <= 0) {
+            errores.add("El Teléfono es obligatorio.");
+        }
+        if (datos.getOcupacion() == null || datos.getOcupacion().trim().isEmpty()) {
+            errores.add("La Ocupación es obligatoria.");
+        }
+        if (datos.getNacionalidad() == null || datos.getNacionalidad().trim().isEmpty()) {
+            errores.add("La Nacionalidad es obligatoria.");
+        }
 
-            //Cancelar -> segun el diagrama de secuencia lo hace la pantalla
-            //mensaje ¿Desea cancelar el alta del huésped? Y los botones Si y No.
-                //Si, termina el metodo
-                //no, regresa al principio del metodo
+        // Regla especial CUIT/IVA
+        if (datos.getPosicionIva() == PosIva.ResponsableInscripto) {
+            if (datos.getCuit() == null || datos.getCuit().trim().isEmpty()) {
+                errores.add("El CUIT es obligatorio para Responsables Inscriptos.");
+            } else {
+                // Podrías añadir una validación básica de formato CUIT aquí si quieres
+                if (!validarFormatoCUIT(datos.getCuit())) {
+                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X).");
+                }
+            }
+        }
 
-        //Registramos el huesped, persistimos en bdd -> lo hace el gestor o el DAO?
-        //“El huésped nombres y apellido ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro?
-        //Botones Si No
-        //No y termina
-        //Si y volves al principio de todo
-        // Segun el diagrama de secuencia no lo hace el gestor
+        return errores;
     }
 
-    public boolean modificarHuesped(){
-        //ponemos todos los datos del huesped en pantalla
-        //Botones SIGUIENTE, CANCELAR Y BORRAR
+    private boolean validarFormatoCUIT(String cuit) {
+        if (cuit == null) return false;
+        // Expresión regular básica: 2 dígitos, guión, 8 dígitos, guión, 1 dígito
+        return cuit.matches("\\d{2}-\\d{8}-\\d{1}");
+    }
 
-            //el actor blaquea 1 o + datos y toca SIGUIENTE
-            //mostramos mensaje detallando omisiones hechas
-            //volvemos al paso anterior
+    public DtoHuesped chequearDuplicado(DtoHuesped datos) throws PersistenciaException {
+        // La validación de null ya se hizo en el paso anterior (validarDatosHuesped)
+        return daoHuesped.buscarPorTipoYNumeroDocumento(datos.getTipoDocumento(), datos.getDocumento());
+    }
 
-            //ya existe el document
-            //misma logica que el dar el alta
+    public DtoHuesped crearHuespedCompleto(DtoHuesped datosHuesped) throws PersistenciaException {
 
-            //Cancelar
-            //misma logica que dar de alta
+        try {
+            //Crear la Dirección
+            // Llamamos al DAO de Dirección. Este metodo actualiza el DTO de dirección
+            // con el nuevo ID generado por la BD
+            DtoDireccion direccionConId = daoDireccion.CrearDireccion(datosHuesped.getDireccion());
 
-            //BORRAR
-            //ejecutar cu11 "dar de baja huesped"
 
-        //Modifica los datos, toca siguiente
-        //actualizamos los datos, persistir con dao en la bdd
-        //mensaje de exito
-        //termina
-    }*/
+            //Crear el Huésped
+            // Ahora llamamos al DAO de Huésped, pasándole el DTO completo.
+            // El DAO de Huésped sabrá sacar el ID de la dirección desde datosHuesped.getDireccion().getId()
+            daoHuesped.crearHuesped(datosHuesped);
+            daoHuesped.crearEmailHuesped(datosHuesped);
+
+
+            return datosHuesped;
+
+        } catch (PersistenciaException e) {
+            // Si algo falló (crear dirección O crear huésped), capturamos la excepcion
+            System.err.println("Error en la capa de Gestor al crear el huésped completo:");
+            // y la relanzamos para que la Pantalla se entere.
+            throw e;
+        }
+    }
 
 
     /* Valida si un huésped puede ser eliminado del sistema

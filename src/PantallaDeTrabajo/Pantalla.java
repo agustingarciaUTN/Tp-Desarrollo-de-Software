@@ -1,5 +1,4 @@
 package PantallaDeTrabajo;
-
 import Huesped.*;
 import enums.PosIva;
 import enums.TipoDocumento;
@@ -8,6 +7,8 @@ import Usuario.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import Excepciones.PersistenciaException;
 
 public class Pantalla {
 
@@ -141,8 +142,7 @@ public class Pantalla {
             System.out.println("1. Buscar huesped (CU2)");
             System.out.println("2. Dar de alta huesped (CU9)");
             System.out.println("3. Dar de baja huesped (CU11) ");
-            System.out.println("4. Modificar Huesped");
-            System.out.println("5. Cerrar sesión");
+            System.out.println("4. Cerrar sesión");
             System.out.println("========================================");
             System.out.print("Ingrese una opción: ");
 
@@ -163,20 +163,12 @@ public class Pantalla {
                     iniciarBusquedaHuesped();
                     break;
                 case 2:
-                    // iniciarAltaHuesped();
+                    iniciarAltaHuesped();
                     break;
                 case 3:
                     iniciarBajaHuesped();
                     break;
                 case 4:
-                    System.out.println("Funcionalidad en desarrollo...\n");
-                    pausa();
-                    break;
-                case 5:
-                    System.out.println("Funcionalidad en desarrollo...\n");
-                    pausa();
-                    break;
-                case 6:
                     System.out.print("¿Está seguro que desea cerrar sesión? (SI/NO): ");
                     String confirmar = scanner.nextLine().trim();
                     if (confirmar.equalsIgnoreCase("SI")) {
@@ -192,6 +184,308 @@ public class Pantalla {
         //Paso 5: El CU termina
     }
 
+    public void iniciarAltaHuesped() {//este metodo debe tener el mismo nombre que el CU?
+
+        //no se si es necesario, despues habra que ver la parte estetica
+        System.out.println("-- Iniciando CU9 'dar de alta huesped' --");
+
+        boolean continuarCargando = true;//bandera
+
+        while (continuarCargando) {
+            //metodo para pedir datos
+            DtoHuesped datosIngresados = mostrarYPedirDatosFormulario();
+
+            System.out.println("Acciones: 1 = SIGUIENTE, 2 = CANCELAR");
+            System.out.println("Ingrese una opción: ");
+            int opcionBoton = scanner.nextInt();
+            scanner.nextLine();//para consumir el salto de linea
+
+            if (opcionBoton == 1) {//presiono SIGUIENTE
+                System.out.println("Procesando datos...");
+
+
+                //aca hay que llamar al gestor para que valide los datos
+                List<String> errores = new ArrayList<>();
+                errores = gestorHuesped.validarDatosHuesped(datosIngresados);
+
+
+                if (!errores.isEmpty()) {
+                    System.out.println("ERROR: Se encontraron los siguientes errores: ");
+                    for (String error : errores) {
+                        System.out.println("- " + error);
+                    }
+                    System.out.println("Por favor, ingrese los datos nuevamente");
+                    continue; //fuerzaa al inicio del while
+                }
+
+                try {
+                    DtoHuesped duplicado = gestorHuesped.chequearDuplicado(datosIngresados);
+
+                    if (duplicado != null) {
+                        System.out.println("----------------------------------------------------------------");
+                        System.out.println("⚠️ ¡CUIDADO! El tipo y número de documento ya existen en el sistema:");
+                        System.out.println("   Huésped existente: " + duplicado.getNombres() + " " + duplicado.getApellido());
+                        System.out.println("----------------------------------------------------------------");
+                        System.out.println("Opciones: 1 = ACEPTAR IGUALMENTE, 2 = CORREGIR");
+                        System.out.print("Ingrese una opción: ");
+
+                        int opcionDuplicado = scanner.nextInt();
+                        scanner.nextLine(); // Consumir salto de línea
+
+                        if (opcionDuplicado == 2) { // Eligió CORREGIR
+                            System.out.println("Seleccionó CORREGIR. Vuelva a ingresar los datos.");
+                            continue; // Vuelve al inicio del while para pedir todo de nuevo
+                        }
+                        // Si elige 1 (ACEPTAR IGUALMENTE), no hacemos nada y el código sigue
+                    }
+
+
+                    //paso todas las validaciones, creamos el Huesped en la db
+                    gestorHuesped.crearHuespedCompleto(datosIngresados);
+
+
+                } catch (PersistenciaException e) {
+                    System.out.println("ERROR DE BASE DE DATOS: No se pudo verificar el duplicado.");
+                    e.printStackTrace();
+                    continue; // Volver a empezar
+                }
+
+                System.out.println("El huésped '" + datosIngresados.getNombres() + " " + datosIngresados.getApellido() + "' ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro? (SI/NO)");
+
+                System.out.println("¿Desea cargar otro huésped? (SI/NO): ");
+
+                //validacion de ingreso correcto
+                String ingresoOtroHuesped = scanner.nextLine();
+                while (!ingresoOtroHuesped.equalsIgnoreCase("NO") && !ingresoOtroHuesped.equalsIgnoreCase("SI")) {
+                    //no se si aca hay que consumir salto de linea o no
+                    System.out.println("Ingreso invalido. ¿Desea cargar otro huésped? (SI/NO): ");
+                    ingresoOtroHuesped = scanner.nextLine();
+                }
+
+                //si ingreso NO termina el bucle, si ingreso SI se repite
+                if (ingresoOtroHuesped.equalsIgnoreCase("NO")) {
+                    continuarCargando = false;
+                }
+
+            } else if (opcionBoton == 2) {//presiono CANCELAR
+                System.out.println("¿Desea cancelar el alta del huésped? (SI/NO): ");
+
+                //validacion de ingreso correcto (capaz esto puede ser una funcion aparte, habria que ver como manejar los mensajes distintos)
+                String ingresoCancelarAlta = scanner.nextLine();
+                while (!ingresoCancelarAlta.equalsIgnoreCase("NO") && !ingresoCancelarAlta.equalsIgnoreCase("SI")) {
+                    //no se si aca hay que consumir salto de linea o no
+                    System.out.println("Ingreso invalido. ¿Desea cancelar el alta de huesped? (SI/NO): ");
+                    ingresoCancelarAlta = scanner.nextLine();
+                }
+
+                if (ingresoCancelarAlta.equalsIgnoreCase("SI")) {
+                    System.out.println("Alta cancelada.");
+                    continuarCargando = false;//termina el bucle
+                }
+                //si ingresa NO, el bucle se repite y vuelve a pedir los datos (no se si esta bien que tenga que ingresar todo de 0)
+            } else {
+                System.out.println("Ingreso invalido. Intente nuevamente.");
+            }
+        }//fin while
+
+        System.out.println("-- Fin CU9 'dar de alta huesped' ---");
+    }//fin iniciarAltaHuesped
+
+        private DtoHuesped mostrarYPedirDatosFormulario() {
+        DtoHuesped dtoHuesped = new DtoHuesped();
+        DtoDireccion dtoDireccion = new DtoDireccion();
+        System.out.println("Apellido: ");
+        dtoHuesped.setApellido(scanner.nextLine());
+
+        System.out.println("Nombres: ");
+        dtoHuesped.setNombres(scanner.nextLine());
+
+        TipoDocumento tipoDocumento = pedirTipoDocumento();
+        dtoHuesped.setTipoDocumento(tipoDocumento);
+
+        System.out.println("Número de Documento: ");
+        dtoHuesped.setDocumento(Long.parseLong(scanner.nextLine()));
+
+        System.out.println("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
+        String cuit = scanner.nextLine();
+        if (cuit.trim().isEmpty()) {
+            cuit = null;
+        }
+        dtoHuesped.setCuit(cuit);
+        
+        String posIvaStr = "";
+        System.out.println("Posición Frente al IVA:");
+                    System.out.println("1. " + PosIva.ConsumidorFinal.getDisplayName());
+                    System.out.println("2. " + PosIva.Monotributista.getDisplayName());
+                    System.out.println("3. " + PosIva.ResponsableInscripto.getDisplayName());
+                    System.out.println("4. " + PosIva.Excento.getDisplayName());
+                    System.out.print("Ingrese una opción: ");
+                    try {
+                        int opcionIva = scanner.nextInt();
+                        scanner.nextLine(); // Consumir salto de línea
+                        switch (opcionIva) {
+                            case 1: posIvaStr = PosIva.ConsumidorFinal.getDisplayName(); break;
+                            case 2: posIvaStr = PosIva.Monotributista.getDisplayName(); break;
+                            case 3: posIvaStr = PosIva.ResponsableInscripto.getDisplayName(); break;
+                            case 4: posIvaStr = PosIva.Excento.getDisplayName(); break;
+                            default:
+                                System.out.println("Opción inválida. Se mantendrá el valor actual.");
+                                break;
+                        }
+                        if (opcionIva >= 1 && opcionIva <= 4) {
+                            dtoHuesped.setPosicionIva(PosIva.fromString(posIvaStr));
+                        }
+                    } catch (Exception e) {
+                        scanner.nextLine(); // Limpiar el buffer
+                        System.out.println("Entrada inválida. Se mantendrá el valor actual.");
+                    }
+                    
+        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
+        dtoHuesped.setFechaNacimiento(fechaNacimiento);
+
+        System.out.println("Calle: ");
+        dtoDireccion.setCalle(scanner.nextLine());
+
+        System.out.println("Número de calle: ");
+        dtoDireccion.setNumero(Integer.parseInt(scanner.nextLine()));
+
+        System.out.println("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
+        dtoDireccion.setDepartamento(scanner.nextLine());
+
+        System.out.println("Piso (ingrese 0 si no aplica): ");
+        dtoDireccion.setPiso(Integer.parseInt(scanner.nextLine()));
+
+        System.out.println("Código Postal: ");
+        dtoDireccion.setCodPostal(Integer.parseInt(scanner.nextLine()));
+
+        System.out.println("Localidad: ");
+        dtoDireccion.setLocalidad(scanner.nextLine());
+
+        System.out.println("Provincia: ");
+        dtoDireccion.setProvincia(scanner.nextLine());
+
+        System.out.println("Pais: ");
+        dtoDireccion.setPais(scanner.nextLine());
+
+        System.out.println("Teléfono: ");
+        dtoHuesped.setTelefono(Long.parseLong(scanner.nextLine()));
+
+        System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
+        String email = scanner.nextLine();
+        if (email.trim().isEmpty()) {
+            email = null;
+        }
+        dtoHuesped.setEmail(email);
+
+        System.out.println("Ocupacion: ");
+        dtoHuesped.setOcupacion(scanner.nextLine());
+
+        System.out.println("Nacionalidad: ");
+        dtoHuesped.setNacionalidad(scanner.nextLine());
+
+
+        //asociamos el la direccion con el huesped
+        dtoHuesped.setDireccion(dtoDireccion);
+
+
+        System.out.println("--- Fin Formulario ---");
+        return dtoHuesped; // Devolver el DTO con los datos cargados
+
+    }
+       private Date pedirFecha(String mensaje) {
+        Date fecha = null;
+        boolean valida = false;
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+        formatoFecha.setLenient(false);
+
+        while (!valida) {
+            System.out.print(mensaje + " (Enter para omitir): ");
+            String fechaStr = scanner.nextLine();
+
+            if (fechaStr.trim().isEmpty()) {
+                valida = true; // Omitir es válido
+                fecha = null;
+            } else {
+                try {
+                    fecha = formatoFecha.parse(fechaStr);
+                    valida = true; // Formato válido
+                } catch (ParseException e) {
+                    System.out.println("Error: Formato de fecha inválido. Use dd/MM/yyyy o presione Enter para omitir.");
+                }
+            }
+        }
+        return fecha;
+    }
+
+    private TipoDocumento pedirTipoDocumento() {
+        TipoDocumento tipoDoc = null;
+        boolean valido = false;
+
+        // Mostrar opciones válidas construyendo un String
+        StringBuilder opciones = new StringBuilder("Tipo de Documento (");
+        TipoDocumento[] valores = TipoDocumento.values();
+        for (int i = 0; i < valores.length; i++) {
+            opciones.append(valores[i].name()); // .name() devuelve el nombre del enum (DNI, LE, etc.)
+            if (i < valores.length - 1) {
+                opciones.append("/");
+            }
+        }
+        opciones.append("): ");
+
+        while (!valido) {
+            System.out.print(opciones.toString());
+            String tipoDocStr = scanner.nextLine().toUpperCase().trim(); // A mayúsculas y sin espacios
+            if (tipoDocStr.isEmpty()) {
+                valido = true; // Omitir es válido
+                tipoDoc = null;
+            } else {
+                try {
+                    tipoDoc = TipoDocumento.valueOf(tipoDocStr);
+                    valido = true; // Opción válida
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: Tipo de documento inválido. Ingrese una de las opciones o Enter para omitir.");
+                }
+            }
+        }
+        return tipoDoc;
+    }
+
+    private PosIva pedirPosIva() {
+        PosIva posIva = null;
+        boolean valido = false;
+
+        // Mostrar opciones
+        StringBuilder opciones = new StringBuilder("Posición IVA (");
+        PosIva[] valores = PosIva.values();
+        for (int i = 0; i < valores.length; i++) {
+            opciones.append(valores[i].name());
+            if (i < valores.length - 1) {
+                opciones.append("/");
+            }
+        }
+        opciones.append(", por defecto Consumidor_Final): "); // Aclarar el default
+
+        while (!valido) {
+            System.out.print(opciones.toString());
+            String posIvaStr = scanner.nextLine().toUpperCase().trim();
+
+            // Permitir Enter para el valor por defecto
+            if (posIvaStr.isEmpty()) {
+                posIva = PosIva.ConsumidorFinal; // Asignar el default
+                valido = true;
+            } else {
+                try {
+                    posIva = PosIva.valueOf(posIvaStr);
+                    valido = true;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para Consumidor_Final.");
+                }
+            }
+        }
+        return posIva;
+    }
+
+    
     //METODO AUXILIAR PARA PAUSAR
     public void pausa() {
         System.out.print("Presione ENTER para continuar...");
