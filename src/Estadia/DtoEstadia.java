@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// src/Dominio/Estadia.java
-=======
->>>>>>> cu10
 package Estadia;
 
 import java.util.Date;

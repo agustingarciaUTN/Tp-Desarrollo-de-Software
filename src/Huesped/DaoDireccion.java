@@ -6,11 +6,7 @@ import java.sql.*;
 
 public class DaoDireccion implements DaoDireccionInterfaz {
 
-<<<<<<< HEAD
         //debe ser tipo DtoDireccion porque necesitamos el ID de la Direccion creada para asignarla al Huesped
-=======
-          //debe ser tipo DtoDireccion porque necesitamos el ID de la Direccion creada para asignarla al Huesped
->>>>>>> cu10
         @Override
         public DtoDireccion CrearDireccion(DtoDireccion dto) throws PersistenciaException{
             // Lógica para crear una dirección en la base de datos

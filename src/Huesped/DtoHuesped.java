@@ -17,10 +17,7 @@ public class DtoHuesped {
     private String ocupacion;
     private String nacionalidad;
     private DtoDireccion dtoDireccion;
-<<<<<<< HEAD
-=======
-    private int idDireccion;
->>>>>>> cu10
+    private int idDireccion;   
 
     // Constructor con todos los datos
     public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
@@ -107,8 +104,6 @@ public class DtoHuesped {
         this.nacionalidad = nacionalidad;
     }
     public void setDireccion(DtoDireccion dtoDireccion){ this.dtoDireccion = dtoDireccion; }
-<<<<<<< HEAD
-=======
     public DtoDireccion getDireccion(){ return this.dtoDireccion; }
     public int getIdDireccion() {
         return idDireccion;
@@ -116,7 +111,6 @@ public class DtoHuesped {
     public void setIdDireccion(int idDireccion) {
         this.idDireccion = idDireccion;
     }
->>>>>>> cu10
     
     public boolean estanVacios() {
         boolean apellidoVacio = (apellido == null || apellido.trim().isEmpty());
@@ -126,8 +120,6 @@ public class DtoHuesped {
         return apellidoVacio && nombresVacio && tipoDocVacio && docVacio;
     }
     
-<<<<<<< HEAD
-=======
     // Método auxiliar para convertir string de la BD a PosIva
     public static PosIva convertirPosIvaString(String posicionIvaStr) {
         if (posicionIvaStr == null) {
@@ -159,5 +151,4 @@ public class DtoHuesped {
         // Copiamos la referencia de la dirección (se edita por separado)
         this.dtoDireccion = original.dtoDireccion;
     }
->>>>>>> cu10
 }

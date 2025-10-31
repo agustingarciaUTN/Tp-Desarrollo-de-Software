@@ -1,9 +1,5 @@
 package Huesped;
 
-<<<<<<< HEAD
-//PROBANDO
-=======
->>>>>>> cu10
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
@@ -42,13 +38,10 @@ public class GestorHuesped {
         }
         else {
             listaHuespedes = daoHuesped.obtenerHuespedesPorCriterio(datos);
-<<<<<<< HEAD
-=======
         }
 
         for (DtoHuesped huesped : listaHuespedes) {
             asignarDireccionAHuesped(huesped);
->>>>>>> cu10
         }
         
         return listaHuespedes;
@@ -156,10 +149,6 @@ public class GestorHuesped {
                 return false;
             }
 
-<<<<<<< HEAD
-            // 2. Obtener el ID de la dirección antes de eliminar el huésped
-            int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
-=======
         // 2. Obtener el ID de la dirección antes de eliminar el huésped
             int idDireccion = daoHuesped.obtenerIdDireccion(tipoDocumento, nroDocumento);
             
@@ -171,16 +160,12 @@ public class GestorHuesped {
                  registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de emails (BD)");
                  return false;
             }
->>>>>>> cu10
 
             // 3. Eliminar el huésped
             boolean huespedEliminado = daoHuesped.eliminarHuesped(tipoDocumento, nroDocumento);
 
             if (!huespedEliminado) {
-<<<<<<< HEAD
-=======
                 // (Si esto falla ahora, es raro, pero la auditoría es correcta)
->>>>>>> cu10
                 System.err.println("No se pudo eliminar el huésped");
                 registrarAuditoriaFallida(tipoDocumento, nroDocumento, "Error en eliminación de BD");
                 return false;
@@ -263,9 +248,6 @@ public class GestorHuesped {
         }
     }
 
-<<<<<<< HEAD
-// FIN DE LOS MÉTODOS A AGREGAR
-=======
     public void modificarHuesped(DtoHuesped dtoHuespedOriginal, DtoHuesped dtoHuespedModificado){
         
         // 1. Aseguramos que el DTO original (para el WHERE) tenga su dirección
@@ -402,7 +384,6 @@ public class GestorHuesped {
         return false;
     }
 
->>>>>>> cu10
 }
 
        
