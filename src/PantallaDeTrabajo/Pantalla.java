@@ -636,13 +636,73 @@ public class Pantalla {
                     salir = salirRef.getValue();
                     break;
                 case 15:
-                    //CU11
-                    System.out.println("Falta CU11, Huésped borrado del sistema. \n");
+                    eliminarHuespedDesdeCU10(dtoHuesped);//CU11
                     salir = true;
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.\n");
             }
+        }
+    }
+
+    private void eliminarHuespedDesdeCU10(DtoHuesped dtoHuesped){
+        String tipoDoc = dtoHuesped.getTipoDocumento().name();
+        long nroDoc = dtoHuesped.getDocumento();
+
+        boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
+
+        if (!puedeEliminar) {
+            // Flujo Alternativo 2.A: El huésped se alojó alguna vez
+            System.out.println("\n*** NO SE PUEDE ELIMINAR ***");
+            System.out.println("El huésped se ha alojado en el hotel en alguna oportunidad.");
+            System.out.println("Por razones de auditoría, el huésped NO puede ser eliminado del sistema.");
+            System.out.println("*****************************\n");
+
+            pausa();
+            return; // Termina el CU (Flujo Alternativo 2.A.1)
+        }
+
+        // Paso 2 (continuación): El huésped NUNCA se alojó, se puede eliminar
+        System.out.println("\nLos datos del huésped que será eliminado son:");
+        System.out.println("----------------------------------------");
+        System.out.println("Nombre:    " + dtoHuesped.getNombres());
+        System.out.println("Apellido:  " + dtoHuesped.getApellido());
+        System.out.println("Documento: " + dtoHuesped.getTipoDocumento().name() + " " + dtoHuesped.getDocumento());
+        System.out.println("----------------------------------------\n");
+
+        System.out.println("¿Está seguro que desea ELIMINAR este huésped?");
+        System.out.println("1. ELIMINAR");
+        System.out.println("2. CANCELAR");
+        System.out.print("Ingrese una opción: ");
+
+        int opcion = leerOpcionNumerica();
+
+        if (opcion == 1) {
+            // Paso 3: El actor presiona "ELIMINAR"
+            System.out.println("\nEliminando huésped...");
+
+            boolean eliminado = gestorHuesped.eliminarHuesped(tipoDoc, nroDoc);
+
+            if (eliminado) {
+                // Éxito
+                System.out.println("\n*** ELIMINACIÓN EXITOSA ***");
+                System.out.println("Los datos del huésped " + dtoHuesped.getNombres() + " " + dtoHuesped.getApellido());
+                System.out.println("(" + dtoHuesped.getTipoDocumento().name() + " " + dtoHuesped.getDocumento() + ")");
+                System.out.println("han sido eliminados del sistema.");
+                System.out.println("***************************\n");
+            } else {
+                // Error
+                System.out.println("\n*** ERROR ***");
+                System.out.println("No se pudo eliminar el huésped.");
+                System.out.println("Intente nuevamente o contacte al administrador.");
+                System.out.println("*************\n");
+            }
+
+        } else if (opcion == 2) {
+            // Flujo Alternativo 3.A: El actor presiona "CANCELAR"
+            System.out.println("\nEliminación cancelada.\n");
+        } else {
+            System.out.println("\nOpción inválida. Eliminación cancelada.\n");
         }
     }
     
