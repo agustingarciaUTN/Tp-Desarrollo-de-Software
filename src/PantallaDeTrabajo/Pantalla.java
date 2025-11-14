@@ -445,35 +445,49 @@ public class Pantalla {
     private TipoDocumento pedirTipoDocumento() {
         TipoDocumento tipoDoc = null;
         boolean valido = false;
-
-        // Mostrar opciones válidas construyendo un String
-        StringBuilder opciones = new StringBuilder("Tipo de Documento (");
-        TipoDocumento[] valores = TipoDocumento.values();
-        for (int i = 0; i < valores.length; i++) {
-            opciones.append(valores[i].name()); // .name() devuelve el nombre del enum (DNI, LE, etc.)
-            if (i < valores.length - 1) {
-                opciones.append("/");
-            }
-        }
-        opciones.append("): ");
+        
 
         while (!valido) {
-            System.out.print(opciones.toString());
-            String tipoDocStr = scanner.nextLine().toUpperCase().trim(); // A mayúsculas y sin espacios
-            if (tipoDocStr.isEmpty()) {
-                valido = true; // Omitir es válido
-                tipoDoc = null;
-            } else {
-                try {
-                    tipoDoc = TipoDocumento.valueOf(tipoDocStr);
-                    valido = true; // Opción válida
+            System.out.println("Tipo de Documento" + '\n' + "1. DNI"+ '\n' + "2. LE" +'\n'+ "3. LC" + '\n' + "4.PASAPORTE" + '\n' + "5. OTRO");
+            int opcion = Integer.parseInt(scanner.nextLine());
+
+            // Permitir Enter para el valor por defecto
+            
+
+            try {
+                switch (opcion) {
+                    case 1:
+                        tipoDoc = TipoDocumento.DNI;
+                        valido = true;
+                        break;
+                    case 2:
+                        tipoDoc = TipoDocumento.LE;
+                        valido = true;
+                        break;
+                    case 3:
+                        tipoDoc = TipoDocumento.LC;
+                        valido = true;
+                        break;
+                    case 4:
+                        tipoDoc = TipoDocumento.PASAPORTE;
+                        valido = true;
+                        break;
+                    case 5:
+                        tipoDoc = TipoDocumento.OTRO;
+                        valido = true;
+                        break;
+                    default:
+                        System.out.println("Error: Tipo de documento inválido. Ingrese una opción válida.");
+                        break;
+                    }
+
                 } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Tipo de documento inválido. Ingrese una de las opciones o Enter para omitir.");
+                    System.out.println("Error: Tipo de documento inválido. Ingrese una opción válida.");
                 }
             }
-        }
         return tipoDoc;
     }
+        
 
 
    private String pedirPosIva() {
