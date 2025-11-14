@@ -1,30 +1,26 @@
 package Huesped;
 
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 
 import enums.PosIva;
 import enums.TipoDocumento;
-import Dominio.Huesped;
+
 import Estadia.GestorEstadia;
 import Excepciones.PersistenciaException;
 import Estadia.DaoEstadia;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Scanner;
+
 
 public class GestorHuesped {
-    //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
+    //debe presentarse en pantalla la opción para ejecutar el método de buscar huesped
     // solo si se autentico antes el conserje
 
     //los daos que utilizara el gestor (son de tipo interfaz por SOLID)
     private final DaoHuespedInterfaz daoHuesped;
     private final DaoDireccionInterfaz daoDireccion;
-    private GestorEstadia gestorEstadia;
+    private final GestorEstadia gestorEstadia;
 
     public GestorHuesped(DaoHuespedInterfaz daoHuesped, DaoDireccionInterfaz daoDireccion) {
         this.daoHuesped = daoHuesped;
@@ -122,7 +118,7 @@ public class GestorHuesped {
             } else {
                 // Podrías añadir una validación básica de formato CUIT aquí si quieres
                 if (!validarFormatoCUIT(datos.getCuit())) {
-                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X o XX/XXXXXXXX/X) .");
+                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X) .");
                 }
             }
         }
@@ -132,7 +128,7 @@ public class GestorHuesped {
 
     private boolean validarFormatoCUIT(String cuit) {
         if (cuit == null) return false;
-        // Expresión regular básica: 2 dígitos, guión, 8 dígitos, guión, 1 dígito
+        // Expresión regular básica: 2 dígitos, guion, 8 dígitos, guion, 1 dígito
         return cuit.matches("^\\d{2}-\\d{8}-\\d{1}$");
     }
 
@@ -435,10 +431,8 @@ public class GestorHuesped {
     }    
 
     public boolean tipoynroDocExistente(DtoHuesped dtoHuesped) {
-        if(daoHuesped.docExistente(dtoHuesped)){  //consultar dao si existe un huesped con ese tipo y nro de doc
-            return true; //retornar true si existe, false si no
-        }
-        return false;
+        //consultar dao si existe un huesped con ese tipo y nro de doc
+        return daoHuesped.docExistente(dtoHuesped); //retornar true si existe, false si no
     }
 
     /**

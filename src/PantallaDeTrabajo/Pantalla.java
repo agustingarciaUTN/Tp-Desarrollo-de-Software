@@ -196,8 +196,15 @@ public class Pantalla {
 
             System.out.println("Acciones: 1 = SIGUIENTE, 2 = CANCELAR");
             System.out.println("Ingrese una opción: ");
-            int opcionBoton = scanner.nextInt();
-            scanner.nextLine();//para consumir el salto de linea
+            int opcionBoton = -1;
+            try {
+                opcionBoton = scanner.nextInt();
+                scanner.nextLine();//para consumir el salto de linea
+            } catch (InputMismatchException e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                break;
+            }
 
             if (opcionBoton == 1) {//presiono SIGUIENTE
                 System.out.println("Procesando datos...");
@@ -301,7 +308,7 @@ public class Pantalla {
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
 
-        System.out.print("Número de Documento: ");
+
         String numeroDocumento = pedirDocumento(tipoDocumento);
 
         String cuit = pedirCUIT();
@@ -416,11 +423,15 @@ public class Pantalla {
         while (!valido) {
             System.out.print(mensaje);
             String entrada = scanner.nextLine(); // leemos siempre como String
+            int validez = Integer.parseInt(entrada);
 
             if (entrada.trim().isEmpty()) {
                 System.out.println("Error: Este campo es obligatorio. No se puede omitir.");
                 continue;
-            } else {
+            } else if(validez <= 0){
+                System.out.println("Error: ingreser un numero positivo por favor.");
+            }
+            else {
                 try {
                     valor = Integer.parseInt(entrada); // intentamos convertir el String a int
                     valido = true;      // Si funciona, es válido
@@ -512,6 +523,16 @@ public class Pantalla {
             } else {
                 try {
                     fecha = formatoFecha.parse(fechaStr);
+                    // Convertir a LocalDate para comparar solo la fecha (sin hora)
+                    java.time.LocalDate fechaLocal = java.time.Instant.ofEpochMilli(fecha.getTime())
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate();
+                    java.time.LocalDate hoy = java.time.LocalDate.now();
+
+                    if (!fechaLocal.isBefore(hoy)) {
+                        System.out.println("Error: La fecha debe ser anterior a hoy. Ingrese una fecha pasada.");
+                        continue;
+                    }
                     valida = true; // Formato válido
                 } catch (ParseException e) {
                     System.out.println("Error: Formato de fecha inválido. Use dd/MM/yyyy o presione Enter para omitir.");
@@ -1256,6 +1277,7 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
         String regexOtro = "^.{4,20}$";
 
         while (!valido) {
+            System.out.print("Número de Documento: ");
             String entrada = scanner.nextLine().trim().toUpperCase(); // Normalizamos a mayúsculas
 
             if (entrada.isEmpty()) {
