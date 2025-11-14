@@ -132,7 +132,7 @@ public class GestorHuesped {
     private boolean validarFormatoCUIT(String cuit) {
         if (cuit == null) return false;
         // Expresión regular básica: 2 dígitos, guión, 8 dígitos, guión, 1 dígito
-        return cuit.matches("^\\d{2}[\\-/]\\d{8}[\\-/]\\d{1}$");
+        return cuit.matches("^\\d{2}-\\d{8}-\\d{1}$");
     }
 
     public DtoHuesped chequearDuplicado(DtoHuesped datos) throws PersistenciaException {
