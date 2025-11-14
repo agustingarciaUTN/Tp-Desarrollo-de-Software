@@ -122,7 +122,7 @@ public class GestorHuesped {
             } else {
                 // Podrías añadir una validación básica de formato CUIT aquí si quieres
                 if (!validarFormatoCUIT(datos.getCuit())) {
-                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X).");
+                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X o XX/XXXXXXXX/X) .");
                 }
             }
         }
@@ -133,7 +133,7 @@ public class GestorHuesped {
     private boolean validarFormatoCUIT(String cuit) {
         if (cuit == null) return false;
         // Expresión regular básica: 2 dígitos, guión, 8 dígitos, guión, 1 dígito
-        return cuit.matches("\\d{2}-\\d{8}-\\d{1}");
+        return cuit.matches("^\\d{2}-\\d{8}-\\d{1}$");
     }
 
     public DtoHuesped chequearDuplicado(DtoHuesped datos) throws PersistenciaException {
