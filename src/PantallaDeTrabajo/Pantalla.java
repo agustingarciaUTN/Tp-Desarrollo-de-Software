@@ -7,7 +7,6 @@ import Usuario.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import Excepciones.PersistenciaException;
 
 public class Pantalla {
@@ -187,7 +186,7 @@ public class Pantalla {
     public void iniciarAltaHuesped() {//este metodo debe tener el mismo nombre que el CU?
 
         //no se si es necesario, despues habra que ver la parte estetica
-        System.out.println("-- Iniciando CU9 'dar de alta huesped' --");
+        System.out.println('\n'+"-- Iniciando CU9 'dar de alta huesped' --");
 
         boolean continuarCargando = true;//bandera
 
@@ -227,7 +226,7 @@ public class Pantalla {
                         System.out.println("   Huésped existente: " + duplicado.getNombres() + " " + duplicado.getApellido());
                         System.out.println("----------------------------------------------------------------");
                         System.out.println("Opciones: 1 = ACEPTAR IGUALMENTE, 2 = CORREGIR");
-                        System.out.print("Ingrese una opción: ");
+                        System.out.println("Ingrese una opción: ");
 
                         int opcionDuplicado = scanner.nextInt();
                         scanner.nextLine(); // Consumir salto de línea
@@ -294,17 +293,19 @@ public class Pantalla {
         //metodo privado para pedir los datos del huesped a ingresar
     private DtoHuesped mostrarYPedirDatosFormulario() {
 
-        System.out.println("Apellido: ");
+        System.out.println('\n'+"INGRESE LOS DATOS DEL HUÉSPED A REGISTRAR");
+
+        System.out.print("Apellido: ");
         String apellido = scanner.nextLine();
 
-        System.out.println("Nombres: ");
+        System.out.print("Nombres: ");
         String nombres = scanner.nextLine();
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
 
         Long numeroDocumento = pedirLong("Número de Documento: ");
 
-        System.out.println("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
+        System.out.print("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
         String cuit = scanner.nextLine();
         if (cuit.trim().isEmpty()) { // trim() quita espacios en blanco al inicio y final
             cuit = null;
@@ -315,41 +316,41 @@ public class Pantalla {
 
         Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
 
-        System.out.println("Calle: ");
+        System.out.print("Calle: ");
         String calleDireccion = scanner.nextLine();
 
         Integer numeroDireccion = pedirEntero("Número de calle: ");
 
-        System.out.println("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
+        System.out.print("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
         String departamentoDireccion = scanner.nextLine();
 
-        System.out.println("Piso (ingrese - si no aplica): ");
+        System.out.print("Piso (ingrese - si no aplica): ");
         String pisoDireccion = scanner.nextLine();
 
         Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
-        System.out.println("Localidad: ");
+        System.out.print("Localidad: ");
         String localidadDireccion = scanner.nextLine();
 
-        System.out.println("Provincia: ");
+        System.out.print("Provincia: ");
         String provinciaDireccion = scanner.nextLine();
 
-        System.out.println("Pais: ");
+        System.out.print("Pais: ");
         String paisDireccion = scanner.nextLine();
 
-        System.out.println("Teléfono: ");
+        System.out.print("Teléfono: ");
         long telefono = Long.parseLong(scanner.nextLine());
 
-        System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
+        System.out.print("Email (opcional, presione Enter para omitir): ");//no obligatorio
         String email = scanner.nextLine();
         if (email.trim().isEmpty()) {
             email = null;
         }
 
-        System.out.println("Ocupacion: ");
+        System.out.print("Ocupacion: ");
         String ocupacion = scanner.nextLine();
 
-        System.out.println("Nacionalidad: ");
+        System.out.print("Nacionalidad: ");
 
         String nacionalidad = scanner.nextLine();
 
@@ -398,7 +399,7 @@ public class Pantalla {
         Long valor = null; // Usamos la clase wrapper Long
         boolean valido = false;
         while (!valido) {
-            System.out.print(mensaje + " (Enter para omitir): ");
+            System.out.print(mensaje);
             String entrada = scanner.nextLine(); // Leemos siempre como String
 
             if (entrada.trim().isEmpty()) {
