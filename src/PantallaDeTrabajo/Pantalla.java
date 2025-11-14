@@ -457,7 +457,7 @@ public class Pantalla {
     private String pedirCUIT() {
         String cuit;
         // Expresion para CUIT: 2 dígitos, un guión o barrita, 8 dígitos, un guión o barrita, 1 dígito.
-        String expresionCUIT = "^\\d{2}[\\-/]\\d{8}[\\-/]\\d{1}$"; 
+        String expresionCUIT = "^\\d{2}-\\d{8}-\\d{1}$"; 
 
         while (true) {
             System.out.print("CUIT (opcional, formato XX-XXXXXXXX-X, presione Enter para omitir): ");
@@ -467,7 +467,7 @@ public class Pantalla {
                 return null;        
             //Si no está vacío, valida el formato
             } else if (!cuit.matches(expresionCUIT)) {
-                System.out.println("Error: Formato de CUIT incorrecto. Debe ser XX-XXXXXXXX-X o XX/XXXXXXXX/X.");
+                System.out.println("Error: Formato de CUIT incorrecto. Debe ser XX-XXXXXXXX-X");
             } else {
                 return cuit;
             }
