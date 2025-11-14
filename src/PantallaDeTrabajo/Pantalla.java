@@ -448,42 +448,49 @@ public class Pantalla {
         
 
         while (!valido) {
-            System.out.println("Tipo de Documento" + '\n' + "1. DNI"+ '\n' + "2. LE" +'\n'+ "3. LC" + '\n' + "4.PASAPORTE" + '\n' + "5. OTRO");
-            int opcion = Integer.parseInt(scanner.nextLine());
+            System.out.println("Tipo de Documento" + '\n' + "1. DNI"+ '\n' + "2. LE" +'\n'+ "3. LC" + '\n' + "4. PASAPORTE" + '\n' + "5. OTRO");
+            System.out.print("Ingrese una opción numérica: ");
+            String entrada = scanner.nextLine().trim();
 
-            // Permitir Enter para el valor por defecto
-            
+            // Enter -> valor por defecto (DNI)
+            if (entrada.isEmpty()) {
+                System.out.println("Por favor seleccione una opción.");
+                continue;
+            }
 
+            int opcion;
             try {
-                switch (opcion) {
-                    case 1:
-                        tipoDoc = TipoDocumento.DNI;
-                        valido = true;
-                        break;
-                    case 2:
-                        tipoDoc = TipoDocumento.LE;
-                        valido = true;
-                        break;
-                    case 3:
-                        tipoDoc = TipoDocumento.LC;
-                        valido = true;
-                        break;
-                    case 4:
-                        tipoDoc = TipoDocumento.PASAPORTE;
-                        valido = true;
-                        break;
-                    case 5:
-                        tipoDoc = TipoDocumento.OTRO;
-                        valido = true;
-                        break;
-                    default:
-                        System.out.println("Error: Tipo de documento inválido. Ingrese una opción válida.");
-                        break;
-                    }
+                opcion = Integer.parseInt(entrada);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Ingrese un número válido (1-5) o presione Enter para DNI.");
+                continue;
+            }
 
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Tipo de documento inválido. Ingrese una opción válida.");
-                }
+            switch (opcion) {
+                case 1:
+                    tipoDoc = TipoDocumento.DNI;
+                    valido = true;
+                    break;
+                case 2:
+                    tipoDoc = TipoDocumento.LE;
+                    valido = true;
+                    break;
+                case 3:
+                    tipoDoc = TipoDocumento.LC;
+                    valido = true;
+                    break;
+                case 4:
+                    tipoDoc = TipoDocumento.PASAPORTE;
+                    valido = true;
+                    break;
+                case 5:
+                    tipoDoc = TipoDocumento.OTRO;
+                    valido = true;
+                    break;
+                default:
+                    System.out.println("Error: Tipo de documento inválido. Ingrese 1-5 o Enter para DNI.");
+                    break;
+            }
             }
         return tipoDoc;
     }
@@ -496,37 +503,45 @@ public class Pantalla {
 
 
         while (!valido) {
-            System.out.println("Posicion frente al IVA:" + '\n' + "1. Consumidor Final (por defecto)"+ '\n' + " 2. Monotributista" +'\n'+ "3. Responsable Inscripto"+'\n'+"4. Excento");
-            int opcion = Integer.parseInt(scanner.nextLine());
+            System.out.println("Posicion frente al IVA:" + '\n' + "1. Consumidor Final (por defecto)"+ '\n' + "2. Monotributista" +'\n'+ "3. Responsable Inscripto"+'\n'+"4. Excento");
+            System.out.print("Ingrese una opción numérica (Enter para Consumidor Final): ");
+            String entrada = scanner.nextLine().trim();
 
-            // Permitir Enter para el valor por defecto
-            {
-                try {
-                    switch (opcion) {
-                        case 1:
-                            posIva = PosIva.ConsumidorFinal.toString();
-                            valido = true;
-                            break;
-                        case 2:
-                            posIva = PosIva.Monotributista.toString();
-                            valido = true;
-                            break;
-                        case 3:
-                            posIva = PosIva.ResponsableInscripto.toString();
-                            valido = true;
-                            break;
-                        case 4:
-                            posIva = PosIva.Excento.toString();
-                            valido = true;
-                            break;
-                        default:
-                            posIva = PosIva.ConsumidorFinal.toString();
-                            valido = true;
-                            break;
-                        }
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para ConsumidorFinal.");
-                }
+            // Enter -> valor por defecto
+            if (entrada.isEmpty()) {
+                posIva = PosIva.ConsumidorFinal.toString();
+                valido = true;
+                continue;
+            }
+
+            int opcion;
+            try {
+                opcion = Integer.parseInt(entrada);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Ingrese un número válido (1-4) o presione Enter para Consumidor Final.");
+                continue;
+            }
+
+            switch (opcion) {
+                case 1:
+                    posIva = PosIva.ConsumidorFinal.toString();
+                    valido = true;
+                    break;
+                case 2:
+                    posIva = PosIva.Monotributista.toString();
+                    valido = true;
+                    break;
+                case 3:
+                    posIva = PosIva.ResponsableInscripto.toString();
+                    valido = true;
+                    break;
+                case 4:
+                    posIva = PosIva.Excento.toString();
+                    valido = true;
+                    break;
+                default:
+                    System.out.println("Error: Posición IVA inválida. Ingrese 1-4 o Enter para Consumidor Final.");
+                    break;
             }
         }
         return posIva;
