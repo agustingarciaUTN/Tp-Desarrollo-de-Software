@@ -307,7 +307,7 @@ public class Pantalla {
 
         String posIva = pedirPosIva();
 
-        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
+        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento ");
 
         String calleDireccion = pedirStringValidado("Calle: ");
 
@@ -413,7 +413,7 @@ public class Pantalla {
         Integer valor = null; // Usamos la clase wrapper para permitir null
         boolean valido = false;
         while (!valido) {
-            System.out.println(mensaje);
+            System.out.print(mensaje);
             String entrada = scanner.nextLine(); // leemos siempre como String
 
             if (entrada.trim().isEmpty()) {
