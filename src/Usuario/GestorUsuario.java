@@ -39,11 +39,6 @@ public class GestorUsuario {
             //Verificar si las contraseñas coinciden
             boolean autenticacionExitosa = hashAlmacenado.equals(hashIngresado);
 
-            /*if (autenticacionExitosa) {
-                System.out.println("Autenticación exitosa para el usuario: " + nombre);
-            } else {
-                System.err.println("Contraseña incorrecta para el usuario: " + nombre);
-            }*/
 
             return autenticacionExitosa;
 

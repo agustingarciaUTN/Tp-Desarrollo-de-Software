@@ -303,7 +303,8 @@ public class Pantalla {
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
 
-        Long numeroDocumento = pedirLong("Número de Documento: ");
+        System.out.print("Número de Documento: ");
+        String numeroDocumento = pedirDocumento(tipoDocumento);
 
         System.out.print("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
         String cuit = scanner.nextLine();
@@ -357,11 +358,11 @@ public class Pantalla {
         //casteo los wrappers (necesarios para las validaciones) a primitivos para su posterior uso en la app
         int numeroDireccionPrimitivo = numeroDireccion.intValue();
         int codPostalDireccionPrimitivo = codPostalDireccion.intValue();
-        long numeroDocumentoPrimitivo = numeroDocumento.longValue();
+
 
         // Crear los DTO  (aún no tenemos el ID de dirección)
         DtoDireccion direccionDto = new DtoDireccion(calleDireccion, numeroDireccionPrimitivo, departamentoDireccion, pisoDireccion, codPostalDireccionPrimitivo, localidadDireccion, provinciaDireccion, paisDireccion);
-        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumentoPrimitivo, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
+        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumento, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
 
         //asociamos el la direccion con el huesped
         huespedDto.setDireccion(direccionDto);
@@ -462,7 +463,6 @@ public class Pantalla {
             String tipoDocStr = scanner.nextLine().toUpperCase().trim(); // A mayúsculas y sin espacios
             if (tipoDocStr.isEmpty()) {
                 valido = true; // Omitir es válido
-                tipoDoc = null;
             } else {
                 try {
                     tipoDoc = TipoDocumento.valueOf(tipoDocStr);
@@ -607,7 +607,7 @@ public class Pantalla {
 
         // VALIDACIÓN DE NÚMERO DE DOCUMENTO
         if (criterios.getTipoDocumento() != null) {
-            criterios.setDocumento(validarYLeerNumeroDocumento(criterios.getTipoDocumento()));
+            criterios.setDocumento(pedirDocumento(criterios.getTipoDocumento()));
         }
 
         return criterios;
@@ -629,7 +629,7 @@ public class Pantalla {
         }
     }
 
-    private long validarYLeerNumeroDocumento(TipoDocumento tipoDoc) {
+    /*private long validarYLeerNumeroDocumento(TipoDocumento tipoDoc) {
         while (true) {
             System.out.print("Número de Documento: ");
             String numeroStr = scanner.nextLine().trim();
@@ -639,7 +639,7 @@ public class Pantalla {
             }
 
             try {
-                long numero = Long.parseLong(numeroStr);
+
 
                 // VALIDACIÓN DE RANGO SEGÚN TIPO DE DOCUMENTO
                 if (tipoDoc == TipoDocumento.DNI) {
@@ -665,7 +665,7 @@ public class Pantalla {
                 System.out.println("⚠ El número de documento debe ser un valor numérico. Intente nuevamente.");
             }
         }
-    }
+    }*/
 
     private void seleccionarHuespedDeLista(List<DtoHuesped> huespedes) {
         mostrarListaHuespedes(huespedes);
@@ -743,7 +743,7 @@ public class Pantalla {
 
         // Paso 2: Validar si el huésped puede ser eliminado
         String tipoDoc = huespedSeleccionado.getTipoDocumento().name();
-        long nroDoc = huespedSeleccionado.getDocumento();
+        String nroDoc = huespedSeleccionado.getDocumento();
 
         boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
 
@@ -858,7 +858,7 @@ public class Pantalla {
                     break;
                 case 4:
                     System.out.print("Nuevo Número de Documento: ");
-                   dtoHuespedModificado.setDocumento(scanner.nextLong());
+                   dtoHuespedModificado.setDocumento(scanner.nextLine());
                     break;
                 case 5:
                     System.out.print("Nuevo CUIT: ");
@@ -966,7 +966,7 @@ public class Pantalla {
 
     private void eliminarHuespedDesdeCU10(DtoHuesped dtoHuesped){
         String tipoDoc = dtoHuesped.getTipoDocumento().name();
-        long nroDoc = dtoHuesped.getDocumento();
+        String nroDoc = dtoHuesped.getDocumento();
 
         boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
 
@@ -1165,4 +1165,59 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
             }
         }
     }
+    private String pedirDocumento(TipoDocumento tipo) {
+        String documento = null;
+        boolean valido = false;
+
+        // Definimos las reglas (Regex)
+        // DNI, LE, LC: Solo números, entre 7 y 8 dígitos (ej: 12345678)
+        String regexNumerico = "^\\d{7,8}$";
+        // Pasaporte: Letras y números, entre 6 y 15 caracteres
+        String regexPasaporte = "^[A-Z0-9]{6,15}$";
+        // Otro: Cualquier cosa entre 4 y 20 caracteres
+        String regexOtro = "^.{4,20}$";
+
+        while (!valido) {
+            String entrada = scanner.nextLine().trim().toUpperCase(); // Normalizamos a mayúsculas
+
+            if (entrada.isEmpty()) {
+                // Si es obligatorio (que lo es), no dejamos pasar vacío
+                System.out.println("Error: El documento es obligatorio.");
+                continue;
+            }
+
+            // Validamos según el tipo seleccionado
+            switch (tipo) {
+                case DNI:
+                case LE:
+                case LC:
+                    if (entrada.matches(regexNumerico)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Para " + tipo + " debe ingresar entre 7 y 8 números.");
+                    }
+                    break;
+                case PASAPORTE:
+                    if (entrada.matches(regexPasaporte)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato de Pasaporte inválido (solo letras y números).");
+                    }
+                    break;
+                default: // OTRO
+                    if (entrada.matches(regexOtro)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato inválido.");
+                    }
+                    break;
+            }
+
+            if (valido) {
+                documento = entrada;
+            }
+        }
+        return documento;
+    }
+
 }

@@ -9,7 +9,7 @@ public class DtoHuesped {
     private String apellido;
     private long telefono;
     private TipoDocumento tipoDocumento;
-    private long documento;
+    private String documento;
     private String cuit;
     private String posicionIva;
     private Date fechaNacimiento;
@@ -20,7 +20,7 @@ public class DtoHuesped {
     private int idDireccion;   
 
     // Constructor con todos los datos
-    public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, long documento, String cuit, String posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
+    public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, String documento, String cuit, String posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
         this.nombres = nombres;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -61,10 +61,10 @@ public class DtoHuesped {
     public void setTipoDocumento(TipoDocumento tipoDocumento) {
         this.tipoDocumento = tipoDocumento;
     }
-    public long getDocumento() {
+    public String getDocumento() {
         return documento;
     }
-    public void setDocumento(long documento) {
+    public void setDocumento(String documento) {
         this.documento = documento;
     }
     public String getCuit() {
@@ -116,7 +116,7 @@ public class DtoHuesped {
         boolean apellidoVacio = (apellido == null || apellido.trim().isEmpty());
         boolean nombresVacio = (nombres == null || nombres.trim().isEmpty());
         boolean tipoDocVacio = (tipoDocumento == null);
-        boolean docVacio = (documento <= 0);
+        boolean docVacio = (documento.isEmpty());
         return apellidoVacio && nombresVacio && tipoDocVacio && docVacio;
     }
     

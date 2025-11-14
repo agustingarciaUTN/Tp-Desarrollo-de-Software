@@ -26,7 +26,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             pstmt.setString(2, dto.getApellido());
             pstmt.setLong(3, dto.getTelefono());
             pstmt.setString(4, dto.getTipoDocumento().name()); // Guardamos el Enum como String
-            pstmt.setLong(5, dto.getDocumento());
+            pstmt.setString(5, dto.getDocumento());
             pstmt.setString(6, dto.getCuit());
             pstmt.setString(7, dto.getPosicionIva().toString());
 
@@ -58,7 +58,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, dto.getTipoDocumento().name());
-            pstmt.setLong(2, dto.getDocumento());
+            pstmt.setString(2, dto.getDocumento());
             pstmt.setString(3, dto.getEmail());
 
             int filasAfectadas = pstmt.executeUpdate();
@@ -70,7 +70,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             return false;
         }
     }
-    public DtoHuesped buscarPorTipoYNumeroDocumento(TipoDocumento tipoDoc, Long numDoc) throws PersistenciaException {
+    public DtoHuesped buscarPorTipoYNumeroDocumento(TipoDocumento tipoDoc, String numDoc) throws PersistenciaException {
         // Devuelve un DTO si lo encuentra, o null si no existe
         String sql = "SELECT * FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
 
@@ -79,7 +79,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
 
             // Usamos .name() para convertir el Enum a String
             pstmt.setString(1, tipoDoc.name());
-            pstmt.setLong(2, numDoc);
+            pstmt.setString(2, numDoc);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -89,7 +89,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                     h.setNombres(rs.getString("nombres"));
                     h.setApellido(rs.getString("apellido"));
                     h.setTipoDocumento(TipoDocumento.valueOf(rs.getString("tipo_documento")));
-                    h.setDocumento(rs.getLong("numero_documento"));
+                    h.setDocumento(rs.getString("numero_documento"));
 
                     return h;
                 }
@@ -124,7 +124,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 //Mapeamos cada columna al atributo correspondiente del DTO
                 huespedDTO.setApellido(rs.getString("apellido"));
                 huespedDTO.setNombres(rs.getString("nombres"));
-                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                huespedDTO.setDocumento(rs.getString("numero_documento"));
                 huespedDTO.setTelefono(rs.getLong("telefono"));
                 huespedDTO.setCuit(rs.getString("cuit"));
                 huespedDTO.setNacionalidad(rs.getString("nacionalidad"));
@@ -195,7 +195,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
             sql.append(" AND h.tipo_documento = ?"); // <-- Se agregó h.
             params.add(criterios.getTipoDocumento().name()); 
         }
-        if (criterios.getDocumento() > 0) {
+        if (!criterios.getDocumento().equals("0")) {
             sql.append(" AND h.numero_documento = ?");
             params.add(criterios.getDocumento());
         }
@@ -224,7 +224,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 //Mapeamos cada columna al atributo correspondiente del DTO
                 huespedDTO.setApellido(rs.getString("apellido"));
                 huespedDTO.setNombres(rs.getString("nombres"));
-                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                huespedDTO.setDocumento(rs.getString("numero_documento"));
                 huespedDTO.setTelefono(rs.getLong("telefono"));
                 huespedDTO.setCuit(rs.getString("cuit"));
                 huespedDTO.setNacionalidad(rs.getString("nacionalidad"));
@@ -266,14 +266,14 @@ public class DaoHuesped implements DaoHuespedInterfaz {
         return huespedesEncontrados;
         
     }
-public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
+public int obtenerIdDireccion(String tipoDocumento, String nroDocumento) {
         String sql = "SELECT id_direccion FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
 
         try (Connection conn = Coneccion.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, tipoDocumento);
-            ps.setLong(2, nroDocumento);
+            ps.setString(2, nroDocumento);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -295,14 +295,14 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
      * @param nroDocumento Número de documento del huésped
      * @return true si se eliminó exitosamente
      */
-    public boolean eliminarHuesped(String tipoDocumento, long nroDocumento) {
+    public boolean eliminarHuesped(String tipoDocumento, String nroDocumento) {
         String sql = "DELETE FROM huesped WHERE tipo_documento = ? AND numero_documento = ?";
 
         try (Connection conn = Coneccion.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, tipoDocumento);
-            ps.setLong(2, nroDocumento);
+            ps.setString(2, nroDocumento);
 
             int filasAfectadas = ps.executeUpdate();
 
@@ -350,7 +350,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
         }
     }
 
-    public boolean eliminarEmailsHuesped(String tipoDocumento, long nroDocumento) {
+    public boolean eliminarEmailsHuesped(String tipoDocumento, String nroDocumento) {
         // Usamos nro_documento porque así se llama en email_huesped
         String sql = "DELETE FROM email_huesped WHERE tipo_documento = ? AND nro_documento = ?";
 
@@ -358,7 +358,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, tipoDocumento);
-            ps.setLong(2, nroDocumento);
+            ps.setString(2, nroDocumento);
 
             ps.executeUpdate();
             
@@ -383,7 +383,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
             sql.append(" AND tipo_documento = ?");
             params.add(criterios.getTipoDocumento().name()); //.name() es para devolver el valor del enum como string
         }
-        if (criterios.getDocumento() > 0) {
+        if (!criterios.getDocumento().equals("0")) {
             sql.append(" AND numero_documento = ?");
             params.add(criterios.getDocumento());
         }
@@ -409,7 +409,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
                 DtoHuesped huespedDTO = new DtoHuesped();
                 
                 //Mapeamos cada columna al atributo correspondiente del DTO
-                huespedDTO.setDocumento(rs.getLong("numero_documento"));
+                huespedDTO.setDocumento(rs.getString("numero_documento"));
                 
                 //Para el enum cambia
                 //Primero leemos el tipo de documento como string y despues lo convertimos a enum
@@ -455,7 +455,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
                 pstmt.setString(1, modificado.getApellido());
                 pstmt.setString(2, modificado.getNombres());
                 pstmt.setString(3, modificado.getTipoDocumento() != null ? modificado.getTipoDocumento().name() : null);
-                pstmt.setLong(4, modificado.getDocumento());
+                pstmt.setString(4, modificado.getDocumento());
                 pstmt.setString(5, modificado.getCuit());
                 pstmt.setString(6, modificado.getPosicionIva() != null ? modificado.getPosicionIva().toString() : null);
 
@@ -477,7 +477,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
 
                 // WHERE params: original tipo + numero
                 pstmt.setString(12, original.getTipoDocumento() != null ? original.getTipoDocumento().name() : null);
-                pstmt.setLong(13, original.getDocumento());
+                pstmt.setString(13, original.getDocumento());
 
                 pstmt.executeUpdate();
             }
@@ -490,7 +490,7 @@ public int obtenerIdDireccion(String tipoDocumento, long nroDocumento) {
             try (PreparedStatement pstmt = conn.prepareStatement(sqlEmail)) {
                 // Usamos .name() porque tipo_documento en la BD es un varchar/string
                 pstmt.setString(1, modificado.getTipoDocumento().name()); 
-                pstmt.setLong(2, modificado.getDocumento());
+                pstmt.setString(2, modificado.getDocumento());
                 pstmt.setString(3, modificado.getEmail());
                 
                 pstmt.executeUpdate();
