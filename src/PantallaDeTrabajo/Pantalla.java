@@ -12,9 +12,9 @@ import Excepciones.PersistenciaException;
 
 public class Pantalla {
 
-    private GestorHuesped gestorHuesped;
+    private final GestorHuesped gestorHuesped;
     private final Scanner scanner;//para la entrada por teclado
-    private GestorUsuario gestorUsuario;
+    private final GestorUsuario gestorUsuario;
     private boolean usuarioAutenticado;
     private String nombreUsuarioActual;
 
@@ -291,108 +291,132 @@ public class Pantalla {
         System.out.println("-- Fin CU9 'dar de alta huesped' ---");
     }//fin iniciarAltaHuesped
 
-        private DtoHuesped mostrarYPedirDatosFormulario() {
-        DtoHuesped dtoHuesped = new DtoHuesped();
-        DtoDireccion dtoDireccion = new DtoDireccion();
+        //metodo privado para pedir los datos del huesped a ingresar
+    private DtoHuesped mostrarYPedirDatosFormulario() {
+
         System.out.println("Apellido: ");
-        dtoHuesped.setApellido(scanner.nextLine());
+        String apellido = scanner.nextLine();
 
         System.out.println("Nombres: ");
-        dtoHuesped.setNombres(scanner.nextLine());
+        String nombres = scanner.nextLine();
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
-        dtoHuesped.setTipoDocumento(tipoDocumento);
 
-        System.out.println("Número de Documento: ");
-        dtoHuesped.setDocumento(Long.parseLong(scanner.nextLine()));
+        Long numeroDocumento = pedirLong("Número de Documento: ");
 
         System.out.println("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
         String cuit = scanner.nextLine();
-        if (cuit.trim().isEmpty()) {
+        if (cuit.trim().isEmpty()) { // trim() quita espacios en blanco al inicio y final
             cuit = null;
         }
-        dtoHuesped.setCuit(cuit);
-        
-        String posIvaStr = "";
-        System.out.println("Posición Frente al IVA:");
-                    System.out.println("1. " + PosIva.ConsumidorFinal.getDisplayName());
-                    System.out.println("2. " + PosIva.Monotributista.getDisplayName());
-                    System.out.println("3. " + PosIva.ResponsableInscripto.getDisplayName());
-                    System.out.println("4. " + PosIva.Excento.getDisplayName());
-                    System.out.print("Ingrese una opción: ");
-                    try {
-                        int opcionIva = scanner.nextInt();
-                        scanner.nextLine(); // Consumir salto de línea
-                        switch (opcionIva) {
-                            case 1: posIvaStr = PosIva.ConsumidorFinal.getDisplayName(); break;
-                            case 2: posIvaStr = PosIva.Monotributista.getDisplayName(); break;
-                            case 3: posIvaStr = PosIva.ResponsableInscripto.getDisplayName(); break;
-                            case 4: posIvaStr = PosIva.Excento.getDisplayName(); break;
-                            default:
-                                System.out.println("Opción inválida. Se mantendrá el valor actual.");
-                                break;
-                        }
-                        if (opcionIva >= 1 && opcionIva <= 4) {
-                            dtoHuesped.setPosicionIva(PosIva.fromString(posIvaStr));
-                        }
-                    } catch (Exception e) {
-                        scanner.nextLine(); // Limpiar el buffer
-                        System.out.println("Entrada inválida. Se mantendrá el valor actual.");
-                    }
-                    
+
+
+        String posIva = pedirPosIva();
+
         Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
-        dtoHuesped.setFechaNacimiento(fechaNacimiento);
 
         System.out.println("Calle: ");
-        dtoDireccion.setCalle(scanner.nextLine());
+        String calleDireccion = scanner.nextLine();
 
-        System.out.println("Número de calle: ");
-        dtoDireccion.setNumero(Integer.parseInt(scanner.nextLine()));
+        Integer numeroDireccion = pedirEntero("Número de calle: ");
 
         System.out.println("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
-        dtoDireccion.setDepartamento(scanner.nextLine());
+        String departamentoDireccion = scanner.nextLine();
 
-        System.out.println("Piso (ingrese 0 si no aplica): ");
-        dtoDireccion.setPiso(Integer.parseInt(scanner.nextLine()));
+        System.out.println("Piso (ingrese - si no aplica): ");
+        String pisoDireccion = scanner.nextLine();
 
-        System.out.println("Código Postal: ");
-        dtoDireccion.setCodPostal(Integer.parseInt(scanner.nextLine()));
+        Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
         System.out.println("Localidad: ");
-        dtoDireccion.setLocalidad(scanner.nextLine());
+        String localidadDireccion = scanner.nextLine();
 
         System.out.println("Provincia: ");
-        dtoDireccion.setProvincia(scanner.nextLine());
+        String provinciaDireccion = scanner.nextLine();
 
         System.out.println("Pais: ");
-        dtoDireccion.setPais(scanner.nextLine());
+        String paisDireccion = scanner.nextLine();
 
         System.out.println("Teléfono: ");
-        dtoHuesped.setTelefono(Long.parseLong(scanner.nextLine()));
+        long telefono = Long.parseLong(scanner.nextLine());
 
         System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
         String email = scanner.nextLine();
         if (email.trim().isEmpty()) {
             email = null;
         }
-        dtoHuesped.setEmail(email);
 
         System.out.println("Ocupacion: ");
-        dtoHuesped.setOcupacion(scanner.nextLine());
+        String ocupacion = scanner.nextLine();
 
         System.out.println("Nacionalidad: ");
-        dtoHuesped.setNacionalidad(scanner.nextLine());
 
+        String nacionalidad = scanner.nextLine();
+
+        //casteo los wrappers (necesarios para las validaciones) a primitivos para su posterior uso en la app
+        int numeroDireccionPrimitivo = numeroDireccion.intValue();
+        int codPostalDireccionPrimitivo = codPostalDireccion.intValue();
+        long numeroDocumentoPrimitivo = numeroDocumento.longValue();
+
+        // Crear los DTO  (aún no tenemos el ID de dirección)
+        DtoDireccion direccionDto = new DtoDireccion(calleDireccion, numeroDireccionPrimitivo, departamentoDireccion, pisoDireccion, codPostalDireccionPrimitivo, localidadDireccion, provinciaDireccion, paisDireccion);
+        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumentoPrimitivo, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
 
         //asociamos el la direccion con el huesped
-        dtoHuesped.setDireccion(dtoDireccion);
+        huespedDto.setDireccion(direccionDto);
 
 
         System.out.println("--- Fin Formulario ---");
-        return dtoHuesped; // Devolver el DTO con los datos cargados
+        return huespedDto; // Devolver el DTO con los datos cargados
 
     }
-       private Date pedirFecha(String mensaje) {
+
+    private Integer pedirEntero(String mensaje) {
+        Integer valor = null; // Usamos la clase wrapper para permitir null
+        boolean valido = false;
+        while (!valido) {
+            System.out.println(mensaje);
+            String entrada = scanner.nextLine(); // leemos siempre como String
+
+            if (entrada.trim().isEmpty()) {
+                valido = true; // omitir es una entrada válida (valida el gestor, regla de negocio)
+                valor = -1;
+            } else {
+                try {
+                    valor = Integer.parseInt(entrada); // intentamos convertir el String a int
+                    valido = true;      // Si funciona, es válido
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Ingrese un número entero válido o presione Enter para omitir.");
+                }
+            }
+        }
+        return valor;
+    }
+
+
+    private Long pedirLong(String mensaje) { // Devuelve Long (wrapper)
+        Long valor = null; // Usamos la clase wrapper Long
+        boolean valido = false;
+        while (!valido) {
+            System.out.print(mensaje + " (Enter para omitir): ");
+            String entrada = scanner.nextLine(); // Leemos siempre como String
+
+            if (entrada.trim().isEmpty()) {
+                valido = true; // Omitir es válido
+                valor = -1L;
+            } else {
+                try {
+                    valor = Long.parseLong(entrada); // Intentamos convertir String a long
+                    valido = true;      // Si funciona, es válido
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Ingrese un número entero válido o presione Enter para omitir.");
+                }
+            }
+        }
+        return valor;
+    }
+
+    private Date pedirFecha(String mensaje) {
         Date fecha = null;
         boolean valida = false;
         SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
@@ -449,7 +473,51 @@ public class Pantalla {
         }
         return tipoDoc;
     }
-    
+
+
+   private String pedirPosIva() {
+        String posIva = null;
+        boolean valido = false;
+
+
+        while (!valido) {
+            System.out.println("Posicion frente al IVA (1.Consumidor Final (por defecto),"+ '\n' + " 2.Monotributista, " +'\n'+ "3.Responsable Inscripto, "+'\n'+"4.Excento)");
+            int opcion = Integer.parseInt(scanner.nextLine());
+
+            // Permitir Enter para el valor por defecto
+            if (opcion == 0) {
+                posIva = PosIva.ConsumidorFinal.toString(); // Asignar el default
+                valido = true;
+            } else {
+                try {
+                    switch (opcion) {
+                        case 1:
+                            posIva = PosIva.ConsumidorFinal.toString();
+                            valido = true;
+                            break;
+                        case 2:
+                            posIva = PosIva.Monotributista.toString();
+                            valido = true;
+                            break;
+                        case 3:
+                            posIva = PosIva.ResponsableInscripto.toString();
+                            valido = true;
+                            break;
+                        case 4:
+                            posIva = PosIva.Excento.toString();
+                            valido = true;
+                            break;
+                    }
+
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para ConsumidorFinal.");
+                }
+            }
+        }
+        return posIva;
+    }
+
+
     //METODO AUXILIAR PARA PAUSAR
     public void pausa() {
         System.out.print("Presione ENTER para continuar...");
@@ -797,25 +865,25 @@ public class Pantalla {
                     break;
                 case 6:
                     System.out.println("Nueva Posición Frente al IVA:");
-                    System.out.println("1. " + PosIva.ConsumidorFinal.getDisplayName());
-                    System.out.println("2. " + PosIva.Monotributista.getDisplayName());
-                    System.out.println("3. " + PosIva.ResponsableInscripto.getDisplayName());
-                    System.out.println("4. " + PosIva.Excento.getDisplayName());
+                    System.out.println("1. " + PosIva.ConsumidorFinal.getDescripicion());
+                    System.out.println("2. " + PosIva.Monotributista.getDescripicion());
+                    System.out.println("3. " + PosIva.ResponsableInscripto.getDescripicion());
+                    System.out.println("4. " + PosIva.Excento.getDescripicion());
                     System.out.print("Ingrese una opción: ");
                     try {
                         int opcionIva = scanner.nextInt();
                         scanner.nextLine(); // Consumir salto de línea
                         switch (opcionIva) {
-                            case 1: posIvaStr = PosIva.ConsumidorFinal.getDisplayName(); break;
-                            case 2: posIvaStr = PosIva.Monotributista.getDisplayName(); break;
-                            case 3: posIvaStr = PosIva.ResponsableInscripto.getDisplayName(); break;
-                            case 4: posIvaStr = PosIva.Excento.getDisplayName(); break;
+                            case 1: posIvaStr = PosIva.ConsumidorFinal.getDescripicion(); break;
+                            case 2: posIvaStr = PosIva.Monotributista.getDescripicion(); break;
+                            case 3: posIvaStr = PosIva.ResponsableInscripto.getDescripicion(); break;
+                            case 4: posIvaStr = PosIva.Excento.getDescripicion(); break;
                             default:
                                 System.out.println("Opción inválida. Se mantendrá el valor actual.");
                                 break;
                         }
                         if (opcionIva >= 1 && opcionIva <= 4) {
-                            dtoHuespedModificado.setPosicionIva(PosIva.fromString(posIvaStr));
+                            dtoHuespedModificado.setPosicionIva(posIvaStr);
                         }
                     } catch (Exception e) {
                         scanner.nextLine(); // Limpiar el buffer
@@ -999,7 +1067,7 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
                 break;
             case 4:
                 System.out.print("Nuevo Piso: ");
-                direccion.setPiso(scanner.nextInt());
+                direccion.setPiso(scanner.nextLine());
                 break;
             case 5:
                 System.out.print("Nuevo Código Postal: ");

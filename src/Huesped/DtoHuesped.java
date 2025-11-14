@@ -11,7 +11,7 @@ public class DtoHuesped {
     private TipoDocumento tipoDocumento;
     private long documento;
     private String cuit;
-    private PosIva posicionIva;
+    private String posicionIva;
     private Date fechaNacimiento;
     private String email;
     private String ocupacion;
@@ -20,7 +20,7 @@ public class DtoHuesped {
     private int idDireccion;   
 
     // Constructor con todos los datos
-    public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, long documento, String cuit, PosIva posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
+    public DtoHuesped(String nombres, String apellido, long telefono, TipoDocumento tipoDocumento, long documento, String cuit, String posicionIva, Date fechaNacimiento, String email, String ocupacion, String nacionalidad) {
         this.nombres = nombres;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -73,10 +73,10 @@ public class DtoHuesped {
     public void setCuit(String cuit) {
         this.cuit = cuit;
     }
-    public PosIva getPosicionIva() {
+    public String getPosicionIva() {
         return posicionIva;
     }
-    public void setPosicionIva(PosIva posicionIva) {
+    public void setPosicionIva(String posicionIva) {
         this.posicionIva = posicionIva;
     }
     public Date getFechaNacimiento() {

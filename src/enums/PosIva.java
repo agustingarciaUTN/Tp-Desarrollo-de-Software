@@ -1,45 +1,47 @@
 package enums;
 
+import java.text.Normalizer;
+
 public enum PosIva {
     ConsumidorFinal("Consumidor Final"),
     Monotributista("Monotributista"),
     ResponsableInscripto("Responsable inscripto"),
-    Excento("Excento");
+    Excento("Exento");
 
-    private final String displayName;
+    private final String descripicion;
 
-    PosIva(String displayName) {
-        this.displayName = displayName;
+    PosIva(String descripicion) {
+        this.descripicion = descripicion;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getDescripicion() {
+        return descripicion;
     }
 
-    public static PosIva fromString(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            return ConsumidorFinal;
-        }
-
-        // Primero intentamos con el nombre exacto
-        for (PosIva pos : PosIva.values()) {
-            if (pos.displayName.equalsIgnoreCase(text.trim())) {
-                return pos;
-            }
-        }
-
-        // Si no funciona, intentamos sin espacios
-        String normalized = text.replace(" ", "").toUpperCase();
-        try {
-            return valueOf(normalized);
-        } catch (IllegalArgumentException e) {
-            System.err.println("Valor de posicion_iva no reconocido: " + text + ". Usando valor por defecto.");
-            return ConsumidorFinal;
-        }
+    public String getDescripcion() {
+        return descripicion;
     }
-
     @Override
     public String toString() {
-        return displayName;
+        return descripicion;
+    }
+
+    public static PosIva fromString(String s) {
+        if (s == null) return null;
+        String norm = normalize(s);
+        for (PosIva p : values()) {
+            if (norm.equals(normalize(p.name())) || norm.equals(normalize(p.descripicion))) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("PosIva inválido: " + s);
+    }
+
+    private static String normalize(String input) {
+        if (input == null) return "";
+        String tmp = Normalizer.normalize(input, Normalizer.Form.NFD);
+        tmp = tmp.replaceAll("\\p{M}", "");      // quitar acentos
+        tmp = tmp.replaceAll("[\\s_\\-]+", "");  // quitar espacios, guiones y underscores
+        return tmp.toLowerCase();
     }
 }
