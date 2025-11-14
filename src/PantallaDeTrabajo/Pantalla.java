@@ -294,65 +294,44 @@ public class Pantalla {
     private DtoHuesped mostrarYPedirDatosFormulario() {
 
         System.out.println('\n'+"INGRESE LOS DATOS DEL HUÉSPED A REGISTRAR");
-
-        System.out.print("Apellido: ");
-        String apellido = scanner.nextLine();
-
-        System.out.print("Nombres: ");
-        String nombres = scanner.nextLine();
+      
+        String apellido = pedirStringTexto("Apellido: ");
+        
+        String nombres = pedirStringTexto("Nombres: ");
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
 
         Long numeroDocumento = pedirLong("Número de Documento: ");
 
-        System.out.print("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
-        String cuit = scanner.nextLine();
-        if (cuit.trim().isEmpty()) { // trim() quita espacios en blanco al inicio y final
-            cuit = null;
-        }
-
+        String cuit = pedirCUIT();
 
         String posIva = pedirPosIva();
 
         Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
 
-        System.out.print("Calle: ");
-        String calleDireccion = scanner.nextLine();
+        String calleDireccion = pedirStringValidado("Calle: ");
 
         Integer numeroDireccion = pedirEntero("Número de calle: ");
 
-        System.out.print("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
-        String departamentoDireccion = scanner.nextLine();
+        String departamentoDireccion = pedirStringOpcional("Departamento (opcional, presione Enter para omitir): ");
 
-        System.out.print("Piso (ingrese - si no aplica): ");
-        String pisoDireccion = scanner.nextLine();
+        String pisoDireccion = pedirStringOpcional("Piso (opcional, presione Enter para omitir): ");
 
         Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
-        System.out.print("Localidad: ");
-        String localidadDireccion = scanner.nextLine();
+        String localidadDireccion = pedirStringValidado("Localidad: ");
+        
+        String provinciaDireccion = pedirStringValidado("Provincia: ");
+        
+        String paisDireccion = pedirStringTexto("Pais: ");
 
-        System.out.print("Provincia: ");
-        String provinciaDireccion = scanner.nextLine();
+        Long telefono = pedirLong("Teléfono: ");
 
-        System.out.print("Pais: ");
-        String paisDireccion = scanner.nextLine();
+        String email = pedirEmail();
 
-        System.out.print("Teléfono: ");
-        long telefono = Long.parseLong(scanner.nextLine());
-
-        System.out.print("Email (opcional, presione Enter para omitir): ");//no obligatorio
-        String email = scanner.nextLine();
-        if (email.trim().isEmpty()) {
-            email = null;
-        }
-
-        System.out.print("Ocupacion: ");
-        String ocupacion = scanner.nextLine();
-
-        System.out.print("Nacionalidad: ");
-
-        String nacionalidad = scanner.nextLine();
+        String ocupacion = pedirStringTexto("Ocupacion: ");
+        
+        String nacionalidad = pedirStringTexto("Nacionalidad: ");
 
         //casteo los wrappers (necesarios para las validaciones) a primitivos para su posterior uso en la app
         int numeroDireccionPrimitivo = numeroDireccion.intValue();
@@ -371,6 +350,64 @@ public class Pantalla {
         return huespedDto; // Devolver el DTO con los datos cargados
 
     }
+    
+    private String pedirStringValidado(String mensaje) {
+        String entrada;
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+            if (entrada.trim().isEmpty()) {
+                System.out.println("Error: Este campo es obligatorio.");
+            } else if (!entrada.matches("^[a-zA-Z0-9 ]+$")) { // Solo letras, números y espacios
+                System.out.println("Error: Solo se admiten letras, números y espacios. No se permiten caracteres especiales.");
+            } else {
+                return entrada.trim();
+            }
+        }
+    }
+    
+    private String pedirStringTexto(String mensaje) {
+        String entrada;
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+
+            if (entrada.trim().isEmpty()) {
+                System.out.println("Error: Este campo es obligatorio.");
+        
+             // Esta expresion ^[\p{L} ]+$ permite cualquier letra de cualquier idioma
+            // y espacios, pero no números ni caracteres especiales.
+            } else if (!entrada.matches("^[\\p{L} ]+$")) { 
+                System.out.println("Error: Solo se admiten letras y espacios.");
+        
+            } else {
+                return entrada.trim();
+            }
+        }
+    }
+    
+    private String pedirStringOpcional(String mensaje) {
+        String entrada;
+        // La expresion permite letras (a-z, A-Z), números (0-9) y espacios.
+        String str = "^[a-zA-Z0-9 ]+$";
+
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+
+            //Si está vacío, es válido (opcional)
+            if (entrada.trim().isEmpty()) {
+                return null; // O puedes devolver "" si lo preferís
+        
+            //Si no está vacío, valida el formato
+            } else if (!entrada.matches(str)) {
+                System.out.println("Error: Solo se admiten letras, números y espacios. No se permiten caracteres especiales.");
+        
+            } else {
+                return entrada;
+            }
+        }
+    }
 
     private Integer pedirEntero(String mensaje) {
         Integer valor = null; // Usamos la clase wrapper para permitir null
@@ -380,8 +417,8 @@ public class Pantalla {
             String entrada = scanner.nextLine(); // leemos siempre como String
 
             if (entrada.trim().isEmpty()) {
-                valido = true; // omitir es una entrada válida (valida el gestor, regla de negocio)
-                valor = -1;
+                System.out.println("Error: Este campo es obligatorio. No se puede omitir.");
+                continue;
             } else {
                 try {
                     valor = Integer.parseInt(entrada); // intentamos convertir el String a int
@@ -403,20 +440,61 @@ public class Pantalla {
             String entrada = scanner.nextLine(); // Leemos siempre como String
 
             if (entrada.trim().isEmpty()) {
-                valido = true; // Omitir es válido
-                valor = -1L;
+                System.out.println("Error: Este campo es obligatorio. No se puede omitir.");
+                continue;
             } else {
                 try {
                     valor = Long.parseLong(entrada); // Intentamos convertir String a long
                     valido = true;      // Si funciona, es válido
                 } catch (NumberFormatException e) {
                     System.out.println("Error: Ingrese un número entero válido o presione Enter para omitir.");
-                }
+                } 
             }
         }
         return valor;
     }
+    
+    private String pedirCUIT() {
+        String cuit;
+        // Expresion para CUIT: 2 dígitos, un guión o barrita, 8 dígitos, un guión o barrita, 1 dígito.
+        String expresionCUIT = "^\\d{2}[\\-/]\\d{8}[\\-/]\\d{1}$"; 
 
+        while (true) {
+            System.out.print("CUIT (opcional, formato XX-XXXXXXXX-X, presione Enter para omitir): ");
+            cuit = scanner.nextLine();
+            //Si está vacío, es válido (opcional)
+            if (cuit.trim().isEmpty()) {
+                return null;        
+            //Si no está vacío, valida el formato
+            } else if (!cuit.matches(expresionCUIT)) {
+                System.out.println("Error: Formato de CUIT incorrecto. Debe ser XX-XXXXXXXX-X o XX/XXXXXXXX/X.");
+            } else {
+                return cuit;
+            }
+        }
+    }
+
+    private String pedirEmail() {
+        String email;
+        // expresion simple para emails: algo@algo.algo
+        String expresionEmail = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+        while (true) {
+            System.out.print("Email (opcional, presione Enter para omitir): ");
+            email = scanner.nextLine();
+
+            if (email.trim().isEmpty()) {
+                return null; // Válido (opcional)
+        
+            } else if (!email.matches(expresionEmail)) {
+                System.out.println("Error: Formato de email no válido.");
+        
+            } else {
+                return email; // Válido
+            }
+        }
+    }
+    
     private Date pedirFecha(String mensaje) {
         Date fecha = null;
         boolean valida = false;
@@ -424,12 +502,12 @@ public class Pantalla {
         formatoFecha.setLenient(false);
 
         while (!valida) {
-            System.out.print(mensaje + " (Enter para omitir): ");
+            System.out.print(mensaje + " (formato dd/MM/yyyy): ");
             String fechaStr = scanner.nextLine();
 
             if (fechaStr.trim().isEmpty()) {
-                valida = true; // Omitir es válido
-                fecha = null;
+                System.out.println("Error: Este campo es obligatorio.");
+                continue;
             } else {
                 try {
                     fecha = formatoFecha.parse(fechaStr);
