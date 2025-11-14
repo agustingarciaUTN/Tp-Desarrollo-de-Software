@@ -496,14 +496,11 @@ public class Pantalla {
 
 
         while (!valido) {
-            System.out.println("Posicion frente al IVA (1.Consumidor Final (por defecto),"+ '\n' + " 2.Monotributista, " +'\n'+ "3.Responsable Inscripto, "+'\n'+"4.Excento)");
+            System.out.println("Posicion frente al IVA:" + '\n' + "1. Consumidor Final (por defecto)"+ '\n' + " 2. Monotributista" +'\n'+ "3. Responsable Inscripto"+'\n'+"4. Excento");
             int opcion = Integer.parseInt(scanner.nextLine());
 
             // Permitir Enter para el valor por defecto
-            if (opcion == 0) {
-                posIva = PosIva.ConsumidorFinal.toString(); // Asignar el default
-                valido = true;
-            } else {
+            {
                 try {
                     switch (opcion) {
                         case 1:
@@ -522,8 +519,11 @@ public class Pantalla {
                             posIva = PosIva.Excento.toString();
                             valido = true;
                             break;
-                    }
-
+                        default:
+                            posIva = PosIva.ConsumidorFinal.toString();
+                            valido = true;
+                            break;
+                        }
                 } catch (IllegalArgumentException e) {
                     System.out.println("Error: Posición IVA inválida. Ingrese una opción válida o Enter para ConsumidorFinal.");
                 }
