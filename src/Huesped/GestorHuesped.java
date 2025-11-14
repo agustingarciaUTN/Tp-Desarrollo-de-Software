@@ -115,7 +115,7 @@ public class GestorHuesped {
         }
 
         // Regla especial CUIT/IVA
-        if (datos.getPosicionIva() == PosIva.ResponsableInscripto) {
+        if (datos.getPosicionIva().equals(PosIva.ResponsableInscripto.toString()) ) {
             if (datos.getCuit() == null || datos.getCuit().trim().isEmpty()) {
                 errores.add("El CUIT es obligatorio para Responsables Inscriptos.");
             } else {
@@ -350,7 +350,7 @@ public class GestorHuesped {
     }
     
 
- public boolean validarDatos(DtoHuesped dtoHuesped, String TipoDoc, String PosIva) {
+ public boolean validarDatos(DtoHuesped dtoHuesped, String TipoDoc, String PosicionIva) {
         List<String> errores = new ArrayList<>();
 
         if (dtoHuesped.getApellido() == null || dtoHuesped.getApellido().isBlank()) {
@@ -370,11 +370,14 @@ public class GestorHuesped {
         if(dtoHuesped.getCuit() == null || dtoHuesped.getCuit().isBlank()) {
             errores.add("CUIT");
         }
-        if (PosIva == null || PosIva.isBlank()) {
-            // Si querés asignar por omisión:
-            dtoHuesped.setPosicionIva(enums.PosIva.ConsumidorFinal);
+        if (PosicionIva == null || PosicionIva.isBlank()) {
+            dtoHuesped.setPosicionIva(PosIva.ConsumidorFinal.toString());
         } else {
-            dtoHuesped.setPosicionIva(enums.PosIva.fromString(PosIva));
+             try {
+                 dtoHuesped.setPosicionIva(PosIva.fromString(PosicionIva).toString());
+            } catch (IllegalArgumentException e) {
+                 errores.add("Posición IVA inválida.");
+            }
         }
         
         if(dtoHuesped.getFechaNacimiento() == null) {

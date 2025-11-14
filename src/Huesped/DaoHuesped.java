@@ -145,7 +145,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 String posicionIvaStr = rs.getString("pos_iva");
                 
                 // Convertimos y establecemos la posición IVA usando el nuevo método fromString
-                huespedDTO.setPosicionIva(PosIva.fromString(posicionIvaStr));
+                huespedDTO.setPosicionIva(posicionIvaStr);
                 
                 // Convertimos y establecemos el tipo de documento
                 try {
@@ -245,7 +245,7 @@ public class DaoHuesped implements DaoHuespedInterfaz {
                 String tipoDocumentoStr = rs.getString("tipo_documento");
                 String posicionIvaStr = rs.getString("pos_iva");
                 // Convertimos y establecemos la posición IVA usando el método fromString
-                huespedDTO.setPosicionIva(PosIva.fromString(posicionIvaStr));
+                huespedDTO.setPosicionIva(posicionIvaStr);
                 try {
                     if (tipoDocumentoStr != null) {
                         huespedDTO.setTipoDocumento(TipoDocumento.valueOf(tipoDocumentoStr.toUpperCase()));

@@ -21,7 +21,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
                 pstmt.setString(1, dto.getCalle());
                 pstmt.setInt(2, dto.getNumero());
                 pstmt.setString(3, dto.getDepartamento());
-                pstmt.setInt(4, dto.getPiso());
+                pstmt.setString(4, dto.getPiso());
                 pstmt.setInt(5, dto.getCodPostal());
                 pstmt.setString(6, dto.getLocalidad());
                 pstmt.setString(7, dto.getProvincia());
@@ -61,7 +61,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
                 pstmt.setString(1, dto.getCalle());
                 pstmt.setInt(2, dto.getNumero());
                 pstmt.setString(3, dto.getDepartamento());
-                pstmt.setInt(4, dto.getPiso());
+                pstmt.setString(4, dto.getPiso());
                 pstmt.setInt(5, dto.getCodPostal());
                 pstmt.setString(6, dto.getLocalidad());
                 pstmt.setString(7, dto.getProvincia());
@@ -103,7 +103,7 @@ public class DaoDireccion implements DaoDireccionInterfaz {
                         dtoDireccion.setCalle(rs.getString("calle"));
                         dtoDireccion.setNumero(rs.getInt("numero"));
                         dtoDireccion.setDepartamento(rs.getString("departamento"));
-                        dtoDireccion.setPiso(rs.getInt("piso"));
+                        dtoDireccion.setPiso(rs.getString("piso"));
                         dtoDireccion.setCodPostal(rs.getInt("codPostal"));
                         dtoDireccion.setLocalidad(rs.getString("localidad"));
                         dtoDireccion.setProvincia(rs.getString("provincia"));
