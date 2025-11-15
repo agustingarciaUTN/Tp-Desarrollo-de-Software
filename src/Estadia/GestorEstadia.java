@@ -15,12 +15,12 @@ public class GestorEstadia {
      * @param nroDocumento Número de documento del huésped
      * @return true si el huésped tiene al menos una estadía registrada
      */
-    public boolean huespedSeAlojoAlgunaVez(String tipoDocumento, long nroDocumento) {
+    public boolean huespedSeAlojoAlgunaVez(String tipoDocumento, String nroDocumento) {
         if (tipoDocumento == null || tipoDocumento.trim().isEmpty()) {
             return false;
         }
 
-        if (nroDocumento <= 0) {
+        if (nroDocumento.isEmpty()) {
             return false;
         }
 

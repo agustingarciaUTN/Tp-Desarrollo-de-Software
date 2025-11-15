@@ -7,7 +7,6 @@ import Usuario.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import Excepciones.PersistenciaException;
 
 public class Pantalla {
@@ -187,7 +186,7 @@ public class Pantalla {
     public void iniciarAltaHuesped() {//este metodo debe tener el mismo nombre que el CU?
 
         //no se si es necesario, despues habra que ver la parte estetica
-        System.out.println("-- Iniciando CU9 'dar de alta huesped' --");
+        System.out.println('\n'+"-- Iniciando CU9 'dar de alta huesped' --");
 
         boolean continuarCargando = true;//bandera
 
@@ -197,8 +196,15 @@ public class Pantalla {
 
             System.out.println("Acciones: 1 = SIGUIENTE, 2 = CANCELAR");
             System.out.println("Ingrese una opción: ");
-            int opcionBoton = scanner.nextInt();
-            scanner.nextLine();//para consumir el salto de linea
+            int opcionBoton = -1;
+            try {
+                opcionBoton = scanner.nextInt();
+                scanner.nextLine();//para consumir el salto de linea
+            } catch (InputMismatchException e) {
+                scanner.nextLine(); //limpiar buffer
+                System.out.println("\nOpción inválida. Intente nuevamente.\n");
+                break;
+            }
 
             if (opcionBoton == 1) {//presiono SIGUIENTE
                 System.out.println("Procesando datos...");
@@ -227,7 +233,7 @@ public class Pantalla {
                         System.out.println("   Huésped existente: " + duplicado.getNombres() + " " + duplicado.getApellido());
                         System.out.println("----------------------------------------------------------------");
                         System.out.println("Opciones: 1 = ACEPTAR IGUALMENTE, 2 = CORREGIR");
-                        System.out.print("Ingrese una opción: ");
+                        System.out.println("Ingrese una opción: ");
 
                         int opcionDuplicado = scanner.nextInt();
                         scanner.nextLine(); // Consumir salto de línea
@@ -294,73 +300,55 @@ public class Pantalla {
         //metodo privado para pedir los datos del huesped a ingresar
     private DtoHuesped mostrarYPedirDatosFormulario() {
 
-        System.out.println("Apellido: ");
-        String apellido = scanner.nextLine();
-
-        System.out.println("Nombres: ");
-        String nombres = scanner.nextLine();
+        System.out.println('\n'+"INGRESE LOS DATOS DEL HUÉSPED A REGISTRAR");
+      
+        String apellido = pedirStringTexto("Apellido: ");
+        
+        String nombres = pedirStringTexto("Nombres: ");
 
         TipoDocumento tipoDocumento = pedirTipoDocumento();
 
-        Long numeroDocumento = pedirLong("Número de Documento: ");
 
-        System.out.println("CUIT (opcional, presione Enter para omitir): ");//no obligatorio
-        String cuit = scanner.nextLine();
-        if (cuit.trim().isEmpty()) { // trim() quita espacios en blanco al inicio y final
-            cuit = null;
-        }
+        String numeroDocumento = pedirDocumento(tipoDocumento);
 
+        String cuit = pedirCUIT();
 
         String posIva = pedirPosIva();
 
-        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
+        Date fechaNacimiento = pedirFecha("Fecha de Nacimiento ");
 
-        System.out.println("Calle: ");
-        String calleDireccion = scanner.nextLine();
+        String calleDireccion = pedirStringValidado("Calle: ");
 
         Integer numeroDireccion = pedirEntero("Número de calle: ");
 
-        System.out.println("Departamento (ingrese 0 si no aplica): ");//supongo que es opcional
-        String departamentoDireccion = scanner.nextLine();
+        String departamentoDireccion = pedirStringOpcional("Departamento (opcional, presione Enter para omitir): ");
 
-        System.out.println("Piso (ingrese - si no aplica): ");
-        String pisoDireccion = scanner.nextLine();
+        String pisoDireccion = pedirStringOpcional("Piso (opcional, presione Enter para omitir): ");
 
         Integer codPostalDireccion = pedirEntero("Código Postal: ");
 
-        System.out.println("Localidad: ");
-        String localidadDireccion = scanner.nextLine();
+        String localidadDireccion = pedirStringValidado("Localidad: ");
+        
+        String provinciaDireccion = pedirStringValidado("Provincia: ");
+        
+        String paisDireccion = pedirStringTexto("Pais: ");
 
-        System.out.println("Provincia: ");
-        String provinciaDireccion = scanner.nextLine();
+        Long telefono = pedirLong("Teléfono: ");
 
-        System.out.println("Pais: ");
-        String paisDireccion = scanner.nextLine();
+        String email = pedirEmail();
 
-        System.out.println("Teléfono: ");
-        long telefono = Long.parseLong(scanner.nextLine());
-
-        System.out.println("Email (opcional, presione Enter para omitir): ");//no obligatorio
-        String email = scanner.nextLine();
-        if (email.trim().isEmpty()) {
-            email = null;
-        }
-
-        System.out.println("Ocupacion: ");
-        String ocupacion = scanner.nextLine();
-
-        System.out.println("Nacionalidad: ");
-
-        String nacionalidad = scanner.nextLine();
+        String ocupacion = pedirStringTexto("Ocupacion: ");
+        
+        String nacionalidad = pedirStringTexto("Nacionalidad: ");
 
         //casteo los wrappers (necesarios para las validaciones) a primitivos para su posterior uso en la app
         int numeroDireccionPrimitivo = numeroDireccion.intValue();
         int codPostalDireccionPrimitivo = codPostalDireccion.intValue();
-        long numeroDocumentoPrimitivo = numeroDocumento.longValue();
+
 
         // Crear los DTO  (aún no tenemos el ID de dirección)
         DtoDireccion direccionDto = new DtoDireccion(calleDireccion, numeroDireccionPrimitivo, departamentoDireccion, pisoDireccion, codPostalDireccionPrimitivo, localidadDireccion, provinciaDireccion, paisDireccion);
-        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumentoPrimitivo, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
+        DtoHuesped huespedDto = new DtoHuesped(nombres, apellido, telefono, tipoDocumento, numeroDocumento, cuit, posIva, fechaNacimiento, email, ocupacion, nacionalidad);
 
         //asociamos el la direccion con el huesped
         huespedDto.setDireccion(direccionDto);
@@ -370,18 +358,80 @@ public class Pantalla {
         return huespedDto; // Devolver el DTO con los datos cargados
 
     }
+    
+    private String pedirStringValidado(String mensaje) {
+        String entrada;
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+            if (entrada.trim().isEmpty()) {
+                System.out.println("Error: Este campo es obligatorio.");
+            } else if (!entrada.matches("^[a-zA-Z0-9 ]+$")) { // Solo letras, números y espacios
+                System.out.println("Error: Solo se admiten letras, números y espacios. No se permiten caracteres especiales.");
+            } else {
+                return entrada.trim();
+            }
+        }
+    }
+    
+    private String pedirStringTexto(String mensaje) {
+        String entrada;
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+
+            if (entrada.trim().isEmpty()) {
+                System.out.println("Error: Este campo es obligatorio.");
+        
+             // Esta expresion ^[\p{L} ]+$ permite cualquier letra de cualquier idioma
+            // y espacios, pero no números ni caracteres especiales.
+            } else if (!entrada.matches("^[\\p{L} ]+$")) { 
+                System.out.println("Error: Solo se admiten letras y espacios.");
+        
+            } else {
+                return entrada.trim();
+            }
+        }
+    }
+    
+    private String pedirStringOpcional(String mensaje) {
+        String entrada;
+        // La expresion permite letras (a-z, A-Z), números (0-9) y espacios.
+        String str = "^[a-zA-Z0-9 ]+$";
+
+        while (true) {
+            System.out.print(mensaje);
+            entrada = scanner.nextLine();
+
+            //Si está vacío, es válido (opcional)
+            if (entrada.trim().isEmpty()) {
+                return null; // O puedes devolver "" si lo preferís
+        
+            //Si no está vacío, valida el formato
+            } else if (!entrada.matches(str)) {
+                System.out.println("Error: Solo se admiten letras, números y espacios. No se permiten caracteres especiales.");
+        
+            } else {
+                return entrada;
+            }
+        }
+    }
 
     private Integer pedirEntero(String mensaje) {
         Integer valor = null; // Usamos la clase wrapper para permitir null
         boolean valido = false;
         while (!valido) {
-            System.out.println(mensaje);
+            System.out.print(mensaje);
             String entrada = scanner.nextLine(); // leemos siempre como String
+            int validez = Integer.parseInt(entrada);
 
             if (entrada.trim().isEmpty()) {
-                valido = true; // omitir es una entrada válida (valida el gestor, regla de negocio)
-                valor = -1;
-            } else {
+                System.out.println("Error: Este campo es obligatorio. No se puede omitir.");
+                continue;
+            } else if(validez <= 0){
+                System.out.println("Error: ingreser un numero positivo por favor.");
+            }
+            else {
                 try {
                     valor = Integer.parseInt(entrada); // intentamos convertir el String a int
                     valido = true;      // Si funciona, es válido
@@ -398,24 +448,65 @@ public class Pantalla {
         Long valor = null; // Usamos la clase wrapper Long
         boolean valido = false;
         while (!valido) {
-            System.out.print(mensaje + " (Enter para omitir): ");
+            System.out.print(mensaje);
             String entrada = scanner.nextLine(); // Leemos siempre como String
 
             if (entrada.trim().isEmpty()) {
-                valido = true; // Omitir es válido
-                valor = -1L;
+                System.out.println("Error: Este campo es obligatorio. No se puede omitir.");
+                continue;
             } else {
                 try {
                     valor = Long.parseLong(entrada); // Intentamos convertir String a long
                     valido = true;      // Si funciona, es válido
                 } catch (NumberFormatException e) {
                     System.out.println("Error: Ingrese un número entero válido o presione Enter para omitir.");
-                }
+                } 
             }
         }
         return valor;
     }
+    
+    private String pedirCUIT() {
+        String cuit;
+        // Expresion para CUIT: 2 dígitos, un guión o barrita, 8 dígitos, un guión o barrita, 1 dígito.
+        String expresionCUIT = "^\\d{2}-\\d{8}-\\d{1}$"; 
 
+        while (true) {
+            System.out.print("CUIT (opcional, formato XX-XXXXXXXX-X, presione Enter para omitir): ");
+            cuit = scanner.nextLine();
+            //Si está vacío, es válido (opcional)
+            if (cuit.trim().isEmpty()) {
+                return null;        
+            //Si no está vacío, valida el formato
+            } else if (!cuit.matches(expresionCUIT)) {
+                System.out.println("Error: Formato de CUIT incorrecto. Debe ser XX-XXXXXXXX-X");
+            } else {
+                return cuit;
+            }
+        }
+    }
+
+    private String pedirEmail() {
+        String email;
+        // expresion simple para emails: algo@algo.algo
+        String expresionEmail = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+        while (true) {
+            System.out.print("Email (opcional, presione Enter para omitir): ");
+            email = scanner.nextLine();
+
+            if (email.trim().isEmpty()) {
+                return null; // Válido (opcional)
+        
+            } else if (!email.matches(expresionEmail)) {
+                System.out.println("Error: Formato de email no válido.");
+        
+            } else {
+                return email; // Válido
+            }
+        }
+    }
+    
     private Date pedirFecha(String mensaje) {
         Date fecha = null;
         boolean valida = false;
@@ -423,15 +514,25 @@ public class Pantalla {
         formatoFecha.setLenient(false);
 
         while (!valida) {
-            System.out.print(mensaje + " (Enter para omitir): ");
+            System.out.print(mensaje + " (formato dd/MM/yyyy): ");
             String fechaStr = scanner.nextLine();
 
             if (fechaStr.trim().isEmpty()) {
-                valida = true; // Omitir es válido
-                fecha = null;
+                System.out.println("Error: Este campo es obligatorio.");
+                continue;
             } else {
                 try {
                     fecha = formatoFecha.parse(fechaStr);
+                    // Convertir a LocalDate para comparar solo la fecha (sin hora)
+                    java.time.LocalDate fechaLocal = java.time.Instant.ofEpochMilli(fecha.getTime())
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate();
+                    java.time.LocalDate hoy = java.time.LocalDate.now();
+
+                    if (!fechaLocal.isBefore(hoy)) {
+                        System.out.println("Error: La fecha debe ser anterior a hoy. Ingrese una fecha pasada.");
+                        continue;
+                    }
                     valida = true; // Formato válido
                 } catch (ParseException e) {
                     System.out.println("Error: Formato de fecha inválido. Use dd/MM/yyyy o presione Enter para omitir.");
@@ -461,7 +562,6 @@ public class Pantalla {
             String tipoDocStr = scanner.nextLine().toUpperCase().trim(); // A mayúsculas y sin espacios
             if (tipoDocStr.isEmpty()) {
                 valido = true; // Omitir es válido
-                tipoDoc = null;
             } else {
                 try {
                     tipoDoc = TipoDocumento.valueOf(tipoDocStr);
@@ -606,7 +706,7 @@ public class Pantalla {
 
         // VALIDACIÓN DE NÚMERO DE DOCUMENTO
         if (criterios.getTipoDocumento() != null) {
-            criterios.setDocumento(validarYLeerNumeroDocumento(criterios.getTipoDocumento()));
+            criterios.setDocumento(pedirDocumento(criterios.getTipoDocumento()));
         }
 
         return criterios;
@@ -628,7 +728,7 @@ public class Pantalla {
         }
     }
 
-    private long validarYLeerNumeroDocumento(TipoDocumento tipoDoc) {
+    /*private long validarYLeerNumeroDocumento(TipoDocumento tipoDoc) {
         while (true) {
             System.out.print("Número de Documento: ");
             String numeroStr = scanner.nextLine().trim();
@@ -638,7 +738,7 @@ public class Pantalla {
             }
 
             try {
-                long numero = Long.parseLong(numeroStr);
+
 
                 // VALIDACIÓN DE RANGO SEGÚN TIPO DE DOCUMENTO
                 if (tipoDoc == TipoDocumento.DNI) {
@@ -664,7 +764,7 @@ public class Pantalla {
                 System.out.println("⚠ El número de documento debe ser un valor numérico. Intente nuevamente.");
             }
         }
-    }
+    }*/
 
     private void seleccionarHuespedDeLista(List<DtoHuesped> huespedes) {
         mostrarListaHuespedes(huespedes);
@@ -742,7 +842,7 @@ public class Pantalla {
 
         // Paso 2: Validar si el huésped puede ser eliminado
         String tipoDoc = huespedSeleccionado.getTipoDocumento().name();
-        long nroDoc = huespedSeleccionado.getDocumento();
+        String nroDoc = huespedSeleccionado.getDocumento();
 
         boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
 
@@ -857,7 +957,7 @@ public class Pantalla {
                     break;
                 case 4:
                     System.out.print("Nuevo Número de Documento: ");
-                   dtoHuespedModificado.setDocumento(scanner.nextLong());
+                   dtoHuespedModificado.setDocumento(scanner.nextLine());
                     break;
                 case 5:
                     System.out.print("Nuevo CUIT: ");
@@ -965,7 +1065,7 @@ public class Pantalla {
 
     private void eliminarHuespedDesdeCU10(DtoHuesped dtoHuesped){
         String tipoDoc = dtoHuesped.getTipoDocumento().name();
-        long nroDoc = dtoHuesped.getDocumento();
+        String nroDoc = dtoHuesped.getDocumento();
 
         boolean puedeEliminar = gestorHuesped.puedeEliminarHuesped(tipoDoc, nroDoc);
 
@@ -1164,4 +1264,60 @@ public void cambiarDireccionHuesped(DtoDireccion direccion){
             }
         }
     }
+    private String pedirDocumento(TipoDocumento tipo) {
+        String documento = null;
+        boolean valido = false;
+
+        // Definimos las reglas (Regex)
+        // DNI, LE, LC: Solo números, entre 7 y 8 dígitos (ej: 12345678)
+        String regexNumerico = "^\\d{7,8}$";
+        // Pasaporte: Letras y números, entre 6 y 15 caracteres
+        String regexPasaporte = "^[A-Z0-9]{6,15}$";
+        // Otro: Cualquier cosa entre 4 y 20 caracteres
+        String regexOtro = "^.{4,20}$";
+
+        while (!valido) {
+            System.out.print("Número de Documento: ");
+            String entrada = scanner.nextLine().trim().toUpperCase(); // Normalizamos a mayúsculas
+
+            if (entrada.isEmpty()) {
+                // Si es obligatorio (que lo es), no dejamos pasar vacío
+                System.out.println("Error: El documento es obligatorio.");
+                continue;
+            }
+
+            // Validamos según el tipo seleccionado
+            switch (tipo) {
+                case DNI:
+                case LE:
+                case LC:
+                    if (entrada.matches(regexNumerico)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Para " + tipo + " debe ingresar entre 7 y 8 números.");
+                    }
+                    break;
+                case PASAPORTE:
+                    if (entrada.matches(regexPasaporte)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato de Pasaporte inválido (solo letras y números).");
+                    }
+                    break;
+                default: // OTRO
+                    if (entrada.matches(regexOtro)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato inválido.");
+                    }
+                    break;
+            }
+
+            if (valido) {
+                documento = entrada;
+            }
+        }
+        return documento;
+    }
+
 }

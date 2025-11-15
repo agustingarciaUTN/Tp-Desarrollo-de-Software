@@ -131,14 +131,14 @@ public class DaoEstadia implements DaoInterfazEstadia {
     }
 
     @Override
-    public boolean huespedTieneEstadias(String tipoDocumento, long nroDocumento) {
+    public boolean huespedTieneEstadias(String tipoDocumento, String nroDocumento) {
         String sql = "SELECT COUNT(*) as total FROM estadia_huesped WHERE tipo_documento = ? AND nro_documento = ?";
 
         try (Connection conn = Coneccion.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, tipoDocumento);
-            ps.setLong(2, nroDocumento);
+            ps.setString(2, nroDocumento);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
