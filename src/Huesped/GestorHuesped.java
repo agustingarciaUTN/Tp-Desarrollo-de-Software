@@ -1,29 +1,26 @@
 package Huesped;
 
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 
 import enums.PosIva;
 import enums.TipoDocumento;
-import Dominio.Huesped;
+
 import Estadia.GestorEstadia;
 import Excepciones.PersistenciaException;
 import Estadia.DaoEstadia;
 import java.util.List;
 import java.util.ArrayList;
 
+
 public class GestorHuesped {
-    //debe presentarse en pantalla la opcion para ejecutar el metodo de buscar huesped
+    //debe presentarse en pantalla la opción para ejecutar el método de buscar huesped
     // solo si se autentico antes el conserje
 
     //los daos que utilizara el gestor (son de tipo interfaz por SOLID)
     private final DaoHuespedInterfaz daoHuesped;
     private final DaoDireccionInterfaz daoDireccion;
-    private GestorEstadia gestorEstadia;
+    private final GestorEstadia gestorEstadia;
 
     public GestorHuesped(DaoHuespedInterfaz daoHuesped, DaoDireccionInterfaz daoDireccion) {
         this.daoHuesped = daoHuesped;
@@ -64,9 +61,9 @@ public class GestorHuesped {
         if (datos.getTipoDocumento() == null) {
             errores.add("El Tipo de Documento es obligatorio.");
         }
-        if (datos.getDocumento() <= 0) {
+        if (datos.getDocumento().isEmpty()) {
             // Asumiendo que Documento ahora es Long y lo pediste con pedirLongOpcional
-            errores.add("El Número de Documento es obligatorio y debe ser positivo.");
+            errores.add("El Número de Documento es obligatorio.");
         }
         if (datos.getFechaNacimiento() == null) {
             errores.add("La Fecha de Nacimiento es obligatoria.");
@@ -121,7 +118,7 @@ public class GestorHuesped {
             } else {
                 // Podrías añadir una validación básica de formato CUIT aquí si quieres
                 if (!validarFormatoCUIT(datos.getCuit())) {
-                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X o XX/XXXXXXXX/X) .");
+                    errores.add("El formato del CUIT ingresado no es válido (formato CUIT: XX-XXXXXXXX-X) .");
                 }
             }
         }
@@ -131,7 +128,7 @@ public class GestorHuesped {
 
     private boolean validarFormatoCUIT(String cuit) {
         if (cuit == null) return false;
-        // Expresión regular básica: 2 dígitos, guión, 8 dígitos, guión, 1 dígito
+        // Expresión regular básica: 2 dígitos, guion, 8 dígitos, guion, 1 dígito
         return cuit.matches("^\\d{2}-\\d{8}-\\d{1}$");
     }
 
@@ -173,13 +170,15 @@ public class GestorHuesped {
      * @param nroDocumento Número de documento del huésped
      * @return true si puede eliminarse (no tiene estadías), false si no puede
      */
-    public boolean puedeEliminarHuesped(String tipoDocumento, long nroDocumento) {
+    public boolean puedeEliminarHuesped(String tipoDocumento, String nroDocumento) {
         if (tipoDocumento == null || tipoDocumento.trim().isEmpty()) {
             System.err.println("El tipo de documento no puede estar vacío");
             return false;
         }
 
-        if (nroDocumento <= 0) {
+        TipoDocumento tipo = TipoDocumento.valueOf(tipoDocumento);
+        String documentoValido = pedirDocumento(nroDocumento, tipo);
+        if (documentoValido == null || documentoValido.trim().isEmpty()) {
             System.err.println("El número de documento no es válido");
             return false;
         }
@@ -197,7 +196,7 @@ public class GestorHuesped {
      * @param nroDocumento Número de documento del huésped
      * @return true si se eliminó exitosamente
      */
-    public boolean eliminarHuesped(String tipoDocumento, long nroDocumento) {
+    public boolean eliminarHuesped(String tipoDocumento, String nroDocumento) {
         try {
             // NIVEL 2.1: Verificar que puede eliminarse (ya valida que no tenga estadías)
             if (!puedeEliminarHuesped(tipoDocumento, nroDocumento)) {
@@ -259,7 +258,7 @@ public class GestorHuesped {
      * NIVEL 2.2: Verifica si un huésped tiene reservas pendientes o activas
      * Reserva pendiente = fecha_inicio >= HOY y no tiene check-in
      */
-    private boolean tieneReservasPendientes(String tipoDocumento, long nroDocumento) {
+    private boolean tieneReservasPendientes(String tipoDocumento, String nroDocumento) {
         // Consultar si existe en reserva_huesped con reservas activas/pendientes
         // Por ahora retornamos false (implementar cuando tengas el módulo de reservas)
 
@@ -272,9 +271,9 @@ public class GestorHuesped {
     /**
      * NIVEL 2.3: Registra en log la eliminación exitosa de un huésped
      */
-    private void registrarAuditoriaExitosa(String tipoDocumento, long nroDocumento) {
+    private void registrarAuditoriaExitosa(String tipoDocumento, String nroDocumento) {
         String timestamp = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
-        String mensaje = String.format("[AUDITORÍA] %s - Huésped eliminado: %s %d - Usuario: Sistema",
+        String mensaje = String.format("[AUDITORÍA] %s - Huésped eliminado: %s %s - Usuario: Sistema",
                 timestamp, tipoDocumento, nroDocumento);
 
         System.out.println(mensaje);
@@ -286,9 +285,9 @@ public class GestorHuesped {
     /**
      * NIVEL 2.3: Registra en log un intento fallido de eliminación
      */
-    private void registrarAuditoriaFallida(String tipoDocumento, long nroDocumento, String motivo) {
+    private void registrarAuditoriaFallida(String tipoDocumento, String nroDocumento, String motivo) {
         String timestamp = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
-        String mensaje = String.format("[AUDITORÍA] %s - Intento fallido de eliminar huésped: %s %d - Motivo: %s",
+        String mensaje = String.format("[AUDITORÍA] %s - Intento fallido de eliminar huésped: %s %s - Motivo: %s",
                 timestamp, tipoDocumento, nroDocumento, motivo);
 
         System.err.println(mensaje);
@@ -364,7 +363,12 @@ public class GestorHuesped {
         } else if (dtoHuesped.getTipoDocumento() == null) {
         errores.add("Tipo de documento");
         }
-        if (dtoHuesped.getDocumento() <= 0L) {
+        /*String documentoValido = pedirDocumento(nroDocumento, tipo);
+        if (documentoValido == null || documentoValido.trim().isEmpty()) {
+            System.err.println("El número de documento no es válido");
+            return false;
+        }*/
+        if (dtoHuesped.getDocumento() == null || dtoHuesped.getDocumento().isBlank()) {
             errores.add("Número de documento");
         }
         if(dtoHuesped.getCuit() == null || dtoHuesped.getCuit().isBlank()) {
@@ -427,10 +431,8 @@ public class GestorHuesped {
     }    
 
     public boolean tipoynroDocExistente(DtoHuesped dtoHuesped) {
-        if(daoHuesped.docExistente(dtoHuesped)){  //consultar dao si existe un huesped con ese tipo y nro de doc
-            return true; //retornar true si existe, false si no
-        }
-        return false;
+        //consultar dao si existe un huesped con ese tipo y nro de doc
+        return daoHuesped.docExistente(dtoHuesped); //retornar true si existe, false si no
     }
 
     /**
@@ -451,6 +453,54 @@ public class GestorHuesped {
         return false;
     }
 
+
+    private String pedirDocumento(String nroDoc, TipoDocumento tipo) {
+        String documento = null;
+        boolean valido = false;
+
+
+        // Definimos las reglas (Regex)
+        // DNI, LE, LC: Solo números, entre 7 y 8 dígitos (ej: 12345678)
+        String regexNumerico = "^\\d{7,8}$";
+        // Pasaporte: Letras y números, entre 6 y 15 caracteres
+        String regexPasaporte = "^[A-Z0-9]{6,15}$";
+        // Otro: Cualquier cosa entre 4 y 20 caracteres
+        String regexOtro = "^.{4,20}$";
+
+
+            // Validamos según el tipo seleccionado
+            switch (tipo) {
+                case DNI:
+                case LE:
+                case LC:
+                    if (nroDoc.matches(regexNumerico)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Para " + tipo + " debe ingresar entre 7 y 8 números.");
+                    }
+                    break;
+                case PASAPORTE:
+                    if (nroDoc.matches(regexPasaporte)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato de Pasaporte inválido (solo letras y números).");
+                    }
+                    break;
+                default: // OTRO
+                    if (nroDoc.matches(regexOtro)) {
+                        valido = true;
+                    } else {
+                        System.out.println("Error: Formato inválido.");
+                    }
+                    break;
+            }
+
+            if (valido) {
+                documento = nroDoc;
+            }
+
+        return documento;
+    }
 }
 
        

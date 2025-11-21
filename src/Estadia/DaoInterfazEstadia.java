@@ -10,5 +10,5 @@ public interface DaoInterfazEstadia {
     ArrayList<DtoEstadia> obtenerTodasLasEstadias();
 
     // Método específico para validar si un huésped tiene estadías (CU11)
-    boolean huespedTieneEstadias(String tipoDocumento, long nroDocumento);
+    boolean huespedTieneEstadias(String tipoDocumento, String nroDocumento);
 }
